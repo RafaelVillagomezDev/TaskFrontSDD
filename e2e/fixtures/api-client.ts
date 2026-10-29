@@ -1,6 +1,8 @@
 import { request, type APIRequestContext } from '@playwright/test';
 import { z } from 'zod';
 
+import { buildClientTimeHeaders } from '../../src/shared/api/client-time.util';
+
 const csrfResponseSchema = z.object({ data: z.object({ csrfToken: z.string() }) });
 
 const HTTP_OK = 200;
@@ -11,6 +13,15 @@ export interface Account {
   email: string;
   password: string;
 }
+
+export interface NewTask {
+  title: string;
+  // Día AAAA-MM-DD del dispositivo
+  date: string;
+  completed?: boolean;
+}
+
+const taskResponseSchema = z.object({ data: z.object({ id: z.string() }) });
 
 export function requireEnv(name: string): string {
   const value = process.env[name];
@@ -37,6 +48,40 @@ async function withApi<T>(work: (api: APIRequestContext) => Promise<T>): Promise
 async function csrfToken(api: APIRequestContext): Promise<string> {
   const response = await api.get('/auth/csrf');
   return csrfResponseSchema.parse(await response.json()).data.csrfToken;
+}
+
+// Inicia sesión por API y devuelve el token CSRF de la sesión
+async function loginByApi(api: APIRequestContext, account: Account): Promise<string> {
+  const login = await api.post('/auth/login', {
+    headers: { 'X-CSRF-Token': await csrfToken(api) },
+    data: account,
+  });
+  if (login.status() !== HTTP_OK) {
+    throw new Error(`No se pudo iniciar sesión con ${account.email}: HTTP ${String(login.status())}`);
+  }
+  return csrfResponseSchema.parse(await login.json()).data.csrfToken;
+}
+
+function expectStatus(response: { status: () => number }, expected: number, action: string): void {
+  if (response.status() !== expected) {
+    throw new Error(`No se pudo ${action}: HTTP ${String(response.status())}`);
+  }
+}
+
+// Crea las tareas de un test por API, en orden (y completa las marcadas); se borran al borrar la cuenta
+export async function createTasks(account: Account, tasks: NewTask[]): Promise<void> {
+  await withApi(async (api) => {
+    const session = await loginByApi(api, account);
+    for (const task of tasks) {
+      const headers = { 'X-CSRF-Token': session, ...buildClientTimeHeaders() };
+      const created = await api.post('/tasks', { headers, data: { title: task.title, date: task.date } });
+      expectStatus(created, HTTP_CREATED, `crear la tarea «${task.title}»`);
+      if (task.completed !== true) continue;
+      const { id } = taskResponseSchema.parse(await created.json()).data;
+      const completed = await api.patch(`/tasks/${id}`, { headers, data: { completed: true } });
+      expectStatus(completed, HTTP_OK, `completar la tarea «${task.title}»`);
+    }
+  });
 }
 
 export async function registerAccount(account: Account): Promise<void> {

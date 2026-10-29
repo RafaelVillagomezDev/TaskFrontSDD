@@ -1,6 +1,7 @@
 import { Navigate, type RouteObject } from 'react-router';
 
 import { LoginPage, RegisterPage } from '../../modules/auth';
+import { BoardPage } from '../../modules/tasks';
 import { NAVIGATION_TEXTS } from '../texts/navigation.texts';
 import { PlaceholderPage } from './placeholder.page';
 import { PrivateLayout } from './private.layout';
@@ -22,7 +23,7 @@ export const APP_ROUTES: RouteObject[] = [
       {
         element: <PrivateLayout />,
         children: [
-          { path: ROUTES.board, element: <PlaceholderPage>{NAVIGATION_TEXTS.board}</PlaceholderPage> },
+          { path: ROUTES.board, element: <BoardPage /> },
           { path: ROUTES.history, element: <PlaceholderPage>{NAVIGATION_TEXTS.history}</PlaceholderPage> },
           { path: ROUTES.alerts, element: <PlaceholderPage>{NAVIGATION_TEXTS.alerts}</PlaceholderPage> },
           { path: ROUTES.account, element: <PlaceholderPage>{NAVIGATION_TEXTS.account}</PlaceholderPage> },

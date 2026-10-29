@@ -98,6 +98,17 @@ describe('BoardColumn', () => {
     expect(within(column).getByRole('heading', { name: 'Jueves' })).toBeInTheDocument();
     expect(within(column).getAllByRole('listitem')).toHaveLength(1);
   });
+
+  it('la lista admite un nombre accesible para distinguir varios grupos en la columna', () => {
+    render(
+      <BoardColumn aria-label="jueves">
+        <BoardColumn.List aria-label="Completadas">
+          <li>Tarea</li>
+        </BoardColumn.List>
+      </BoardColumn>,
+    );
+    expect(screen.getByRole('list', { name: 'Completadas' })).toBeInTheDocument();
+  });
 });
 
 describe('S-09: AuthLayout', () => {

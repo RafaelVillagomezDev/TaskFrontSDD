@@ -12,7 +12,7 @@
 | Tokens de diseño (`src/styles/design-tokens.css`) | Listos, sin compilar todavía |
 | Referencia de diseño del tablero (`docs/design/`) | Lista |
 | Proyecto Vite + React, Docker, SonarQube, hooks de git | Pendiente |
-| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | `spec.md` aprobada, `plan.md` aprobado y `tasks.md` creado (114 tareas + 1 externa); implementación en curso: 56 de 114 (fase 0 «Base» y fase H1 «Crear mi cuenta y entrar» completas) |
+| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | `spec.md` aprobada, `plan.md` aprobado y `tasks.md` creado (114 tareas + 1 externa); implementación en curso: 63 de 114 (fase 0 «Base», fase H1 «Crear mi cuenta y entrar» y fase H2 «Ver las tareas de mi semana» completas) |
 | Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Hecho (spec 003 de la API): la sesión sigue tras recargar |
 
 ## Funcionalidades previstas
@@ -118,7 +118,7 @@ En los tests unitarios ninguna petición llega a la red: `jest/setup.ts` hace fa
 - Usa `network_mode: host` para que el navegador vea la app en `localhost:5173` y la API en `localhost:3000`. Solo así coinciden el origen con `CORS_ORIGIN` y se aceptan las cookies `Secure`.
 - En Docker Desktop (macOS/Windows) requiere activar **Settings → Resources → Network → Enable host networking**.
 - Antes de ejecutarlas: `web` levantado, TaskApiSDD levantada y el usuario de prueba creado.
-- Los tests que necesitan una cuenta propia la registran por API con un email único (`e2e-…@kompitu.test`) y la borran al terminar (`e2e/fixtures/auth.fixture.ts`). Cada pantalla pasa por `expectResponsive` (`e2e/fixtures/responsive.fixture.ts`).
+- Los tests que necesitan una cuenta propia la registran por API con un email único (`e2e-…@kompitu.test`) y la borran al terminar (`e2e/fixtures/auth.fixture.ts`). Cada pantalla pasa por `expectResponsive` (`e2e/fixtures/responsive.fixture.ts`). Las tareas que necesita un test se crean por API en esa cuenta (`createTasks`, en `e2e/fixtures/api-client.ts`) y se borran con ella.
 ```bash
 docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:e2e         # Todas, en Chromium y Firefox
 docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:e2e:report  # Informe HTML del último run

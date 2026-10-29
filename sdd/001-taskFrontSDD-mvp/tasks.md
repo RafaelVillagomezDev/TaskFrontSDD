@@ -264,27 +264,34 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
 ## Fase H2 — Ver las tareas de mi semana (HU-02, P1)
 
 ### Tests (deben fallar)
-- [ ] T057 [P] [H2] Tests de `task.schema` y de `getWeekTasks`: `from`/`to`/`pageSize=100` y concatenación de páginas si `totalPages > 1` (R-4) — `tasks/schemas/tests/task.schema.test.ts`, `tasks/api/tests/tasks.api.test.ts`
+- [x] T057 [P] [H2] Tests de `task.schema` y de `getWeekTasks`: `from`/`to`/`pageSize=100` y concatenación de páginas si `totalPages > 1` (R-4) — `tasks/schemas/tests/task.schema.test.ts`, `tasks/api/tests/tasks.api.test.ts`
   - Verifica: `dce pnpm test src/modules/tasks/schemas src/modules/tasks/api` **falla**.
-- [ ] T058 [P] [H2] Tests de `use-week-board`:
+  - Hecho (2026-10-29): 13 casos: recurso `Task` (fecha AAAA-MM-DD real), `from`/`to`/`page`/`pageSize=100`, cabeceras de hora, 3 páginas concatenadas en orden, semana vacía sin más peticiones, fallo de una página siguiente → error de la semana entera, y respuesta fuera de contrato → `INTERNAL_ERROR`.
+- [x] T058 [P] [H2] Tests de `use-week-board`:
   - 7 columnas desde hoy, agrupación por día, pendientes y completadas en el orden de la API (RF-09, RF-10).
   - Columnas pasadas en solo lectura (RF-13).
   - Avanzar, retroceder y «Hoy» (RF-12, RF-47).
   - Invalidación al cambiar el día (RF-14).
   — `tasks/hooks/tests/use-week-board.hook.test.ts`
   - Verifica: `dce pnpm test src/modules/tasks/hooks/tests/use-week-board` **falla**.
-- [ ] T059 [P] [H2] Tests de `DayColumn`, `WeekNavigator` y `TaskCard` en modo lectura: nombre del día, fecha, contador, estado vacío con «crear» salvo en días pasados, «día cerrado» (RF-09, RF-11, RF-13) — `tasks/components/tests/`
+  - Hecho (2026-10-29): 9 casos con el store real y `fetch` simulado. El cambio de día se provoca con `jest.setSystemTime` y el evento `focus` de `useCurrentDay`.
+- [x] T059 [P] [H2] Tests de `DayColumn`, `WeekNavigator` y `TaskCard` en modo lectura: nombre del día, fecha, contador, estado vacío con «crear» salvo en días pasados, «día cerrado» (RF-09, RF-11, RF-13) — `tasks/components/tests/`
   - Verifica: `dce pnpm test src/modules/tasks/components` **falla**.
+  - Hecho (2026-10-29): 15 casos de `DayColumn`, `WeekNavigator` (también solo con teclado) y `TaskCard`, más 5 de la página del tablero con `APP_ROUTES`.
 
 ### Implementación
-- [ ] T060 [H2] `taskSchema` y consulta de la semana — `tasks/schemas/task.schema.ts`, `tasks/api/tasks.api.ts`
+- [x] T060 [H2] `taskSchema` y consulta de la semana — `tasks/schemas/task.schema.ts`, `tasks/api/tasks.api.ts`
   - Verifica: `dce pnpm test src/modules/tasks/schemas src/modules/tasks/api` pasa.
-- [ ] T061 [H2] `useWeekBoard` (plan §5.3) — `tasks/hooks/use-week-board.hook.ts`
+  - Hecho (2026-10-29): `getWeekTasks` es un `queryFn` que pide la primera página y, si `totalPages > 1`, el resto en paralelo; valida cada página con `validatedResult` y aporta la etiqueta `Task`. Constantes en `tasks/schemas/tasks.constants.ts`.
+- [x] T061 [H2] `useWeekBoard` (plan §5.3) — `tasks/hooks/use-week-board.hook.ts`
   - Verifica: `dce pnpm test src/modules/tasks/hooks/tests/use-week-board` pasa.
-- [ ] T062 [H2] `DayColumn` (sobre `BoardColumn`), `WeekNavigator` y `TaskCard`; textos — `tasks/components/`, `tasks/texts/tasks.texts.ts`
+  - Hecho (2026-10-29): el estado es la distancia en semanas a hoy, no un `weekStart` fijo: al cambiar el día el tablero empieza en el nuevo día (caso límite de RF-14) y una semana pasada conserva su distancia. Al cambiar el día se invalidan `Task` y `Streak`. Usa `currentData` para no enseñar las tareas de otra semana mientras carga (RF-40).
+- [x] T062 [H2] `DayColumn` (sobre `BoardColumn`), `WeekNavigator` y `TaskCard`; textos — `tasks/components/`, `tasks/texts/tasks.texts.ts`
   - Verifica: `dce pnpm test src/modules/tasks/components` pasa.
-- [ ] T063 [H2] Página del tablero en `/`, con el tablero desplazable solo dentro de su zona (VII.5) — `tasks/pages/board.page.tsx`, `tasks/index.ts`
+  - Hecho (2026-10-29): `DayColumn` recibe por `children` las acciones del día y solo las muestra si el día no está cerrado; el botón «crear» llega con H3 (T070). `BoardColumn.List` admite `aria-label` para separar «Pendientes» y «Completadas». Estado de cada tarea con `Badge` (`default` pendiente, `success` completada).
+- [x] T063 [H2] Página del tablero en `/`, con el tablero desplazable solo dentro de su zona (VII.5) — `tasks/pages/board.page.tsx`, `tasks/index.ts`
   - Verifica: con sesión, `/` muestra 7 columnas; `dce pnpm lint && dce pnpm typecheck` pasan.
+  - Hecho (2026-10-29): `BoardPage` sustituye a la página provisional de `/`. El tablero es una `<section>` con `overflow-x-auto`; no lleva `tabIndex` (SonarQube S6845), porque Chrome y Firefox ya hacen enfocable con teclado una zona desplazable (RNF-02, RNF-04). Añadida la E2E `board.e2e.ts` (4 tests × 6 proyectos), con `e2e/pages/board.po.ts` y `createTasks` en `e2e/fixtures/api-client.ts` (crea por API las tareas de una cuenta nueva). Lint, typecheck, 391 tests (99,8 % de líneas), build, 156 E2E en los 6 proyectos y quality gate de SonarQube en verde.
 
 ---
 
@@ -564,3 +571,4 @@ Los criterios de éxito se comprueban en:
 - **2026-10-29** — Fase 0 (Base) terminada: T038–T046. Avance de T054 (falta la verificación con X001).
 - **2026-10-29** — Fase H1 terminada salvo T054 (bloqueada por X001): T047–T053, T055 y T056.
 - **2026-10-29** — X001 hecha en TaskApiSDD y T054 verificada: fase H1 completa.
+- **2026-10-29** — Fase H2 terminada: T057–T063, más la E2E del tablero `board.e2e.ts` (no prevista en las tareas).

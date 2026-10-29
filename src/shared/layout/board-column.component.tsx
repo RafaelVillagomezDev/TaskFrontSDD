@@ -12,6 +12,11 @@ interface BoardColumnPartProps {
   children: ReactNode;
 }
 
+interface BoardColumnListProps extends BoardColumnPartProps {
+  // Nombre del grupo cuando la columna tiene varias listas (pendientes y completadas)
+  'aria-label'?: string;
+}
+
 // Columna del tablero de DESIGN.md (Board Columns): 264 px fijos, que el tablero desplaza dentro de su zona
 // (CONSTITUTION.md VII.5, excepción); space-6 entre la cabecera y la primera tarjeta
 function BoardColumnRoot({ 'aria-label': label, children }: Readonly<BoardColumnProps>) {
@@ -36,8 +41,12 @@ function BoardColumnTitle({ children }: Readonly<BoardColumnPartProps>) {
 }
 
 // Lista de tarjetas con space-4 entre ellas
-function BoardColumnList({ children }: Readonly<BoardColumnPartProps>) {
-  return <ul className="flex flex-col gap-4">{children}</ul>;
+function BoardColumnList({ 'aria-label': label, children }: Readonly<BoardColumnListProps>) {
+  return (
+    <ul aria-label={label} className="flex flex-col gap-4">
+      {children}
+    </ul>
+  );
 }
 
 export const BoardColumn = Object.assign(BoardColumnRoot, {

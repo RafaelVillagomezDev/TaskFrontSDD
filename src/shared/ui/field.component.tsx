@@ -4,10 +4,14 @@ import { cn } from '../utils/class-names.util';
 import { Text } from './text.component';
 import type { FieldIds } from './use-field-ids.hook';
 
+// Tono de la ayuda: danger cuando la propia ayuda avisa de un problema (un contador por encima del máximo)
+export type HelperTone = 'muted' | 'danger';
+
 interface FieldProps {
   ids: FieldIds;
   label: string;
   helperText?: string | undefined;
+  helperTone?: HelperTone | undefined;
   errorText?: string | undefined;
   children: ReactNode;
 }
@@ -25,7 +29,7 @@ export function controlClassName(hasError: boolean, fixedHeight = true): string 
 }
 
 // Etiqueta, control, ayuda y error bajo el campo (spec RF-02)
-export function Field({ ids, label, helperText, errorText, children }: Readonly<FieldProps>) {
+export function Field({ ids, label, helperText, helperTone = 'muted', errorText, children }: Readonly<FieldProps>) {
   return (
     <div className="flex flex-col gap-2">
       <Text as="label" htmlFor={ids.controlId} variant="body-sm" className="font-medium">
@@ -33,7 +37,7 @@ export function Field({ ids, label, helperText, errorText, children }: Readonly<
       </Text>
       {children}
       {helperText !== undefined && (
-        <Text id={ids.helperId} variant="body-sm" tone="muted">
+        <Text id={ids.helperId} variant="body-sm" tone={helperTone}>
           {helperText}
         </Text>
       )}

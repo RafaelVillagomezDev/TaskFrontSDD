@@ -3,6 +3,7 @@ import { Button } from '../../../shared/ui/button.component';
 import { DateInput } from '../../../shared/ui/date-input.component';
 import { Dialog } from '../../../shared/ui/dialog.component';
 import { ErrorMessage } from '../../../shared/ui/error-message.component';
+import type { HelperTone } from '../../../shared/ui/field.component';
 import { Input } from '../../../shared/ui/input.component';
 import { Textarea } from '../../../shared/ui/textarea.component';
 import type { TaskForm } from '../hooks/use-task-form.hook';
@@ -14,6 +15,11 @@ interface TaskFormDialogProps {
 }
 
 const { form: texts } = TASKS_TEXTS;
+
+// El contador pasa a rojo en cuanto se supera el máximo, antes de intentar enviar (RF-17)
+function counterTone(length: number, max: number): HelperTone {
+  return length > max ? 'danger' : 'muted';
+}
 
 // Diálogo de crear tarea sobre Dialog (plan §5.4): título y descripción con contador (RF-17), fecha desde hoy
 // (RF-16) y botón deshabilitado mientras se envía (RF-19)
@@ -30,12 +36,14 @@ export function TaskFormDialog({ taskForm }: Readonly<TaskFormDialogProps>) {
             label={texts.title}
             autoComplete="off"
             helperText={texts.counter(counters.title, TITLE_MAX_LENGTH)}
+            helperTone={counterTone(counters.title, TITLE_MAX_LENGTH)}
             errorText={errors.title?.message}
           />
           <Textarea
             {...form.register('description')}
             label={texts.description}
             helperText={texts.counter(counters.description, DESCRIPTION_MAX_LENGTH)}
+            helperTone={counterTone(counters.description, DESCRIPTION_MAX_LENGTH)}
             errorText={errors.description?.message}
           />
           <DateInput

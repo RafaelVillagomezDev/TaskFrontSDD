@@ -110,7 +110,9 @@ describe('D-5: tasksApi.getWeekTasks', () => {
   });
 
   it('RF-44: una respuesta fuera de contrato es INTERNAL_ERROR', async () => {
-    mockApi({ 'GET /tasks': () => apiOk({ items: [{ id: 'a' }], page: 1, pageSize: 100, totalItems: 1, totalPages: 1 }) });
+    mockApi({
+      'GET /tasks': () => apiOk({ items: [{ id: 'a' }], page: 1, pageSize: 100, totalItems: 1, totalPages: 1 }),
+    });
     const result = await fetchWeek();
     expect(toApiError(result.error).code).toBe('INTERNAL_ERROR');
   });
@@ -136,7 +138,11 @@ describe('D-5: tasksApi.createTask', () => {
   it('envía la descripción cuando la hay', async () => {
     const api = mockApi({ 'POST /tasks': () => apiOk(task('n', '2026-10-30'), 201) });
     await store.dispatch(tasksApi.endpoints.createTask.initiate({ ...VALUES, description: 'Integral' }));
-    expect(await api.bodyOf('POST /tasks')).toEqual({ title: 'Comprar pan', description: 'Integral', date: '2026-10-30' });
+    expect(await api.bodyOf('POST /tasks')).toEqual({
+      title: 'Comprar pan',
+      description: 'Integral',
+      date: '2026-10-30',
+    });
   });
 
   it('RF-18: al crear invalida la semana en caché, que se vuelve a pedir', async () => {
@@ -164,6 +170,6 @@ describe('D-5: tasksApi.createTask', () => {
       'POST /tasks': () => apiFail(400, 'VALIDATION_ERROR', [{ field: 'title', message: 'Título no válido.' }]),
     });
     const result = await store.dispatch(tasksApi.endpoints.createTask.initiate(VALUES));
-    expect(toApiError(result.error)).toEqual({ code: 'VALIDATION_ERROR', fieldErrors: { title: 'Título no válido.' } });
+    expect(toApiError(result.error)).toEqual({ code: 'VALIDATION_ERROR', invalidFields: ['title'] });
   });
 });

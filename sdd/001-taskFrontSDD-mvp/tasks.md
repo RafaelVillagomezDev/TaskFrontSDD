@@ -326,10 +326,10 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
   - Verifica: `dce pnpm test src/modules/tasks/schemas src/modules/tasks/api` pasa.
 - [x] T069 [H3] `useTaskForm` en modo crear — `tasks/hooks/use-task-form.hook.ts`
   - Verifica: `dce pnpm test src/modules/tasks/hooks/tests/use-task-form` pasa.
-  - Hecho (2026-10-30): el hook guarda también si el diálogo está abierto y el aviso de RF-52; `openFor(day)` vacía el formulario con la fecha propuesta. Un `useRef` descarta el segundo envío de un doble clic, que llega antes de que el botón se deshabilite (RF-19).
+  - Hecho (2026-10-30): el hook guarda también si el diálogo está abierto y el aviso de RF-52; `openFor(day)` vacía el formulario con la fecha propuesta. `useSingleSubmit` (`shared/ui/use-single-submit.hook.ts`) descarta el segundo envío de un doble clic, que llega antes de que el botón se deshabilite (RF-19). También lo usan el inicio de sesión y el registro: así un doble envío del registro ya no muestra el falso «email ya registrado».
 - [x] T070 [H3] `TaskFormDialog` sobre `Dialog`; abrirlo desde cada columna y desde «Nueva tarea» — `tasks/components/task-form-dialog.component.tsx`, `day-column.component.tsx`, `tasks/pages/board.page.tsx`
   - Verifica: `dre pnpm test:e2e e2e/specs/create-task e2e/specs/fields-task --project=chromium-desktop` pasa.
-  - Hecho (2026-10-30): `TaskFormDialog` controlado sobre `Dialog`. Los contadores van como ayuda del campo (`helperText`), sin cambiar `Field`. `AddTaskButton` al final de cada columna de hoy o futura, y «Nueva tarea» en la cabecera. `AuthNotice` pasa a `shared/ui/notice.component.tsx` (`Notice`) para reutilizarlo en el aviso de RF-52. La E2E de teclado de `board.e2e.ts` cambia: con «Añadir tarea» en las columnas se llega al tablero tabulando por sus botones; en una semana pasada, sin controles, el navegador hace enfocable la zona. Lint, typecheck, 429 tests (99,8 % de líneas), build, quality gate de SonarQube y 246 E2E en verde: Chromium entero en paralelo y Firefox con `--workers=2`, porque en paralelo se agota la memoria de Docker y fallan tests por tiempo de espera.
+  - Hecho (2026-10-30): `TaskFormDialog` controlado sobre `Dialog`. Los contadores van como ayuda del campo (`helperText`) y pasan a rojo al superar el máximo, antes de enviar: `Field` admite `helperTone` (`muted` | `danger`), que también aceptan `Input`, `Textarea` y `PasswordInput`. `AddTaskButton` al final de cada columna de hoy o futura, y «Nueva tarea» en la cabecera. `AuthNotice` pasa a `shared/ui/notice.component.tsx` (`Notice`) para reutilizarlo en el aviso de RF-52; con `onDismiss` muestra «Cerrar aviso» (el aviso de RF-52 se cierra con él o al abrir de nuevo el formulario). La E2E de teclado de `board.e2e.ts` cambia: con «Añadir tarea» en las columnas se llega al tablero tabulando por sus botones; en una semana pasada, sin controles, el navegador hace enfocable la zona. Lint, typecheck, 429 tests (99,8 % de líneas), build, quality gate de SonarQube y 246 E2E en verde en paralelo (1,3 min), tras subir la memoria de Docker Desktop de 8 a 12 GB: con 8 GB, las dos instancias de SonarQube y 6 Firefox agotaban la memoria y fallaban tests por tiempo de espera.
 
 ---
 
@@ -580,3 +580,10 @@ Los criterios de éxito se comprueban en:
 - **2026-10-29** — X001 hecha en TaskApiSDD y T054 verificada: fase H1 completa.
 - **2026-10-29** — Fase H2 terminada: T057–T063, más la E2E del tablero `board.e2e.ts` (no prevista en las tareas).
 - **2026-10-30** — Fase H3 terminada: T064–T070.
+- **2026-10-30** — Revisión de H3 con el usuario:
+  - Contador en rojo al superar el máximo (`helperTone` en `Field`).
+  - Aviso de RF-52 con «Cerrar aviso» (`Notice` con `onDismiss`).
+  - `useSingleSubmit` compartido por los tres formularios.
+  - Los errores de campo de la API muestran «Revisa este campo.» en lugar del texto de `details` (`fieldErrors` → `invalidFields`, `showApiError`; plan §5.9).
+  - `DESIGN.md`: «Añadir tarea» con icono y texto.
+  - Las E2E necesitan 12 GB en Docker.

@@ -22,3 +22,7 @@ export const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   INTERNAL_ERROR: 'Algo ha fallado. Inténtalo de nuevo en unos segundos.',
   NETWORK_ERROR: 'No hay conexión con el servidor. Comprueba tu conexión e inténtalo de nuevo.',
 };
+
+// Bajo un campo que rechaza la API: el formulario ya valida sus reglas, así que solo se ve si la API y el
+// cliente dejan de coincidir (RF-41)
+export const INVALID_FIELD_MESSAGE = 'Revisa este campo.';

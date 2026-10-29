@@ -69,7 +69,7 @@ export function BoardPage() {
           </Button>
         </PageHeader.Actions>
       </PageHeader>
-      {taskForm.notice !== undefined && <Notice>{taskForm.notice}</Notice>}
+      {taskForm.notice !== undefined && <Notice onDismiss={taskForm.dismissNotice}>{taskForm.notice}</Notice>}
       <BoardContent board={board} onAddTask={taskForm.openFor} />
       <TaskFormDialog taskForm={taskForm} />
     </PageContainer>

@@ -43,15 +43,14 @@ describe('DayColumn', () => {
   });
 
   it('RF-10: separa pendientes y completadas, cada grupo en su lista', () => {
-    const region = renderColumn(
-      column({ pending: [task('a'), task('b')], completed: [task('c', true)], total: 3 }),
-    );
+    const region = renderColumn(column({ pending: [task('a'), task('b')], completed: [task('c', true)], total: 3 }));
     const pending = within(region).getByRole('list', { name: 'Pendientes' });
     const completed = within(region).getByRole('list', { name: 'Completadas' });
-    expect(within(pending).getAllByRole('listitem').map((item) => item.textContent)).toEqual([
-      expect.stringContaining('Tarea a'),
-      expect.stringContaining('Tarea b'),
-    ]);
+    expect(
+      within(pending)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual([expect.stringContaining('Tarea a'), expect.stringContaining('Tarea b')]);
     expect(within(completed).getAllByRole('listitem')).toHaveLength(1);
   });
 

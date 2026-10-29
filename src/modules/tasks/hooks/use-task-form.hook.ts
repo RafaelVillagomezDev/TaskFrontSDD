@@ -1,35 +1,18 @@
-import { useMemo, useRef, useState, type BaseSyntheticEvent } from 'react';
+import { useMemo, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm, useWatch, type UseFormReturn } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 
-import { errorMessage, toApiError } from '../../../shared/api/api-error.util';
+import { showApiError } from '../../../shared/api/api-form-error.util';
 import { formatDayLong } from '../../../shared/date/date-format.util';
 import { compareDays } from '../../../shared/date/day.util';
+import { useSingleSubmit } from '../../../shared/ui/use-single-submit.hook';
 import { useCreateTaskMutation } from '../api/tasks.api';
 import { createTaskFormSchema, type TaskFormValues } from '../schemas/task-form.schema';
 import { TASKS_TEXTS } from '../texts/tasks.texts';
 
-type TaskFormField = keyof TaskFormValues;
-
-const TASK_FORM_FIELDS: readonly TaskFormField[] = ['title', 'description', 'date'];
+const TASK_FORM_FIELDS: readonly (keyof TaskFormValues)[] = ['title', 'description', 'date'];
 
 const EMPTY_VALUES: TaskFormValues = { title: '', description: '', date: '' };
-
-function isTaskFormField(field: string): field is TaskFormField {
-  return TASK_FORM_FIELDS.some((candidate) => candidate === field);
-}
-
-// Errores de la API: los de campo bajo su campo y el resto en un mensaje general, sin borrar lo escrito (RF-41)
-function showApiError(form: UseFormReturn<TaskFormValues>, error: unknown): void {
-  const { code, fieldErrors } = toApiError(error);
-  let fieldErrorCount = 0;
-  for (const [field, message] of Object.entries(fieldErrors)) {
-    if (!isTaskFormField(field)) continue;
-    form.setError(field, { message });
-    fieldErrorCount += 1;
-  }
-  if (fieldErrorCount === 0) form.setError('root.server', { message: errorMessage(code) });
-}
 
 export interface TaskFormOptions {
   // Día actual del dispositivo: la fecha no puede ser anterior (RF-16)
@@ -47,14 +30,12 @@ export function useTaskForm({ today, weekStart, weekEnd }: TaskFormOptions) {
   const [createTask, { isLoading }] = useCreateTaskMutation();
   const [isOpen, setIsOpen] = useState(false);
   const [notice, setNotice] = useState<string | undefined>(undefined);
-  // Un segundo envío puede llegar antes de que el botón se deshabilite (doble clic): se descarta aquí
-  const inFlight = useRef(false);
   const [title, description] = useWatch({ control: form.control, name: ['title', 'description'] });
 
   const submit = form.handleSubmit(async (values) => {
     const result = await createTask(values);
     if (result.error !== undefined) {
-      showApiError(form, result.error);
+      showApiError(form, result.error, TASK_FORM_FIELDS);
       return;
     }
     setIsOpen(false);
@@ -62,6 +43,9 @@ export function useTaskForm({ today, weekStart, weekEnd }: TaskFormOptions) {
     const isVisible = compareDays(day, weekStart) >= 0 && compareDays(day, weekEnd) <= 0;
     if (!isVisible) setNotice(TASKS_TEXTS.form.createdOutsideWeek(formatDayLong(day)));
   });
+
+  // Un solo envío a la vez: un doble clic no crea dos tareas (RF-19)
+  const onSubmit = useSingleSubmit(submit);
 
   return {
     form,
@@ -76,21 +60,13 @@ export function useTaskForm({ today, weekStart, weekEnd }: TaskFormOptions) {
       setNotice(undefined);
       setIsOpen(true);
     },
+    dismissNotice: () => {
+      setNotice(undefined);
+    },
     onOpenChange: (open: boolean) => {
       setIsOpen(open);
     },
-    onSubmit: (event?: BaseSyntheticEvent) => {
-      event?.preventDefault();
-      if (inFlight.current) return;
-      inFlight.current = true;
-      void (async () => {
-        try {
-          await submit(event);
-        } finally {
-          inFlight.current = false;
-        }
-      })();
-    },
+    onSubmit,
   };
 }
 

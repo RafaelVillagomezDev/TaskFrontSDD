@@ -5,6 +5,7 @@ import { useLocation, useSearchParams } from 'react-router';
 
 import { errorMessage, toApiError } from '../../../shared/api/api-error.util';
 import { REASON_PARAM } from '../../../shared/router/routes.constants';
+import { useSingleSubmit } from '../../../shared/ui/use-single-submit.hook';
 import { useLoginMutation } from '../api/auth.api';
 import { loginSchema, type LoginValues } from '../schemas/login.schema';
 import { loginEntry, type LoginNotice } from './login-notice.util';
@@ -33,13 +34,12 @@ export function useLoginForm(): LoginForm {
     form.setError('root.server', { message: errorMessage(toApiError(result.error).code) });
   });
 
+  // Un solo envío a la vez: un doble clic no repite la petición (RF-19)
+  const onSubmit = useSingleSubmit(submit);
+
   return {
     form,
-    onSubmit: (event) => {
-      void (async () => {
-        await submit(event);
-      })();
-    },
+    onSubmit,
     isSubmitting: isLoading,
     notice,
     formError: form.formState.errors.root?.server?.message,

@@ -272,7 +272,7 @@ Adapted from the reference in `docs/design/task-board.taste.md` (image: `docs/de
 - Column width: **264px**, gap `space-6` (24px).
 - Column header: title (Body, 600) + count pill (Caption, `radius-full`, same tint as the column status badge) + ghost "more" icon button on the right.
 - Space from header to first card: `space-6`.
-- "Add task" button at the end of each column: full column width, 32px tall, surface background, 1px dashed border, `radius-md`, centered 20px plus icon.
+- "Add task" button at the end of each column: full column width, 32px tall (44px on mobile), surface background, 1px dashed border, `radius-md`, centered 20px plus icon followed by the label "Añadir tarea" (Body SM, muted). Its accessible name starts with the visible label and adds the day ("Añadir tarea el jueves, 29 de octubre de 2026").
 
 ### Task Card
 | Property | Value |
@@ -309,3 +309,4 @@ Task status always uses the existing badge variants; no new hues.
 - Right-hand team member rail: TaskFrontSDD is single-user.
 - Pink and purple status hues: mapped to the existing badge variants above.
 - 10px badge text: Caption (12px) is the minimum size.
+- Icon-only "Add task" button: the label is shown next to the plus icon, so an empty column clearly offers to create a task and voice users can say the visible name.

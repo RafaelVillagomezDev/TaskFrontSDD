@@ -4,18 +4,14 @@ import { useForm, type UseFormReturn } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
 import { errorMessage, toApiError } from '../../../shared/api/api-error.util';
+import { showApiError } from '../../../shared/api/api-form-error.util';
 import { ROUTES } from '../../../shared/router/routes.constants';
+import { useSingleSubmit } from '../../../shared/ui/use-single-submit.hook';
 import { useRegisterMutation } from '../api/auth.api';
 import { registerSchema, type RegisterValues } from '../schemas/register.schema';
 import type { RegisteredState } from './login-notice.util';
 
-type RegisterField = keyof RegisterValues;
-
-const REGISTER_FIELDS: readonly RegisterField[] = ['email', 'password', 'name'];
-
-function isRegisterField(field: string): field is RegisterField {
-  return REGISTER_FIELDS.some((candidate) => candidate === field);
-}
+const REGISTER_FIELDS: readonly (keyof RegisterValues)[] = ['email', 'password', 'name'];
 
 export interface RegisterForm {
   form: UseFormReturn<RegisterValues>;
@@ -41,27 +37,20 @@ export function useRegisterForm(): RegisterForm {
       await navigate(ROUTES.login, { state });
       return;
     }
-    const { code, fieldErrors } = toApiError(result.error);
+    const { code } = toApiError(result.error);
     if (code === 'EMAIL_ALREADY_REGISTERED') {
       form.setError('email', { message: errorMessage(code) }, { shouldFocus: true });
       return;
     }
-    let fieldErrorCount = 0;
-    for (const [field, message] of Object.entries(fieldErrors)) {
-      if (!isRegisterField(field)) continue;
-      form.setError(field, { message });
-      fieldErrorCount += 1;
-    }
-    if (fieldErrorCount === 0) form.setError('root.server', { message: errorMessage(code) });
+    showApiError(form, result.error, REGISTER_FIELDS);
   });
+
+  // Un solo envío a la vez: un doble clic no repite la petición (RF-19)
+  const onSubmit = useSingleSubmit(submit);
 
   return {
     form,
-    onSubmit: (event) => {
-      void (async () => {
-        await submit(event);
-      })();
-    },
+    onSubmit,
     isSubmitting: isLoading,
     formError: form.formState.errors.root?.server?.message,
   };

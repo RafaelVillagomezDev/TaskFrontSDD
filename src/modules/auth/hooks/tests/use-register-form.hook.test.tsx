@@ -33,6 +33,24 @@ afterEach(() => {
 });
 
 describe('useRegisterForm', () => {
+  it('un doble envío crea la cuenta una sola vez, sin el falso «email ya registrado»', async () => {
+    const api = mockApi({ 'GET /auth/csrf': csrf, 'POST /auth/register': () => apiOk(USER, 201) });
+    const { result } = setup();
+    act(() => {
+      result.current.register.form.setValue('email', VALUES.email);
+      result.current.register.form.setValue('password', VALUES.password);
+    });
+    await act(async () => {
+      result.current.register.onSubmit();
+      result.current.register.onSubmit();
+      await Promise.resolve();
+    });
+    await waitFor(() => {
+      expect(result.current.router.location.pathname).toBe('/login');
+    });
+    expect(api.requests.filter((request) => request.method === 'POST')).toHaveLength(1);
+  });
+
   it('RF-01: crea la cuenta y lleva al inicio de sesión con el email ya escrito y el aviso', async () => {
     const api = mockApi({ 'GET /auth/csrf': csrf, 'POST /auth/register': () => apiOk(USER, 201) });
     const { result } = setup();
@@ -68,21 +86,19 @@ describe('useRegisterForm', () => {
     expect(result.current.router.location.pathname).toBe('/register');
   });
 
-  it('RF-41: VALIDATION_ERROR de la API → cada mensaje bajo su campo', async () => {
+  it('RF-41: VALIDATION_ERROR de la API → «Revisa este campo.» bajo cada campo, nunca el texto técnico de la API', async () => {
     mockApi({
       'GET /auth/csrf': csrf,
       'POST /auth/register': () =>
         apiFail(400, 'VALIDATION_ERROR', [
-          { field: 'password', message: 'La contraseña debe tener entre 12 y 128 caracteres' },
+          { field: 'password', message: 'Demasiado pequeño: se esperaba que texto tuviera >=12 caracteres' },
           { field: 'otro', message: 'Ignorado' },
         ]),
     });
     const { result } = setup();
     await submitWith(result, VALUES);
     await waitFor(() => {
-      expect(result.current.register.form.formState.errors.password?.message).toBe(
-        'La contraseña debe tener entre 12 y 128 caracteres',
-      );
+      expect(result.current.register.form.formState.errors.password?.message).toBe('Revisa este campo.');
     });
     expect(result.current.register.formError).toBeUndefined();
   });

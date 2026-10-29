@@ -1,20 +1,21 @@
 import type { ComponentPropsWithRef } from 'react';
 
 import { cn } from '../utils/class-names.util';
-import { controlClassName, Field } from './field.component';
+import { controlClassName, Field, type HelperTone } from './field.component';
 import { useFieldIds } from './use-field-ids.hook';
 
 export interface InputProps extends ComponentPropsWithRef<'input'> {
   label: string;
   helperText?: string | undefined;
+  helperTone?: HelperTone | undefined;
   errorText?: string | undefined;
 }
 
 // Campo de texto con su etiqueta, ayuda y error; la ref llega al <input> (React Hook Form la registra)
-export function Input({ label, helperText, errorText, id, className, ...rest }: Readonly<InputProps>) {
+export function Input({ label, helperText, helperTone, errorText, id, className, ...rest }: Readonly<InputProps>) {
   const ids = useFieldIds({ id, helperText, errorText });
   return (
-    <Field ids={ids} label={label} helperText={helperText} errorText={errorText}>
+    <Field ids={ids} label={label} helperText={helperText} helperTone={helperTone} errorText={errorText}>
       <input
         {...rest}
         id={ids.controlId}

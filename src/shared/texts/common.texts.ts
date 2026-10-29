@@ -4,6 +4,7 @@ export const COMMON_TEXTS = {
   retry: 'Reintentar',
   cancel: 'Cancelar',
   close: 'Cerrar',
+  dismissNotice: 'Cerrar aviso',
   save: 'Guardar',
   delete: 'Eliminar',
   showPassword: 'Mostrar contraseña',

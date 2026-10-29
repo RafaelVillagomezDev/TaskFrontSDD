@@ -122,9 +122,8 @@ En los tests unitarios ninguna petición llega a la red: `jest/setup.ts` hace fa
 ```bash
 docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:e2e         # Todas, en Chromium y Firefox
 docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:e2e:report  # Informe HTML del último run
-docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:e2e --project=firefox-mobile --project=firefox-tablet --project=firefox-desktop --workers=2  # Firefox con menos memoria
 ```
-- Si Docker tiene poca memoria (por ejemplo, con SonarQube levantado), los tests de Firefox en paralelo agotan sus tiempos de espera. Bajar los workers con `--workers=2` lo evita.
+- Docker Desktop necesita al menos **12 GB de memoria** (Settings → Resources): con las dos instancias de SonarQube (la de este repositorio y la de TaskApiSDD) y 6 navegadores Firefox en paralelo, con 8 GB los tests agotan sus tiempos de espera. Si no se puede subir, `--workers=2` lo evita a cambio de tardar más.
 
 ### Producción
 Proyecto de Compose propio (`taskfrontsdd-prod`): compila con Vite y sirve `dist/` con Nginx sin root, con fallback a `index.html`.

@@ -30,6 +30,27 @@ afterEach(() => {
 });
 
 describe('useLoginForm', () => {
+  it('un doble envío inicia sesión una sola vez', async () => {
+    const api = mockApi({
+      'GET /auth/csrf': csrf,
+      'POST /auth/login': () => apiOk({ user: USER, csrfToken: 'sesion-1' }),
+    });
+    const { result, store } = setup();
+    act(() => {
+      result.current.form.setValue('email', 'ana@example.com');
+      result.current.form.setValue('password', 'correct horse battery');
+    });
+    await act(async () => {
+      result.current.onSubmit();
+      result.current.onSubmit();
+      await Promise.resolve();
+    });
+    await waitFor(() => {
+      expect(store.getState().auth.status).toBe('authenticated');
+    });
+    expect(api.requests.filter((request) => request.method === 'POST')).toHaveLength(1);
+  });
+
   it('RF-02: con campos no válidos muestra los errores y no envía nada a la API', async () => {
     const api = mockApi({});
     const { result } = setup();

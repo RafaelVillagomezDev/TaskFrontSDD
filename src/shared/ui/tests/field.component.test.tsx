@@ -24,6 +24,14 @@ describe('Field: etiqueta, ayuda y error accesibles en todos los campos', () => 
     expect(screen.getByText('El título es obligatorio.').className).toContain('text-danger-text');
   });
 
+  it('la ayuda va en gris y, con helperTone danger, en el color de peligro sin marcar el campo como inválido', () => {
+    const { rerender } = render(<Textarea label="Descripción" helperText="10/1000 caracteres" />);
+    expect(screen.getByText('10/1000 caracteres').className).toContain('text-foreground-muted');
+    rerender(<Textarea label="Descripción" helperText="1001/1000 caracteres" helperTone="danger" />);
+    expect(screen.getByText('1001/1000 caracteres').className).toContain('text-danger-text');
+    expect(screen.getByRole('textbox', { name: 'Descripción' })).not.toHaveAttribute('aria-invalid');
+  });
+
   it('sin error no está marcado como inválido', () => {
     render(<Input label="Título" />);
     expect(screen.getByRole('textbox', { name: 'Título' })).not.toHaveAttribute('aria-invalid');

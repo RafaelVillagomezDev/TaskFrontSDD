@@ -83,7 +83,7 @@ La UI se construye con componentes headless de `src/shared/ui/` y piezas de layo
 | `api/session-base-query.ts` | Envuelve `fetchBaseQuery`: cabeceras (D-3, D-4), cerrojo de renovación (D-6), salida de sesión (RF-07). |
 | `api/client-time.util.ts` | `X-Client-Time` en ISO 8601 con desfase `±HH:MM` (nunca `Z`) y `X-Timezone` IANA (API-001 RF-31 a RF-33). |
 | `api/api-envelope.schema.ts` | Esquemas Zod del sobre de éxito, del de error y de la página (`items`, `page`…). |
-| `api/api-error.util.ts` | Convierte un error de la API en `{ code, fieldErrors }` tipado. |
+| `api/api-error.util.ts` | Convierte un error de la API en `{ code, invalidFields }` tipado. `api/api-form-error.util.ts` (`showApiError`) lo lleva a un formulario. |
 | `texts/errors.texts.ts` | Mensaje en español por cada código de error de la API (RF-41). |
 | `texts/common.texts.ts` | Textos comunes (cargando, reintentar, cancelar…). |
 | `store/store.ts`, `store/hooks.ts` | Store con `auth` y la API; `useAppDispatch` y `useAppSelector` tipados. |
@@ -219,8 +219,8 @@ Tipos inferidos de esquemas Zod (`z.infer`), nunca escritos a mano ni con aserci
 - **Bloqueo:** `TOO_MANY_ATTEMPTS` en inicio de sesión, cambio de contraseña o borrado muestra el mensaje de RF-05.
 
 ### 5.9 Errores (RF-40 a RF-45)
-- `api-error.util` convierte `{ error: { code, details } }` en `code: ApiErrorCode` y `fieldErrors` desde `details`.
-- Los formularios asignan `fieldErrors` a sus campos con `setError`. Lo que no es de un campo va a un mensaje general con `errors.texts.ts`.
+- `api-error.util` convierte `{ error: { code, details } }` en `code: ApiErrorCode` e `invalidFields` (los `field` de `details`). El texto de cada detalle no se usa: es el genérico de la validación de la API y puede ser técnico («se esperaba que texto tuviera >=12 caracteres»).
+- Los formularios marcan con `showApiError` cada campo rechazado con «Revisa este campo.» (`errors.texts.ts`). Si no rechaza ningún campo del formulario, el mensaje del código va al error general.
 - Fallo de red o `INTERNAL_ERROR` → mensaje con «Reintentar» (`refetch`) (RF-44).
 
 ## 6. Interfaz
@@ -374,3 +374,4 @@ Todas con versión exacta publicada hace al menos dos semanas. Se instalan dentr
 - **2026-10-29** — Creación del borrador del plan.
 - **2026-10-29** — Plan aprobado por el usuario, incluidas las dependencias de la sección 8, las rutas en inglés y la actualización optimista solo al completar o desmarcar (D-7). Estado → *Aprobado*.
 - **2026-10-29** — Sección 8: añadida `@jest/globals` (aprobada por el usuario), porque en modo ESM Jest no inyecta el objeto `jest`.
+- **2026-10-30** — §3 y §5.9: los errores de campo de la API se muestran con un mensaje propio del cliente («Revisa este campo.») en lugar del texto de `details`, que llega en español pero a veces es técnico (RF-41). `fieldErrors` pasa a `invalidFields` y se añade `showApiError` (decisión del usuario).

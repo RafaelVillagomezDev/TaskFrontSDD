@@ -59,6 +59,9 @@ test.describe('HU-03: crear una tarea', () => {
     await expect(board.board.getByText('Revisar el informe')).toHaveCount(0);
     await board.nextWeek.click();
     await expect(board.column(later).getByRole('listitem')).toContainText('Revisar el informe');
+
+    await board.dismissNotice.click();
+    await expect(board.notice).toBeHidden();
   });
 
   test('RF-19: un doble clic en «Crear tarea» crea una sola tarea', async ({ page, board }) => {

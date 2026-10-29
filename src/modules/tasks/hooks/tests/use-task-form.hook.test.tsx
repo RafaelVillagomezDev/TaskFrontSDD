@@ -123,6 +123,20 @@ describe('useTaskForm (crear)', () => {
     expect(result.current.notice).toBeUndefined();
   });
 
+  it('RF-52: el aviso se puede cerrar', async () => {
+    mockApi({ 'POST /tasks': () => created('2026-11-12') });
+    const { result } = setup();
+    openAndFill(result, { title: 'Comprar pan', date: '2026-11-12' });
+    await submit(result);
+    await waitFor(() => {
+      expect(result.current.notice).toBeDefined();
+    });
+    act(() => {
+      result.current.dismissNotice();
+    });
+    expect(result.current.notice).toBeUndefined();
+  });
+
   it('RF-19: mientras se envía no se puede enviar otra vez', async () => {
     let release: (response: Response) => void = () => undefined;
     const api = mockApi({
@@ -150,15 +164,18 @@ describe('useTaskForm (crear)', () => {
     expect(result.current.isSubmitting).toBe(false);
   });
 
-  it('RF-41: los errores de campo de la API van bajo su campo y se conserva lo escrito', async () => {
+  it('RF-41: un campo que rechaza la API muestra el mensaje del cliente, no el de la API, y conserva lo escrito', async () => {
     mockApi({
-      'POST /tasks': () => apiFail(400, 'VALIDATION_ERROR', [{ field: 'title', message: 'Título no válido.' }]),
+      'POST /tasks': () =>
+        apiFail(400, 'VALIDATION_ERROR', [
+          { field: 'title', message: 'Demasiado grande: se esperaba que texto tuviera <=200 caracteres' },
+        ]),
     });
     const { result } = setup();
     openAndFill(result, { title: 'Comprar pan', description: 'Integral' });
     await submit(result);
     await waitFor(() => {
-      expect(result.current.form.formState.errors.title?.message).toBe('Título no válido.');
+      expect(result.current.form.formState.errors.title?.message).toBe('Revisa este campo.');
     });
     expect(result.current.formError).toBeUndefined();
     expect(result.current.isOpen).toBe(true);

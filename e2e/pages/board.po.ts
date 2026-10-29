@@ -12,6 +12,7 @@ export class BoardPage {
   readonly today: Locator;
   readonly newTask: Locator;
   readonly notice: Locator;
+  readonly dismissNotice: Locator;
 
   constructor(page: Page) {
     this.heading = page.getByRole('heading', { level: 1, name: 'Tablero' });
@@ -22,6 +23,7 @@ export class BoardPage {
     this.today = page.getByRole('button', { name: 'Hoy', exact: true });
     this.newTask = page.getByRole('button', { name: 'Nueva tarea' });
     this.notice = page.getByRole('status');
+    this.dismissNotice = page.getByRole('button', { name: 'Cerrar aviso' });
   }
 
   // Nombre accesible de la columna de un día AAAA-MM-DD: «jueves, 29 de octubre de 2026»

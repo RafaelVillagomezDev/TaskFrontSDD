@@ -1,7 +1,7 @@
 import { API_ERROR_CODES, errorMessage, toApiError } from '../api-error.util';
 
 describe('toApiError', () => {
-  it('RF-41: convierte un error de la API en código y errores por campo', () => {
+  it('RF-41: convierte un error de la API en código y campos rechazados, sin el texto técnico', () => {
     const error = toApiError({
       status: 400,
       data: {
@@ -18,7 +18,8 @@ describe('toApiError', () => {
       },
     });
     expect(error.code).toBe('VALIDATION_ERROR');
-    expect(error.fieldErrors).toEqual({ title: 'El título es obligatorio.', date: 'La fecha no es válida.' });
+    expect(error.invalidFields).toEqual(['title', 'date']);
+    expect(JSON.stringify(error)).not.toContain('obligatorio');
   });
 
   it('RF-44: un fallo de red se trata como NETWORK_ERROR', () => {

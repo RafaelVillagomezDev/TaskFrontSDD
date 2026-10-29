@@ -160,5 +160,7 @@ describe('BoardPage', () => {
     expect(await screen.findByRole('status')).toHaveTextContent(
       'Tarea creada para el jueves, 12 de noviembre de 2026.',
     );
+    await user.click(screen.getByRole('button', { name: 'Cerrar aviso' }));
+    expect(screen.queryByText('Tarea creada para el jueves, 12 de noviembre de 2026.')).not.toBeInTheDocument();
   });
 });

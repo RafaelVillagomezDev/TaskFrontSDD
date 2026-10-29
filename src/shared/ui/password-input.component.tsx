@@ -13,6 +13,7 @@ import { usePasswordVisibility } from './use-password-visibility.hook';
 export function PasswordInput({
   label,
   helperText,
+  helperTone,
   errorText,
   id,
   className,
@@ -21,7 +22,7 @@ export function PasswordInput({
   const ids = useFieldIds({ id, helperText, errorText });
   const { visible, toggle } = usePasswordVisibility();
   return (
-    <Field ids={ids} label={label} helperText={helperText} errorText={errorText}>
+    <Field ids={ids} label={label} helperText={helperText} helperTone={helperTone} errorText={errorText}>
       <div className="relative">
         <input
           {...rest}

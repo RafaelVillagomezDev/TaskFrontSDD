@@ -79,15 +79,25 @@ describe('TaskFormDialog (crear)', () => {
     expect(description).toHaveAccessibleDescription('8/1000 caracteres');
   });
 
+  it('RF-17: el contador pasa a rojo al superar el máximo y vuelve a gris al bajar de él', async () => {
+    const { user, dialog } = await openDialog();
+    const title = within(dialog).getByLabelText('Título');
+    await user.click(title);
+    await user.paste('a'.repeat(200));
+    expect(within(dialog).getByText('200/200 caracteres').className).toContain('text-foreground-muted');
+    await user.type(title, 'a');
+    expect(within(dialog).getByText('201/200 caracteres').className).toContain('text-danger-text');
+    await user.type(title, '{Backspace}');
+    expect(within(dialog).getByText('200/200 caracteres').className).toContain('text-foreground-muted');
+  });
+
   it('RF-02: muestra cada error bajo su campo sin enviar nada', async () => {
     const api = mockApi({});
     const { user, dialog } = await openDialog();
     await user.clear(within(dialog).getByLabelText('Fecha'));
     await user.click(within(dialog).getByRole('button', { name: 'Crear tarea' }));
     expect(await within(dialog).findByText('Escribe un título.')).toBeInTheDocument();
-    expect(within(dialog).getByLabelText('Título')).toHaveAccessibleDescription(
-      '0/200 caracteres Escribe un título.',
-    );
+    expect(within(dialog).getByLabelText('Título')).toHaveAccessibleDescription('0/200 caracteres Escribe un título.');
     expect(within(dialog).getByLabelText('Fecha')).toHaveAccessibleDescription('Elige una fecha.');
     expect(api.requests).toHaveLength(0);
   });

@@ -49,8 +49,9 @@ export const API_ERROR_CODES: readonly ApiErrorCode[] = [
 
 export interface ApiError {
   code: ApiErrorCode;
-  // Errores de validación por campo (details de VALIDATION_ERROR), para mostrarlos bajo cada campo
-  fieldErrors: Record<string, string>;
+  // Campos que rechazó la API (details de VALIDATION_ERROR). Su texto no se conserva: es el genérico de la
+  // validación de la API y puede ser técnico, así que cada formulario muestra el suyo (RF-41)
+  invalidFields: string[];
 }
 
 // Forma de los errores de fetchBaseQuery de RTK Query
@@ -63,18 +64,15 @@ function isApiErrorCode(value: string): value is ApiErrorCode {
 
 export function toApiError(error: unknown): ApiError {
   if (fetchErrorSchema.safeParse(error).success) {
-    return { code: 'NETWORK_ERROR', fieldErrors: {} };
+    return { code: 'NETWORK_ERROR', invalidFields: [] };
   }
   const http = httpErrorSchema.safeParse(error);
   const envelope = http.success ? apiErrorEnvelopeSchema.safeParse(http.data.data) : null;
   if (envelope?.success !== true || !isApiErrorCode(envelope.data.error.code)) {
-    return { code: 'INTERNAL_ERROR', fieldErrors: {} };
+    return { code: 'INTERNAL_ERROR', invalidFields: [] };
   }
   const details = envelope.data.error.details ?? [];
-  return {
-    code: envelope.data.error.code,
-    fieldErrors: Object.fromEntries(details.map((detail) => [detail.field, detail.message])),
-  };
+  return { code: envelope.data.error.code, invalidFields: details.map((detail) => detail.field) };
 }
 
 // Mensaje en español propio de cada código, sin mostrar el código técnico (RF-41)

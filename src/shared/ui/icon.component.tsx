@@ -13,7 +13,7 @@ interface IconProps {
 }
 
 // Único acceso a Lucide (CONSTITUTION.md VII.2): tamaño y grosor de DESIGN.md, color heredado del texto
-export function Icon({ icon: LucideComponent, size = 'inline', label, className }: IconProps) {
+export function Icon({ icon: LucideComponent, size = 'inline', label, className }: Readonly<IconProps>) {
   const accessibility = label === undefined ? { 'aria-hidden': true } : { role: 'img', 'aria-label': label };
   return (
     <LucideComponent

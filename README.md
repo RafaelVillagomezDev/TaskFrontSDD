@@ -166,6 +166,7 @@ graphify query "<pregunta>"     # Consultar el grafo
 - Toda funcionalidad nueva empieza con su spec, plan y tasks en `sdd/`. No necesitan spec las correcciones de errores, los typos, la configuración, las actualizaciones de dependencias ni los cambios de documentación.
 - **Spec-anchored:** las specs no se descartan tras implementarlas; siguen describiendo el comportamiento vigente. Todo cambio de comportamiento actualiza primero la spec y luego el código, y cada RF tiene un test que cita su ID.
 - Solo tokens del sistema de diseño: sin valores arbitrarios de Tailwind.
+- Props de los componentes de solo lectura (`Readonly<Props>`) y `<output>` para los estados de carga, como exige SonarQube (S6759, S6819).
 - TypeScript sin `any` ni aserciones de tipo (`as`, incluido `as const`): tipos con `interface`/`type`, genéricos, type guards o Zod. Las aserciones solo se permiten en los tests.
 - Sin `enum`: uniones de literales (`'todo' | 'in-progress' | 'done'`).
 - Estructura de pantallas según la plantilla de `docs/design/`. El tema (colores, tipografía, márgenes…) sale solo de `DESIGN.md`: cambiarlo solo toca `DESIGN.md` y `design-tokens.css`, nunca los componentes.

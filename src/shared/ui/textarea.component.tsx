@@ -10,7 +10,7 @@ interface TextareaProps extends ComponentPropsWithRef<'textarea'> {
   errorText?: string | undefined;
 }
 
-export function Textarea({ label, helperText, errorText, id, className, ...rest }: TextareaProps) {
+export function Textarea({ label, helperText, errorText, id, className, ...rest }: Readonly<TextareaProps>) {
   const ids = useFieldIds({ id, helperText, errorText });
   return (
     <Field ids={ids} label={label} helperText={helperText} errorText={errorText}>

@@ -10,7 +10,14 @@ import { useFieldIds } from './use-field-ids.hook';
 import { usePasswordVisibility } from './use-password-visibility.hook';
 
 // Contraseña con la opción de mostrarla (spec S-11); nunca se recorta
-export function PasswordInput({ label, helperText, errorText, id, className, ...rest }: Omit<InputProps, 'type'>) {
+export function PasswordInput({
+  label,
+  helperText,
+  errorText,
+  id,
+  className,
+  ...rest
+}: Readonly<Omit<InputProps, 'type'>>) {
   const ids = useFieldIds({ id, helperText, errorText });
   const { visible, toggle } = usePasswordVisibility();
   return (

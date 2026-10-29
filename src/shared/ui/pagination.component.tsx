@@ -16,7 +16,7 @@ interface PaginationProps {
 
 const FIRST_PAGE = 1;
 
-export function Pagination({ page, totalPages, onPageChange, children }: PaginationProps) {
+export function Pagination({ page, totalPages, onPageChange, children }: Readonly<PaginationProps>) {
   const hasPages = totalPages > FIRST_PAGE;
   return (
     <nav aria-label={COMMON_TEXTS.pagination} className="flex flex-wrap items-center justify-between gap-3">

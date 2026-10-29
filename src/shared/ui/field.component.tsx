@@ -25,7 +25,7 @@ export function controlClassName(hasError: boolean, fixedHeight = true): string 
 }
 
 // Etiqueta, control, ayuda y error bajo el campo (spec RF-02)
-export function Field({ ids, label, helperText, errorText, children }: FieldProps) {
+export function Field({ ids, label, helperText, errorText, children }: Readonly<FieldProps>) {
   return (
     <div className="flex flex-col gap-2">
       <Text as="label" htmlFor={ids.controlId} variant="body-sm" className="font-medium">

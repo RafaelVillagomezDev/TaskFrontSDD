@@ -13,7 +13,7 @@ interface ErrorMessageProps {
 }
 
 // Error de una zona con la opción de reintentar (RF-44)
-export function ErrorMessage({ message, onRetry }: ErrorMessageProps) {
+export function ErrorMessage({ message, onRetry }: Readonly<ErrorMessageProps>) {
   return (
     <Box variant="subtle" role="alert" className="flex flex-wrap items-center gap-3 p-4">
       <span className="text-danger">

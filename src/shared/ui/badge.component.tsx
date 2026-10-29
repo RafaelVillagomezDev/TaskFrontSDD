@@ -19,7 +19,7 @@ interface BadgeProps {
   children: ReactNode;
 }
 
-export function Badge({ variant = 'default', children }: BadgeProps) {
+export function Badge({ variant = 'default', children }: Readonly<BadgeProps>) {
   return (
     <span className={cn('inline-flex h-pill items-center rounded-full px-2 text-caption', VARIANT_CLASSES[variant])}>
       {children}

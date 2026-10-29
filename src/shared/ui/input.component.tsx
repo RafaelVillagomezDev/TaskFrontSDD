@@ -11,7 +11,7 @@ export interface InputProps extends ComponentPropsWithRef<'input'> {
 }
 
 // Campo de texto con su etiqueta, ayuda y error; la ref llega al <input> (React Hook Form la registra)
-export function Input({ label, helperText, errorText, id, className, ...rest }: InputProps) {
+export function Input({ label, helperText, errorText, id, className, ...rest }: Readonly<InputProps>) {
   const ids = useFieldIds({ id, helperText, errorText });
   return (
     <Field ids={ids} label={label} helperText={helperText} errorText={errorText}>

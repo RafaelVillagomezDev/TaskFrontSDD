@@ -124,6 +124,7 @@ El push solo pasa con las E2E de Chromium (3 tamaños) y el quality gate en verd
 - `crypto.randomUUID()` para identificadores, nunca `Math.random()`.
 - Complejidad cognitiva ≤ 15 por función. Máximo 4 parámetros (las props cuentan como uno). Sin ternarios anidados, tampoco en JSX.
 - Sin `!` evitable, sin código sin usar, sin código comentado, sin `TODO`/`FIXME`, sin números mágicos (van a `*.constants.ts`).
+- Props de los componentes de solo lectura: `({ … }: Readonly<Props>)` (S6759). Para un estado de carga o resultado, `<output>` en vez de `role="status"` (S6819).
 - Solo componentes funcionales, un componente exportado por fichero (un compound component cuenta como uno: `Tabs` con `Tabs.List`, `Tabs.Trigger`…).
 - Un test por cada componente, página, hook, slice y esquema con lógica.
 - Todo input escribible nuevo o modificado lleva su spec E2E en el mismo cambio.

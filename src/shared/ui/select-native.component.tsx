@@ -11,7 +11,7 @@ interface SelectNativeProps extends ComponentPropsWithRef<'select'> {
 }
 
 // Selector nativo: accesible con teclado y lector de pantalla sin lógica propia; las opciones van en children
-export function SelectNative({ label, helperText, errorText, id, className, ...rest }: SelectNativeProps) {
+export function SelectNative({ label, helperText, errorText, id, className, ...rest }: Readonly<SelectNativeProps>) {
   const ids = useFieldIds({ id, helperText, errorText });
   return (
     <Field ids={ids} label={label} helperText={helperText} errorText={errorText}>

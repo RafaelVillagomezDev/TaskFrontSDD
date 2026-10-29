@@ -1,0 +1,36 @@
+# Ficheros que Claude Code no debe leer: dependencias, builds, secretos y ficheros generados.
+# La protección efectiva son los permisos de .claude/settings.json
+
+# Dependencias
+node_modules/
+.pnpm-store/
+
+# Builds
+dist/
+
+# Variables de entorno y secretos (CONSTITUTION.md, principio V)
+.env
+.env.*
+!.env.example
+*.pem
+
+# Logs
+*.log
+
+# Cobertura, informes y resultados de las pruebas
+coverage/
+playwright-report/
+test-results/
+blob-report/
+
+# Caché
+.cache/
+.eslintcache
+
+# Análisis de SonarQube y copias de seguridad de graphify
+.scannerwork/
+*.graphify-bak
+
+# Sistema operativo
+.DS_Store
+Thumbs.db

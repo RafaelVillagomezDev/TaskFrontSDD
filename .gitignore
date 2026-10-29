@@ -147,3 +147,11 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Playwright MCP (capturas y logs)
+.playwright-mcp/
+
+# Playwright (informes y resultados de E2E)
+playwright-report/
+test-results/
+blob-report/

@@ -133,6 +133,7 @@
   --spacing-pill: 1.25rem; /* 20px — alto de contador/badge */
 
   --container-content: 80rem; /* 1280px — ancho máximo de contenido */
+  --container-dialog: 32rem; /* 512px — ancho máximo de un modal */
 
   /* --- Border radius --- */
   --radius-*: initial;
@@ -206,6 +207,8 @@
     --primary-text: light-dark(var(--color-nova-blue), var(--color-blue-400));
     --danger-text: light-dark(var(--color-red-700), var(--color-spark-red));
     --nav-active: light-dark(var(--color-blue-100), var(--color-slate-800));
+    /* Fondo detrás de modales y drawers (DESIGN.md Overlay) */
+    --overlay: light-dark(rgba(15, 23, 42, 0.5), rgba(0, 0, 0, 0.6));
 
     --duration-fast: 100ms;
     --duration-base: 200ms;
@@ -229,6 +232,7 @@
   --color-border-input: var(--border-input);
   --color-placeholder: var(--placeholder);
   --color-nav-active: var(--nav-active);
+  --color-overlay: var(--overlay);
 
   /* Acciones y estados */
   --color-primary: var(--color-nova-blue);

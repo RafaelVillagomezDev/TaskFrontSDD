@@ -2,6 +2,7 @@
 export {
   authReducer,
   csrfTokenSet,
+  sessionCheckFailed,
   sessionEnded,
   sessionExpired,
   sessionStarted,
@@ -13,6 +14,9 @@ export {
   selectCsrfToken,
   selectCurrentUser,
   selectIsAuthenticated,
+  selectSessionExpired,
   selectUserDisplayName,
 } from './store/auth.selectors';
 export { userSchema, type User } from './schemas/user.schema';
+export { sessionSchema, type Session } from './schemas/user.schema';
+export { authApi, useMeQuery } from './api/auth.api';

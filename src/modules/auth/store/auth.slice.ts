@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
+import { sessionExpired } from '../../../shared/api/session.actions';
 import type { User } from '../schemas/user.schema';
 
 export type AuthStatus = 'unknown' | 'authenticated' | 'anonymous';
@@ -37,11 +38,21 @@ const authSlice = createSlice({
     sessionEnded(): AuthState {
       return { status: 'anonymous', user: null, csrfToken: null, expired: false };
     },
-    sessionExpired(): AuthState {
-      return { status: 'anonymous', user: null, csrfToken: null, expired: true };
+    // La comprobación inicial de GET /me falló: sin sesión, salvo que otra acción ya la haya resuelto
+    sessionCheckFailed(state) {
+      if (state.status === 'unknown') state.status = 'anonymous';
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(sessionExpired, (): AuthState => ({
+      status: 'anonymous',
+      user: null,
+      csrfToken: null,
+      expired: true,
+    }));
   },
 });
 
-export const { sessionStarted, csrfTokenSet, userUpdated, sessionEnded, sessionExpired } = authSlice.actions;
+export const { sessionStarted, csrfTokenSet, userUpdated, sessionEnded, sessionCheckFailed } = authSlice.actions;
+export { sessionExpired };
 export const authReducer = authSlice.reducer;

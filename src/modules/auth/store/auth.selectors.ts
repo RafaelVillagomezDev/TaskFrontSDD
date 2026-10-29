@@ -12,6 +12,9 @@ export const selectCurrentUser = (state: StateWithAuth): User | null => state.au
 
 export const selectCsrfToken = (state: StateWithAuth): string | null => state.auth.csrfToken;
 
+// La sesión terminó porque no se pudo renovar: el inicio de sesión lo avisa (RF-07)
+export const selectSessionExpired = (state: StateWithAuth): boolean => state.auth.expired;
+
 export const selectIsAuthenticated = (state: StateWithAuth): boolean => state.auth.status === 'authenticated';
 
 // Nombre visible en la navegación: el nombre o, si no tiene, el email (RF-50)

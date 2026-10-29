@@ -7,9 +7,9 @@ import {
 } from '@reduxjs/toolkit/query';
 import { z } from 'zod';
 
-import { sessionExpired } from '../../modules/auth';
 import { toApiError, type ApiErrorCode } from './api-error.util';
 import { buildClientTimeHeaders } from './client-time.util';
+import { sessionExpired } from './session.actions';
 
 // Rutas que exigen la hora y la zona del dispositivo (API-002 RF-30)
 const CLIENT_TIME_PATHS = ['/tasks', '/streak', '/alerts'];

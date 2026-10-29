@@ -96,6 +96,12 @@ Based on a **4px base unit**.
 | `shadow-lg` | `0 10px 15px rgba(0,0,0,0.1)` | Dropdowns |
 | `shadow-xl` | `0 20px 25px rgba(0,0,0,0.15)` | Modals |
 
+### Overlay
+
+| Token | Light | Dark | Usage |
+|-------|-------|------|-------|
+| `overlay` | `rgba(15,23,42,0.5)` (Nova Dark 50%) | `rgba(0,0,0,0.6)` | Backdrop behind modals and drawers |
+
 ---
 
 ## Components
@@ -191,6 +197,7 @@ Based on a **4px base unit**.
 ## Grid & Layout
 
 - **Max content width:** 1280px
+- **Max modal width:** 512px (`container-dialog`); full available width on mobile
 - **Gutter:** 24px
 - **Columns:** 12
 - **Breakpoints:**

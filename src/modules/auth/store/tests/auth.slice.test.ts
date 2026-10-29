@@ -1,9 +1,18 @@
-import { authReducer, csrfTokenSet, sessionEnded, sessionExpired, sessionStarted, userUpdated } from '../auth.slice';
+import {
+  authReducer,
+  csrfTokenSet,
+  sessionCheckFailed,
+  sessionEnded,
+  sessionExpired,
+  sessionStarted,
+  userUpdated,
+} from '../auth.slice';
 import {
   selectAuthStatus,
   selectCsrfToken,
   selectCurrentUser,
   selectIsAuthenticated,
+  selectSessionExpired,
   selectUserDisplayName,
 } from '../auth.selectors';
 
@@ -41,6 +50,12 @@ describe('slice auth', () => {
     });
   });
 
+  it('RF-08: sessionCheckFailed deja sin sesión solo si aún no se sabía', () => {
+    expect(authReducer(undefined, sessionCheckFailed()).status).toBe('anonymous');
+    const started = authReducer(undefined, sessionStarted({ user: ana, csrfToken: 'csrf-1' }));
+    expect(authReducer(started, sessionCheckFailed()).status).toBe('authenticated');
+  });
+
   it('RF-07: sessionExpired deja la sesión anónima y marca que caducó', () => {
     const started = authReducer(undefined, sessionStarted({ user: ana, csrfToken: 'csrf-1' }));
     expect(authReducer(started, sessionExpired())).toEqual({
@@ -62,6 +77,11 @@ describe('selectores de auth', () => {
     expect(selectCsrfToken(authenticated)).toBe('csrf-1');
     expect(selectIsAuthenticated(authenticated)).toBe(true);
     expect(selectIsAuthenticated(anonymous)).toBe(false);
+  });
+
+  it('RF-07: selectSessionExpired indica si la sesión caducó', () => {
+    expect(selectSessionExpired(anonymous)).toBe(false);
+    expect(selectSessionExpired({ auth: authReducer(undefined, sessionExpired()) })).toBe(true);
   });
 
   it('RF-50: el nombre visible es el nombre o, si no tiene, el email', () => {

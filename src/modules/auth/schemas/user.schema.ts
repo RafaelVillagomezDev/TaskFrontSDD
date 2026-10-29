@@ -9,3 +9,11 @@ export const userSchema = z.object({
 });
 
 export type User = z.infer<typeof userSchema>;
+
+// Sesión que devuelven GET /me y el inicio de sesión (API-003 RF-01): la cuenta y el token CSRF de la sesión
+export const sessionSchema = z.object({
+  user: userSchema,
+  csrfToken: z.string(),
+});
+
+export type Session = z.infer<typeof sessionSchema>;

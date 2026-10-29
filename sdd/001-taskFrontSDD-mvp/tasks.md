@@ -161,7 +161,7 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
 - [x] T037 [Base] `Badge`, `Spinner`, `ErrorMessage` y `Pagination` — `src/shared/ui/`
   - Verifica: los tests de T036 pasan.
   - Hecho (2026-10-29): el `Spinner` necesitaba una animación de giro que `DESIGN.md` no tenía. El usuario aprobó añadir el token `anim-spin` (800 ms, lineal, infinito) a `DESIGN.md` y a los tokens, y la regla de movimiento reducido ahora también corta las animaciones infinitas (`animation-iteration-count: 1`).
-- [ ] T038 [P] [Base] Tests de `useFocusTrap` y de `Dialog`:
+- [x] T038 [P] [Base] Tests de `useFocusTrap` y de `Dialog`:
   - Subcomponente fuera del padre → error (VI.2).
   - Escape cierra.
   - El foco queda atrapado y vuelve al disparador.
@@ -169,36 +169,45 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
   - Limpieza y carreras del efecto (IV.3).
   — `src/shared/ui/tests/use-focus-trap.hook.test.ts`, `dialog.component.test.tsx`
   - Verifica: `dce pnpm test src/shared/ui/tests/use-focus-trap src/shared/ui/tests/dialog` **falla**.
-- [ ] T039 [Base] `useFocusTrap`, `useDialog` (contexto interno no exportado) y `Dialog` compound — `src/shared/ui/use-focus-trap.hook.ts`, `use-dialog.hook.ts`, `dialog.component.tsx`
+  - Hecho (2026-10-29): 26 casos en `use-focus-trap.hook.test.tsx` (foco atrapado, Escape, limpieza y carreras; incluye `useScrollLock` con bloqueos anidados) y `dialog.component.test.tsx`.
+- [x] T039 [Base] `useFocusTrap`, `useDialog` (contexto interno no exportado) y `Dialog` compound — `src/shared/ui/use-focus-trap.hook.ts`, `use-dialog.hook.ts`, `dialog.component.tsx`
   - Verifica: los tests de T038 pasan.
-- [ ] T040 [P] [Base] Tests de `Drawer` compound, con los mismos casos que `Dialog` — `src/shared/ui/tests/drawer.component.test.tsx`
+  - Hecho (2026-10-29): el usuario aprobó dos tokens nuevos en `DESIGN.md` y `design-tokens.css`: `overlay` (Nova Dark al 50 % en claro, negro al 60 % en oscuro) y `container-dialog` (512 px). Piezas añadidas: `use-scroll-lock.hook.ts`, `compound-context.util.ts` (contexto interno que lanza el error de VI.2) y `modal-panel.component.tsx` (portal, fondo y panel comunes a `Dialog` y `Drawer`, para no duplicar). `Dialog` tiene además `Dialog.Close`.
+- [x] T040 [P] [Base] Tests de `Drawer` compound, con los mismos casos que `Dialog` — `src/shared/ui/tests/drawer.component.test.tsx`
   - Verifica: `dce pnpm test src/shared/ui/tests/drawer` **falla**.
-- [ ] T041 [Base] `Drawer`, reutilizando `useFocusTrap` — `src/shared/ui/drawer.component.tsx`, `use-drawer.hook.ts`
+  - Hecho (2026-10-29): 11 casos, los mismos que `Dialog`.
+- [x] T041 [Base] `Drawer`, reutilizando `useFocusTrap` — `src/shared/ui/drawer.component.tsx`, `use-drawer.hook.ts`
   - Verifica: `dce pnpm test src/shared/ui/tests/drawer` pasa.
+  - Hecho (2026-10-29): reutiliza `useDialog`, `useDialogContent` y `ModalPanel`; `use-drawer.hook.ts` solo crea su contexto interno. El cierre al cambiar de pantalla no va en el panel (un `onClick` en `role="dialog"` lo marcaría Sonar) sino en `shared/layout/use-navigation-drawer.hook.ts`, con estado derivado de la ruta y sin efectos.
 
 ### Layout (`src/shared/layout/`)
-- [ ] T042 [P] [Base] Tests de layout (RF-50, RF-54):
+- [x] T042 [P] [Base] Tests de layout (RF-50, RF-54):
   - `AppShell` muestra `Sidebar` en `lg` y `Navbar` + `Drawer` por debajo.
   - `NavItem` marca la pantalla activa con `aria-current`.
   - `PageHeader`, `PageContainer`, `EmptyState`, `BoardColumn` y `AuthLayout` componen por `children`.
   — `src/shared/layout/tests/`
   - Verifica: `dce pnpm test src/shared/layout` **falla**.
-- [ ] T043 [Base] Piezas de layout según `DESIGN.md` *Layout Patterns*, mobile-first (D-12) — `src/shared/layout/*.layout.tsx`, `*.component.tsx`
+  - Hecho (2026-10-29): 16 casos en `layout.component.test.tsx` y `main-navigation.component.test.tsx`.
+- [x] T043 [Base] Piezas de layout según `DESIGN.md` *Layout Patterns*, mobile-first (D-12) — `src/shared/layout/*.layout.tsx`, `*.component.tsx`
   - Verifica: `dce pnpm test src/shared/layout` pasa.
+  - Hecho (2026-10-29): `AppShell` (+ `AppShell.Body`), `Sidebar`, `Navbar`, `NavItem` (con `NavLink`), `MainNavigation` (usuario + 4 pantallas; recibe las acciones de sesión por `children`, para T055), `PageHeader`, `PageContainer`, `EmptyState`, `BoardColumn` y `AuthLayout`. `jest/setup.ts` añade `TextEncoder` de Node, que React Router necesita en jsdom.
 
 ### Router y arranque
-- [ ] T044 [P] [Base] Tests de rutas (RF-08):
+- [x] T044 [P] [Base] Tests de rutas (RF-08):
   - `ProtectedRoute` sin sesión → `/login?returnTo=…`.
   - Con `status: 'unknown'` → cargador.
   - `use-session-bootstrap`: `200` → `authenticated`, `401` → `anonymous`.
   — `src/shared/router/tests/protected-route.component.test.tsx`, `use-session-bootstrap.hook.test.ts`
   - Verifica: `dce pnpm test src/shared/router` **falla**.
-- [ ] T045 [Base] `ProtectedRoute`, `useSessionBootstrap`, `router.tsx` con las 6 rutas (páginas vacías de momento) y `main.tsx` con el `Provider` (plan §6.1) — `src/shared/router/`, `src/main.tsx`
+  - Hecho (2026-10-29): 23 casos. Los tests montan `APP_ROUTES` con `MemoryRouter` + `useRoutes`: los routers de datos necesitan `Request`, que jsdom no tiene. Los casos `200`/`401` de `GET /me` están en `auth/api/tests/auth.api.test.ts` (entorno node, con `fetch` real simulado).
+- [x] T045 [Base] `ProtectedRoute`, `useSessionBootstrap`, `router.tsx` con las 6 rutas (páginas vacías de momento) y `main.tsx` con el `Provider` (plan §6.1) — `src/shared/router/`, `src/main.tsx`
   - Verifica: `dce pnpm test src/shared/router` pasa.
+  - Hecho (2026-10-29): `ProtectedRoute` con `access="private" | "guest"`: también protege `/login` y `/register` (solo sin sesión, plan §6.1) y, con sesión, vuelve a `returnTo` (solo rutas internas). Sin sesión por caducidad añade `reason=expired` (RF-07). `useSessionBootstrap` usa el endpoint `me` de `auth/api/auth.api.ts` (adelantado de T052), que guarda la sesión en `onQueryStarted`, sin efectos. `sessionExpired` pasa a `shared/api/session.actions.ts` (el slice la escucha con `extraReducers`) para evitar la importación circular `auth` → `base.api` → `auth`.
 
 ### Checkpoint Base
-- [ ] T046 [Base] Base completa.
+- [x] T046 [Base] Base completa.
   - Verifica: `dce pnpm lint && dce pnpm typecheck && dce pnpm test && dce pnpm build` pasan.
+  - Hecho (2026-10-29): lint, typecheck, 289 tests (cobertura 99,4 % de líneas) y build pasan.
 
 ---
 
@@ -231,6 +240,7 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
   - Verifica: `dce pnpm test src/modules/auth/hooks` pasa.
 - [ ] T054 [H1] **(bloqueada por X001)** `use-session-bootstrap` recupera `csrfToken` de `GET /me` (D-1) — `src/shared/router/use-session-bootstrap.hook.ts`, `auth/schemas/user.schema.ts`
   - Verifica: tras iniciar sesión y recargar, crear una tarea funciona sin volver a entrar.
+  - Avance (2026-10-29): el código ya valida `GET /me` con el contrato de la spec 003 de la API (`data: { user, csrfToken }`, `sessionSchema`). Mientras la API no lo implemente, la respuesta no cumple el esquema y la recarga lleva al inicio de sesión, como prevé D-1. Solo queda la verificación.
 - [ ] T055 [H1] Páginas de registro e inicio de sesión con `AuthLayout`; cerrar sesión en la navegación (RF-01, RF-50) — `auth/pages/register.page.tsx`, `login.page.tsx`, `auth/index.ts`
   - Verifica: `dre pnpm test:e2e e2e/specs/register e2e/specs/login e2e/specs/fields-auth --project=chromium-desktop` pasa.
 
@@ -540,3 +550,4 @@ Los criterios de éxito se comprueban en:
 ## Registro de cambios
 
 - **2026-10-29** — Creación de las tareas a partir del plan aprobado.
+- **2026-10-29** — Fase 0 (Base) terminada: T038–T046. Avance de T054 (falta la verificación con X001).

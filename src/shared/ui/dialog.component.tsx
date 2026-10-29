@@ -58,7 +58,7 @@ function DialogTitle({ children }: Readonly<DialogPartProps>) {
   );
 }
 
-// Fila de acciones: en móvil se apilan a todo el ancho, desde sm se alinean a la derecha
+// Fila de acciones: en móvil se apilan a ancho completo, desde sm se alinean a la derecha
 function DialogActions({ children }: Readonly<DialogPartProps>) {
   return <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">{children}</div>;
 }

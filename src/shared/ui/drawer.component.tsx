@@ -43,7 +43,7 @@ function DrawerContent({ children }: Readonly<DrawerPartProps>) {
     <ModalPanel
       state={drawer}
       layerClassName=""
-      className="absolute inset-y-0 left-0 w-sidebar max-w-full gap-6 border-r border-border bg-page p-4"
+      className="absolute inset-y-0 right-auto left-0 h-full max-h-full w-sidebar max-w-full gap-6 border-r border-border bg-page p-4"
     >
       {children}
     </ModalPanel>

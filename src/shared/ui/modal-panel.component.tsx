@@ -13,22 +13,23 @@ interface ModalPanelProps {
   children: ReactNode;
 }
 
-// Capa modal común de Dialog y Drawer: portal en <body>, fondo overlay de DESIGN.md y panel con rol dialog,
-// foco atrapado, Escape y scroll bloqueado (useDialogContent)
+// Capa modal común de Dialog y Drawer: portal en <body>, fondo overlay de DESIGN.md y un <dialog> nativo
+// (SonarQube S6819) abierto con `open`, con foco atrapado, Escape y scroll bloqueado propios (useDialogContent)
 export function ModalPanel({ state, layerClassName, className, children }: Readonly<ModalPanelProps>) {
-  const { containerRef, close } = useDialogContent<HTMLDivElement>(state);
+  const { containerRef, close } = useDialogContent<HTMLDialogElement>(state);
   if (!state.open) return null;
   return createPortal(
     <div className={cn('fixed inset-0 z-50', layerClassName)}>
       {/* Fondo: el clic cierra; con teclado se cierra con Escape */}
       <div aria-hidden="true" data-testid="modal-overlay" className="absolute inset-0 bg-overlay" onClick={close} />
       <Box
+        as="dialog"
+        open
         ref={containerRef}
-        role="dialog"
         aria-modal="true"
         aria-labelledby={state.titleId}
         tabIndex={-1}
-        className={cn('flex flex-col overflow-y-auto shadow-xl focus:outline-none', className)}
+        className={cn('m-0 flex flex-col overflow-y-auto text-foreground shadow-xl focus:outline-none', className)}
       >
         {children}
       </Box>

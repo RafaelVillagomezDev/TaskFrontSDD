@@ -12,8 +12,8 @@
 | Tokens de diseño (`src/styles/design-tokens.css`) | Listos, sin compilar todavía |
 | Referencia de diseño del tablero (`docs/design/`) | Lista |
 | Proyecto Vite + React, Docker, SonarQube, hooks de git | Pendiente |
-| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | `spec.md` aprobada, `plan.md` aprobado y `tasks.md` creado (114 tareas + 1 externa); implementación en curso: 55 de 114 (fase 0 «Base» y fase H1 «Crear mi cuenta y entrar» completas, salvo T054, que espera al cambio de la API) |
-| Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Pendiente (bloquea la recarga sin volver a iniciar sesión) |
+| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | `spec.md` aprobada, `plan.md` aprobado y `tasks.md` creado (114 tareas + 1 externa); implementación en curso: 56 de 114 (fase 0 «Base» y fase H1 «Crear mi cuenta y entrar» completas) |
+| Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Hecho (spec 003 de la API): la sesión sigue tras recargar |
 
 ## Funcionalidades previstas
 

@@ -1,4 +1,4 @@
-import { uniqueAccount } from '../fixtures/api-client';
+import { requireEnv, uniqueAccount } from '../fixtures/api-client';
 import { expect, test } from '../fixtures/auth.fixture';
 import { expectResponsive } from '../fixtures/responsive.fixture';
 import { AppShell } from '../pages/app-shell.po';
@@ -70,5 +70,26 @@ test.describe('HU-01: inicio y cierre de sesión', () => {
     await expect(login.heading).toBeVisible();
     await expect(page).toHaveURL('/login');
     await expect(shell.pageHeading('Tablero')).toHaveCount(0);
+  });
+
+  test('D-1 y RNF-06: tras recargar sigue la sesión y el token CSRF recuperado de GET /me sirve', async ({
+    page,
+    testUser,
+  }) => {
+    const login = new LoginPage(page);
+    await login.goto('/login?returnTo=%2Fhistory');
+    await login.login(testUser);
+    const shell = new AppShell(page);
+    await expect(shell.pageHeading('Historial')).toBeVisible();
+
+    await page.reload();
+    await expect(shell.pageHeading('Historial')).toBeVisible();
+    await expect(page).toHaveURL('/history');
+
+    // POST /auth/logout exige X-CSRF-Token: solo cierra la sesión en la API si el token se recuperó al recargar
+    await shell.logout();
+    await expect(login.heading).toBeVisible();
+    const me = await page.request.get(`${requireEnv('VITE_API_URL')}/me`);
+    expect(me.status()).toBe(401);
   });
 });

@@ -22,9 +22,10 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
 
 ## Requisitos externos
 
-- [ ] X001 [Externa] **TaskApiSDD:** `GET /me` devuelve también `csrfToken` (requisito previo de la spec, D-1, R-1). Se especifica e implementa en el repositorio de la API.
+- [x] X001 [Externa] **TaskApiSDD:** `GET /me` devuelve también `csrfToken` (requisito previo de la spec, D-1, R-1). Se especifica e implementa en el repositorio de la API.
   - Verifica: con sesión iniciada, `curl -b cookies.txt http://localhost:3000/me` devuelve `data.csrfToken`.
   - **Bloquea:** T054. Todo lo demás puede avanzar.
+  - Hecho (2026-10-29): implementada en TaskApiSDD (spec 003). Comprobado: `GET /me` devuelve `data: { user, csrfToken }` con el mismo token que el inicio de sesión.
 
 ---
 
@@ -245,9 +246,10 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
 - [x] T053 [H1] Hooks de formulario y de cierre de sesión, y textos (RF-01 a RF-05, RF-07) — `auth/hooks/`, `auth/texts/auth.texts.ts`
   - Verifica: `dce pnpm test src/modules/auth/hooks` pasa.
   - Hecho (2026-10-29): el login no navega: con la sesión abierta, la ruta de invitado lleva a `returnTo` o al tablero (RF-07). El registro lleva a `/login` con el email en el estado de la navegación, no en la URL. El cierre de sesión marca `signedOut` en el slice: la ruta privada lleva entonces a `/login` sin `returnTo`, porque React Router aplica sus navegaciones como transiciones y la redirección de la ruta protegida se adelantaba a la del hook.
-- [ ] T054 [H1] **(bloqueada por X001)** `use-session-bootstrap` recupera `csrfToken` de `GET /me` (D-1) — `src/shared/router/use-session-bootstrap.hook.ts`, `auth/schemas/user.schema.ts`
+- [x] T054 [H1] `use-session-bootstrap` recupera `csrfToken` de `GET /me` (D-1) — `src/shared/router/use-session-bootstrap.hook.ts`, `auth/schemas/user.schema.ts`
   - Verifica: tras iniciar sesión y recargar, crear una tarea funciona sin volver a entrar.
   - Avance (2026-10-29): el código ya valida `GET /me` con el contrato de la spec 003 de la API (`data: { user, csrfToken }`, `sessionSchema`). Mientras la API no lo implemente, la respuesta no cumple el esquema y la recarga lleva al inicio de sesión, como prevé D-1. Solo queda la verificación.
+  - Hecho (2026-10-29): sin cambios de código; E2E `login.e2e.ts` «D-1 y RNF-06» en los 6 proyectos. Como aún no hay formulario de tareas, la petición con CSRF tras recargar es `POST /auth/logout`: solo cierra la sesión en la API (después `GET /me` → 401) si el token se recuperó de `GET /me`. Crear una tarea tras recargar se cubrirá con las E2E de H3.
 - [x] T055 [H1] Páginas de registro e inicio de sesión con `AuthLayout`; cerrar sesión en la navegación (RF-01, RF-50) — `auth/pages/register.page.tsx`, `login.page.tsx`, `auth/index.ts`
   - Verifica: `dre pnpm test:e2e e2e/specs/register e2e/specs/login e2e/specs/fields-auth --project=chromium-desktop` pasa.
   - Hecho (2026-10-29): `LoginPage` y `RegisterPage` sustituyen a las páginas provisionales; `LogoutButton` va en la navegación (Sidebar y Drawer). El enlace entre pantallas mide 44 px de alto en móvil. Los textos de contraseña son objetos (`fields.password.label`…) para que SonarQube no los tome por credenciales (S2068).
@@ -561,3 +563,4 @@ Los criterios de éxito se comprueban en:
 - **2026-10-29** — Creación de las tareas a partir del plan aprobado.
 - **2026-10-29** — Fase 0 (Base) terminada: T038–T046. Avance de T054 (falta la verificación con X001).
 - **2026-10-29** — Fase H1 terminada salvo T054 (bloqueada por X001): T047–T053, T055 y T056.
+- **2026-10-29** — X001 hecha en TaskApiSDD y T054 verificada: fase H1 completa.

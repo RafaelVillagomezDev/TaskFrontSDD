@@ -1,0 +1,8 @@
+{
+  // Pruebas E2E de Playwright: se ejecutan en Node, con las mismas reglas estrictas que la app
+  "extends": "./tsconfig.node.json",
+  "compilerOptions": {
+    "lib": ["ES2023", "DOM"]
+  },
+  "include": ["e2e"]
+}

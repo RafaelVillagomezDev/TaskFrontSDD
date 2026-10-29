@@ -1,0 +1,15 @@
+# Producción: proyecto propio que convive con desarrollo. Se lanza con las variables de .env.prod:
+#   docker compose --env-file .env.prod -f docker-compose.prod.yml up --build -d
+name: taskfrontsdd-prod
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: ${VITE_API_URL:?Falta VITE_API_URL en .env.prod}
+    env_file: .env.prod
+    ports:
+      - '${WEB_HOST_PORT:?Falta WEB_HOST_PORT en .env.prod}:8080'
+    restart: unless-stopped

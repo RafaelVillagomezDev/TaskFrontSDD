@@ -1,0 +1,31 @@
+# Entorno de desarrollo: web (Vite, Dockerfile.dev) y e2e (Playwright), ambos con .env.dev
+# TaskApiSDD se levanta desde su propio repositorio y escucha en http://localhost:3000
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    env_file: .env.dev
+    ports:
+      - '5173:5173'
+    volumes:
+      # Código montado para la recarga en caliente
+      - .:/app
+      # Evita que el volumen general pise las dependencias del contenedor
+      - /app/node_modules
+
+  e2e:
+    # Debe coincidir con la versión exacta de @playwright/test de package.json (plan §3)
+    image: mcr.microsoft.com/playwright:v1.64.1-noble
+    env_file: .env.dev
+    environment:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+    # Red del host: el navegador ve la app en localhost:5173 y la API en localhost:3000,
+    # el origen coincide con CORS_ORIGIN y las cookies Secure se aceptan (plan R-2)
+    network_mode: host
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    entrypoint: ['sh', '-c', 'corepack enable && pnpm install --frozen-lockfile && exec "$$@"', '--']
+    profiles: ['e2e']

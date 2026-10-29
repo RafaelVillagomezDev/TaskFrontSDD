@@ -157,6 +157,7 @@
 
   --animate-*: initial;
   --animate-scale-in: scale-in 400ms var(--ease-spring);
+  --animate-spin: spin 800ms linear infinite; /* DESIGN.md anim-spin: indicador de carga */
 
   /* --- Breakpoints --- */
   --breakpoint-*: initial;
@@ -165,6 +166,12 @@
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
   --breakpoint-2xl: 1536px;
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
 
   @keyframes scale-in {
     from {
@@ -311,6 +318,7 @@
     *::before,
     *::after {
       animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
   }

@@ -12,7 +12,7 @@
 | Tokens de diseño (`src/styles/design-tokens.css`) | Listos, sin compilar todavía |
 | Referencia de diseño del tablero (`docs/design/`) | Lista |
 | Proyecto Vite + React, Docker, SonarQube, hooks de git | Pendiente |
-| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | `spec.md` aprobada, `plan.md` aprobado y `tasks.md` creado (114 tareas + 1 externa); implementación en curso: 27 de 114 (T001–T027) |
+| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | `spec.md` aprobada, `plan.md` aprobado y `tasks.md` creado (114 tareas + 1 externa); implementación en curso: 37 de 114 (T001–T037) |
 | Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Pendiente (bloquea la recarga sin volver a iniciar sesión) |
 
 ## Funcionalidades previstas

@@ -125,32 +125,42 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
 - [x] T027 [Base] `baseQueryWithSession` con cerrojo de renovación y API base con etiquetas `Task`, `Streak`, `Alert`, `Me` (D-2, D-6) — `src/shared/api/session-base-query.ts`, `base.api.ts`
   - Verifica: `dce pnpm test src/shared/api/tests/session-base-query` pasa.
   - Hecho (2026-10-29): `createSessionBaseQuery` (cookies, `X-CSRF-Token` salvo si la petición trae el suyo, cabeceras de hora en `/tasks`, `/streak` y `/alerts`, cerrojo de renovación y `sessionExpired` solo si había sesión abierta) y `baseApi` con las etiquetas `Task`, `Streak`, `Alert` y `Me`. El stub de `env` de Jest cubre también `../config/env`.
-- [ ] T028 [P] [Base] Tests de `use-current-day` (RF-14):
+- [x] T028 [P] [Base] Tests de `use-current-day` (RF-14):
   - Cambia a medianoche y al recuperar el foco.
   - Limpia temporizador y listener al desmontar.
   - Sin actualizaciones tras desmontar (IV.3).
   — `src/shared/date/tests/use-current-day.hook.test.ts`
   - Verifica: `dce pnpm test src/shared/date/tests/use-current-day` **falla**.
-- [ ] T029 [Base] `useCurrentDay` (D-9) — `src/shared/date/use-current-day.hook.ts`
+  - Hecho (2026-10-29): 10 casos: medianoche (también la segunda), vuelta a la pestaña, foco, pestaña oculta, `msUntilNextMidnight`; limpieza (temporizador y listeners eliminados al desmontar) y carreras (nada se actualiza tras desmontar; varios eventos seguidos dejan un solo temporizador).
+- [x] T029 [Base] `useCurrentDay` (D-9) — `src/shared/date/use-current-day.hook.ts`
   - Verifica: `dce pnpm test src/shared/date/tests/use-current-day` pasa.
+  - Hecho (2026-10-29): al volver a la pestaña recalcula siempre el día, porque con el equipo suspendido el temporizador de medianoche puede no haberse ejecutado.
 
 ### Componentes base (`src/shared/ui/`)
-- [ ] T030 [P] [Base] Tests de `Button`, `Text` y `Box`: prop `as` que conserva las props del elemento, variantes y tamaños de `DESIGN.md`, `disabled`, `focus-ring` (VI.3, R-5) — `src/shared/ui/tests/button.component.test.tsx`, `text.component.test.tsx`, `box.component.test.tsx`
+- [x] T030 [P] [Base] Tests de `Button`, `Text` y `Box`: prop `as` que conserva las props del elemento, variantes y tamaños de `DESIGN.md`, `disabled`, `focus-ring` (VI.3, R-5) — `src/shared/ui/tests/button.component.test.tsx`, `text.component.test.tsx`, `box.component.test.tsx`
   - Verifica: `dce pnpm test src/shared/ui/tests/button src/shared/ui/tests/text src/shared/ui/tests/box` **falla**.
-- [ ] T031 [Base] `Button`, `Text` y `Box` polimórficos sin aserciones (R-5) — `src/shared/ui/button.component.tsx`, `text.component.tsx`, `box.component.tsx`
+  - Hecho (2026-10-29): 24 casos. Choque resuelto a favor de la constitución: los botones SM (32 px) y MD (40 px) de `DESIGN.md` miden menos que el mínimo táctil de 44 px (VII.4), así que en móvil tienen `min-h-touch min-w-touch` y las alturas de `DESIGN.md` se aplican desde `md`. Los enlaces (`variant="link"`) quedan fuera del mínimo, como en WCAG.
+- [x] T031 [Base] `Button`, `Text` y `Box` polimórficos sin aserciones (R-5) — `src/shared/ui/button.component.tsx`, `text.component.tsx`, `box.component.tsx`
   - Verifica: los tests de T030 pasan y `dce pnpm lint` pasa.
-- [ ] T032 [P] [Base] Tests de `Icon`: tamaños desde constantes, `strokeWidth` 1.5, `aria-hidden` sin etiqueta y `aria-label` con ella (VII.2) — `src/shared/ui/tests/icon.component.test.tsx`
+  - Hecho (2026-10-29): tipo `PolymorphicProps<E, OwnProps>` sin aserciones (R-5 resuelto), `type="button"` por defecto, clases literales para que Tailwind las detecte (comprobado en el CSS compilado) y utilidad `cn` con su test.
+- [x] T032 [P] [Base] Tests de `Icon`: tamaños desde constantes, `strokeWidth` 1.5, `aria-hidden` sin etiqueta y `aria-label` con ella (VII.2) — `src/shared/ui/tests/icon.component.test.tsx`
   - Verifica: `dce pnpm test src/shared/ui/tests/icon` **falla**.
-- [ ] T033 [Base] `Icon` y sus constantes — `src/shared/ui/icon.component.tsx`, `icon.constants.ts`
+  - Hecho (2026-10-29): 4 casos: 20 o 24 px, trazo 1.5, `currentColor`, `aria-hidden` sin etiqueta y `role="img"` con nombre accesible si la tiene.
+- [x] T033 [Base] `Icon` y sus constantes — `src/shared/ui/icon.component.tsx`, `icon.constants.ts`
   - Verifica: `dce pnpm test src/shared/ui/tests/icon` pasa.
-- [ ] T034 [P] [Base] Tests de campos: `Field` relaciona etiqueta, campo y error (`aria-describedby`, `aria-invalid`); `Input`, `Textarea`, `DateInput`, `SelectNative`; `PasswordInput` con «mostrar» (S-11) — `src/shared/ui/tests/field.component.test.tsx` y uno por campo
+  - Hecho (2026-10-29): `ICON_SIZES` e `ICON_STROKE_WIDTH` en `icon.constants.ts`; ningún otro componente escribe tamaños de icono.
+- [x] T034 [P] [Base] Tests de campos: `Field` relaciona etiqueta, campo y error (`aria-describedby`, `aria-invalid`); `Input`, `Textarea`, `DateInput`, `SelectNative`; `PasswordInput` con «mostrar» (S-11) — `src/shared/ui/tests/field.component.test.tsx` y uno por campo
   - Verifica: `dce pnpm test src/shared/ui/tests/field src/shared/ui/tests/input` **falla**.
-- [ ] T035 [Base] Componentes de campo y `use-password-visibility.hook.ts` — `src/shared/ui/field.component.tsx`, `input.component.tsx`, `textarea.component.tsx`, `date-input.component.tsx`, `select-native.component.tsx`, `password-input.component.tsx`
+  - Hecho (2026-10-29): 14 casos: etiqueta que nombra al campo, ayuda y error en `aria-describedby`, `aria-invalid`, estilo de `DESIGN.md` con mínimo táctil en móvil, `Textarea`, `DateInput`, `SelectNative` y `PasswordInput` (mostrar u ocultar con ratón y con teclado).
+- [x] T035 [Base] Componentes de campo y `use-password-visibility.hook.ts` — `src/shared/ui/field.component.tsx`, `input.component.tsx`, `textarea.component.tsx`, `date-input.component.tsx`, `select-native.component.tsx`, `password-input.component.tsx`
   - Verifica: los tests de T034 pasan.
-- [ ] T036 [P] [Base] Tests de `Badge`, `Spinner`, `ErrorMessage` (con «Reintentar») y `Pagination` (página actual, totales, accesible por teclado) (RF-34, RF-40, RF-44) — `src/shared/ui/tests/`
+  - Hecho (2026-10-29): sin Context ni render props, cada campo recibe `label`, `errorText` y `helperText` (excepción de VI.3) y un `Field` interno los relaciona con `useFieldIds`; `DateInput` reutiliza `Input`; el estado de «mostrar contraseña» vive en `usePasswordVisibility`.
+- [x] T036 [P] [Base] Tests de `Badge`, `Spinner`, `ErrorMessage` (con «Reintentar») y `Pagination` (página actual, totales, accesible por teclado) (RF-34, RF-40, RF-44) — `src/shared/ui/tests/`
   - Verifica: `dce pnpm test src/shared/ui/tests/badge src/shared/ui/tests/spinner src/shared/ui/tests/error-message src/shared/ui/tests/pagination` **falla**.
-- [ ] T037 [Base] `Badge`, `Spinner`, `ErrorMessage` y `Pagination` — `src/shared/ui/`
+  - Hecho (2026-10-29): 15 casos: variantes de `Badge` (más `outline` para la etiqueta de identificador de *Layout Patterns*), `Spinner` con `role="status"`, `ErrorMessage` como alerta con «Reintentar» por teclado y `Pagination` con resumen en `children`, límites y sin botones con una sola página.
+- [x] T037 [Base] `Badge`, `Spinner`, `ErrorMessage` y `Pagination` — `src/shared/ui/`
   - Verifica: los tests de T036 pasan.
+  - Hecho (2026-10-29): el `Spinner` necesitaba una animación de giro que `DESIGN.md` no tenía. El usuario aprobó añadir el token `anim-spin` (800 ms, lineal, infinito) a `DESIGN.md` y a los tokens, y la regla de movimiento reducido ahora también corta las animaciones infinitas (`animation-iteration-count: 1`).
 - [ ] T038 [P] [Base] Tests de `useFocusTrap` y de `Dialog`:
   - Subcomponente fuera del padre → error (VI.2).
   - Escape cierra.

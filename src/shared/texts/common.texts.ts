@@ -6,4 +6,10 @@ export const COMMON_TEXTS = {
   close: 'Cerrar',
   save: 'Guardar',
   delete: 'Eliminar',
+  showPassword: 'Mostrar contraseña',
+  hidePassword: 'Ocultar contraseña',
+  pagination: 'Paginación',
+  previousPage: 'Página anterior',
+  nextPage: 'Página siguiente',
+  pageOf: (page: number, totalPages: number): string => `Página ${String(page)} de ${String(totalPages)}`,
 };

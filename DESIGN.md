@@ -184,6 +184,7 @@ Based on a **4px base unit**.
 | `anim-base` | 200ms | ease-in-out | Transitions |
 | `anim-slow` | 350ms | ease-in-out | Modals, drawers |
 | `anim-spring` | 400ms | cubic-bezier(0.34,1.56,0.64,1) | Scale-in effects |
+| `anim-spin` | 800ms | linear, infinite | Loading indicator (360° rotation); stops with reduced motion |
 
 ---
 

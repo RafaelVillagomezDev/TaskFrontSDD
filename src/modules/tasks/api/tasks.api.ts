@@ -1,7 +1,8 @@
 import { baseApi } from '../../../shared/api/base.api';
 import { validatedResult, type ApiResult, type BoundBaseQuery } from '../../../shared/api/validated-result.util';
 import { addDays } from '../../../shared/date/day.util';
-import { taskPageSchema, type Task } from '../schemas/task.schema';
+import type { TaskFormValues } from '../schemas/task-form.schema';
+import { taskPageSchema, taskSchema, type Task } from '../schemas/task.schema';
 import { FIRST_PAGE, WEEK_LENGTH, WEEK_PAGE_SIZE } from '../schemas/tasks.constants';
 
 interface WeekRange {
@@ -37,7 +38,15 @@ export const tasksApi = baseApi.injectEndpoints({
       queryFn: (weekStart, _api, _extra, baseQuery) => fetchWeekTasks(baseQuery, weekStart),
       providesTags: ['Task'],
     }),
+    // Crear espera a la API e invalida la semana y la racha (plan D-7); la descripción vacía se guarda como null
+    createTask: build.mutation<Task, TaskFormValues>({
+      queryFn: async ({ title, description, date }, _api, _extra, baseQuery) => {
+        const body = { title, description: description === '' ? null : description, date };
+        return validatedResult(await baseQuery({ url: '/tasks', method: 'POST', body }), taskSchema);
+      },
+      invalidatesTags: (_result, error) => (error === undefined ? ['Task', 'Streak'] : []),
+    }),
   }),
 });
 
-export const { useGetWeekTasksQuery } = tasksApi;
+export const { useGetWeekTasksQuery, useCreateTaskMutation } = tasksApi;

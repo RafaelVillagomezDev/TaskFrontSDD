@@ -10,6 +10,8 @@ export class BoardPage {
   readonly previousWeek: Locator;
   readonly nextWeek: Locator;
   readonly today: Locator;
+  readonly newTask: Locator;
+  readonly notice: Locator;
 
   constructor(page: Page) {
     this.heading = page.getByRole('heading', { level: 1, name: 'Tablero' });
@@ -18,6 +20,8 @@ export class BoardPage {
     this.previousWeek = page.getByRole('button', { name: 'Semana anterior' });
     this.nextWeek = page.getByRole('button', { name: 'Semana siguiente' });
     this.today = page.getByRole('button', { name: 'Hoy', exact: true });
+    this.newTask = page.getByRole('button', { name: 'Nueva tarea' });
+    this.notice = page.getByRole('status');
   }
 
   // Nombre accesible de la columna de un día AAAA-MM-DD: «jueves, 29 de octubre de 2026»
@@ -27,5 +31,10 @@ export class BoardPage {
 
   column(day: string): Locator {
     return this.board.getByRole('region', { name: this.columnName(day), exact: true });
+  }
+
+  // «Añadir tarea» de la columna de un día
+  addTaskTo(day: string): Locator {
+    return this.board.getByRole('button', { name: `Añadir tarea el ${this.columnName(day)}` });
   }
 }

@@ -7,6 +7,7 @@ import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
 import { toApiError } from '../../../../shared/api/api-error.util';
 import { baseApi } from '../../../../shared/api/base.api';
 import { createAppStore, type AppStore } from '../../../../shared/store/store';
+import { sessionStarted } from '../../../auth';
 import { tasksApi } from '../tasks.api';
 
 function task(id: string, date: string, completed = false) {
@@ -112,5 +113,57 @@ describe('D-5: tasksApi.getWeekTasks', () => {
     mockApi({ 'GET /tasks': () => apiOk({ items: [{ id: 'a' }], page: 1, pageSize: 100, totalItems: 1, totalPages: 1 }) });
     const result = await fetchWeek();
     expect(toApiError(result.error).code).toBe('INTERNAL_ERROR');
+  });
+});
+
+describe('D-5: tasksApi.createTask', () => {
+  const USER = { id: 'u1', email: 'ana@example.com', name: 'Ana', createdAt: '2026-10-29T10:00:00.000Z' };
+  const VALUES = { title: 'Comprar pan', description: '', date: '2026-10-30' };
+
+  beforeEach(() => {
+    store.dispatch(sessionStarted({ user: USER, csrfToken: 'sesion-1' }));
+  });
+
+  it('RF-15: envía POST /tasks con el token CSRF de la sesión y la descripción vacía como null', async () => {
+    const api = mockApi({ 'POST /tasks': () => apiOk(task('n', '2026-10-30'), 201) });
+    const result = await store.dispatch(tasksApi.endpoints.createTask.initiate(VALUES));
+    expect(result.data).toEqual(task('n', '2026-10-30'));
+    expect(api.requests[0]?.headers.get('X-CSRF-Token')).toBe('sesion-1');
+    expect(api.requests[0]?.headers.get('X-Client-Time')).not.toBeNull();
+    expect(await api.bodyOf('POST /tasks')).toEqual({ title: 'Comprar pan', description: null, date: '2026-10-30' });
+  });
+
+  it('envía la descripción cuando la hay', async () => {
+    const api = mockApi({ 'POST /tasks': () => apiOk(task('n', '2026-10-30'), 201) });
+    await store.dispatch(tasksApi.endpoints.createTask.initiate({ ...VALUES, description: 'Integral' }));
+    expect(await api.bodyOf('POST /tasks')).toEqual({ title: 'Comprar pan', description: 'Integral', date: '2026-10-30' });
+  });
+
+  it('RF-18: al crear invalida la semana en caché, que se vuelve a pedir', async () => {
+    let created = false;
+    const api = mockApi({
+      'GET /tasks': () => page(created ? [task('n', '2026-10-30')] : [], 1, created ? 1 : 0),
+      'POST /tasks': () => {
+        created = true;
+        return apiOk(task('n', '2026-10-30'), 201);
+      },
+    });
+    const week = store.dispatch(tasksApi.endpoints.getWeekTasks.initiate('2026-10-29'));
+    await week;
+    await store.dispatch(tasksApi.endpoints.createTask.initiate(VALUES));
+    // La invalidación lanza la nueva consulta: se espera a las que estén en curso
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.all(store.dispatch(tasksApi.util.getRunningQueriesThunk()));
+    expect(tasksApi.endpoints.getWeekTasks.select('2026-10-29')(store.getState()).data).toHaveLength(1);
+    week.unsubscribe();
+    expect(api.requests.filter((request) => request.method === 'GET')).toHaveLength(2);
+  });
+
+  it('RF-41: un error de la API llega con su código y sus campos', async () => {
+    mockApi({
+      'POST /tasks': () => apiFail(400, 'VALIDATION_ERROR', [{ field: 'title', message: 'Título no válido.' }]),
+    });
+    const result = await store.dispatch(tasksApi.endpoints.createTask.initiate(VALUES));
+    expect(toApiError(result.error)).toEqual({ code: 'VALIDATION_ERROR', fieldErrors: { title: 'Título no válido.' } });
   });
 });

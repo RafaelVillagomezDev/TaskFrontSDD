@@ -282,6 +282,7 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
 ### Implementación
 - [x] T060 [H2] `taskSchema` y consulta de la semana — `tasks/schemas/task.schema.ts`, `tasks/api/tasks.api.ts`
   - Verifica: `dce pnpm test src/modules/tasks/schemas src/modules/tasks/api` pasa.
+  - Hecho (2026-10-30): `createTaskFormSchema(today)`: la fecha depende del día actual, y `pipe` da un único error por campo (obligatoria → válida → no pasada). `createTask` es un `queryFn` que envía la descripción vacía como `null` e invalida `Task` y `Streak` solo si la API acepta.
   - Hecho (2026-10-29): `getWeekTasks` es un `queryFn` que pide la primera página y, si `totalPages > 1`, el resto en paralelo; valida cada página con `validatedResult` y aporta la etiqueta `Task`. Constantes en `tasks/schemas/tasks.constants.ts`.
 - [x] T061 [H2] `useWeekBoard` (plan §5.3) — `tasks/hooks/use-week-board.hook.ts`
   - Verifica: `dce pnpm test src/modules/tasks/hooks/tests/use-week-board` pasa.
@@ -298,9 +299,10 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
 ## Fase H3 — Crear una tarea (HU-03, P1)
 
 ### Tests (deben fallar)
-- [ ] T064 [P] [H3] Tests de `task-form.schema`: título 200/201 y solo espacios, descripción 1000/1001, fecha válida y no pasada (RF-16, RF-46) — `tasks/schemas/tests/task-form.schema.test.ts`
+- [x] T064 [P] [H3] Tests de `task-form.schema`: título 200/201 y solo espacios, descripción 1000/1001, fecha válida y no pasada (RF-16, RF-46) — `tasks/schemas/tests/task-form.schema.test.ts`
   - Verifica: `dce pnpm test src/modules/tasks/schemas/tests/task-form` **falla**.
-- [ ] T065 [P] [H3] Tests de `use-task-form` en modo crear (RF-19, RF-41):
+  - Hecho (2026-10-30): 12 casos: título 200/201, vacío y solo espacios, medido sin espacios de los extremos; descripción 1000/1001; fecha vacía, con otro formato, inexistente, pasada y futura, con un único error por campo.
+- [x] T065 [P] [H3] Tests de `use-task-form` en modo crear (RF-19, RF-41):
   - Fecha propuesta de la columna (RF-15) o de hoy (RF-51).
   - Envío bloqueado mientras se envía.
   - Dentro de la semana → aparece en su columna (RF-18).
@@ -308,21 +310,26 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
   - `fieldErrors` de la API en sus campos.
   — `tasks/hooks/tests/use-task-form.hook.test.ts`
   - Verifica: `dce pnpm test src/modules/tasks/hooks/tests/use-task-form` **falla**.
-- [ ] T066 [P] [H3] Tests de `TaskFormDialog` en modo crear: contadores 200 y 1000 (RF-17), campo fecha, errores bajo cada campo — `tasks/components/tests/task-form-dialog.component.test.tsx`
+  - Hecho (2026-10-30): 11 casos con el store real y `fetch` simulado, incluidos los contadores (RF-17), `DAY_CLOSED` (RF-42) y sin conexión (RF-44). Además, 4 casos de `createTask` en `tasks.api.test.ts` y 4 de la página del tablero (botón general, botón de cada columna, RF-18 y RF-52).
+- [x] T066 [P] [H3] Tests de `TaskFormDialog` en modo crear: contadores 200 y 1000 (RF-17), campo fecha, errores bajo cada campo — `tasks/components/tests/task-form-dialog.component.test.tsx`
   - Verifica: `dce pnpm test src/modules/tasks/components/tests/task-form-dialog` **falla**.
-- [ ] T067 [P] [H3] E2E en 6 proyectos (RF-15 a RF-19, RF-46, RF-51, RF-52):
+  - Hecho (2026-10-30): 6 casos: foco en el título al abrir, fecha propuesta con `min` en hoy, contadores como descripción accesible del campo, errores bajo cada campo, botón deshabilitado mientras se envía y «Cancelar» con vuelta del foco.
+- [x] T067 [P] [H3] E2E en 6 proyectos (RF-15 a RF-19, RF-46, RF-51, RF-52):
   - `create-task.e2e.ts`: crear desde una columna y desde el botón general, fecha fuera de la semana, doble clic.
   - `fields-task.e2e.ts`: título, descripción y fecha (válido, cada regla, solo teclado).
   — `e2e/specs/`, `e2e/pages/board.po.ts`, `task-form.po.ts`, `e2e/fixtures/tasks.fixture.ts`
   - Verifica: `dre pnpm test:e2e e2e/specs/create-task e2e/specs/fields-task --project=chromium-desktop` **falla**.
+  - Hecho (2026-10-30): `create-task.e2e.ts` (6 tests: columna, botón general, fuera de la semana, doble clic, crear tras recargar, que completa la verificación de T054, y «Cancelar») y `fields-task.e2e.ts` (9 tests: cada regla, fronteras válidas con contadores, `min` de la fecha y solo teclado). El fixture `board` de `e2e/fixtures/tasks.fixture.ts` entra con una cuenta nueva; sus tareas se borran con la cuenta. Page object `e2e/pages/task-form.po.ts`.
 
 ### Implementación
-- [ ] T068 [H3] Esquema del formulario y mutación `createTask` que invalida `Task` y `Streak` — `tasks/schemas/task-form.schema.ts`, `tasks/api/tasks.api.ts`
+- [x] T068 [H3] Esquema del formulario y mutación `createTask` que invalida `Task` y `Streak` — `tasks/schemas/task-form.schema.ts`, `tasks/api/tasks.api.ts`
   - Verifica: `dce pnpm test src/modules/tasks/schemas src/modules/tasks/api` pasa.
-- [ ] T069 [H3] `useTaskForm` en modo crear — `tasks/hooks/use-task-form.hook.ts`
+- [x] T069 [H3] `useTaskForm` en modo crear — `tasks/hooks/use-task-form.hook.ts`
   - Verifica: `dce pnpm test src/modules/tasks/hooks/tests/use-task-form` pasa.
-- [ ] T070 [H3] `TaskFormDialog` sobre `Dialog`; abrirlo desde cada columna y desde «Nueva tarea» — `tasks/components/task-form-dialog.component.tsx`, `day-column.component.tsx`, `tasks/pages/board.page.tsx`
+  - Hecho (2026-10-30): el hook guarda también si el diálogo está abierto y el aviso de RF-52; `openFor(day)` vacía el formulario con la fecha propuesta. Un `useRef` descarta el segundo envío de un doble clic, que llega antes de que el botón se deshabilite (RF-19).
+- [x] T070 [H3] `TaskFormDialog` sobre `Dialog`; abrirlo desde cada columna y desde «Nueva tarea» — `tasks/components/task-form-dialog.component.tsx`, `day-column.component.tsx`, `tasks/pages/board.page.tsx`
   - Verifica: `dre pnpm test:e2e e2e/specs/create-task e2e/specs/fields-task --project=chromium-desktop` pasa.
+  - Hecho (2026-10-30): `TaskFormDialog` controlado sobre `Dialog`. Los contadores van como ayuda del campo (`helperText`), sin cambiar `Field`. `AddTaskButton` al final de cada columna de hoy o futura, y «Nueva tarea» en la cabecera. `AuthNotice` pasa a `shared/ui/notice.component.tsx` (`Notice`) para reutilizarlo en el aviso de RF-52. La E2E de teclado de `board.e2e.ts` cambia: con «Añadir tarea» en las columnas se llega al tablero tabulando por sus botones; en una semana pasada, sin controles, el navegador hace enfocable la zona. Lint, typecheck, 429 tests (99,8 % de líneas), build, quality gate de SonarQube y 246 E2E en verde: Chromium entero en paralelo y Firefox con `--workers=2`, porque en paralelo se agota la memoria de Docker y fallan tests por tiempo de espera.
 
 ---
 
@@ -572,3 +579,4 @@ Los criterios de éxito se comprueban en:
 - **2026-10-29** — Fase H1 terminada salvo T054 (bloqueada por X001): T047–T053, T055 y T056.
 - **2026-10-29** — X001 hecha en TaskApiSDD y T054 verificada: fase H1 completa.
 - **2026-10-29** — Fase H2 terminada: T057–T063, más la E2E del tablero `board.e2e.ts` (no prevista en las tareas).
+- **2026-10-30** — Fase H3 terminada: T064–T070.

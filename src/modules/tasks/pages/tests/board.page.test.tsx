@@ -97,4 +97,68 @@ describe('BoardPage', () => {
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
   });
+
+  it('RF-51: «Nueva tarea» abre el formulario con la fecha de hoy', async () => {
+    const user = userEvent.setup({ advanceTimers: advance });
+    mockApi({ 'GET /tasks': weekWith([]) });
+    renderBoard();
+    await screen.findAllByText('Sin tareas');
+    await user.click(screen.getByRole('button', { name: 'Nueva tarea' }));
+    const dialog = screen.getByRole('dialog', { name: 'Nueva tarea' });
+    expect(within(dialog).getByLabelText('Fecha')).toHaveValue('2026-10-29');
+  });
+
+  it('RF-11 y RF-15: cada columna de hoy o futura ofrece añadir una tarea con su fecha; las pasadas no', async () => {
+    const user = userEvent.setup({ advanceTimers: advance });
+    mockApi({ 'GET /tasks': weekWith([]) });
+    renderBoard();
+    await screen.findAllByText('Sin tareas');
+    expect(screen.getAllByRole('button', { name: /^Añadir tarea el / })).toHaveLength(7);
+    await user.click(screen.getByRole('button', { name: 'Añadir tarea el domingo, 1 de noviembre de 2026' }));
+    expect(within(screen.getByRole('dialog')).getByLabelText('Fecha')).toHaveValue('2026-11-01');
+    await user.click(screen.getByRole('button', { name: 'Cancelar' }));
+
+    await user.click(screen.getByRole('button', { name: 'Semana anterior' }));
+    await screen.findAllByText('Día cerrado');
+    expect(screen.queryByRole('button', { name: /^Añadir tarea el / })).not.toBeInTheDocument();
+  });
+
+  it('RF-18: la tarea creada en la semana visible aparece en su columna', async () => {
+    const user = userEvent.setup({ advanceTimers: advance });
+    let items: unknown[] = [];
+    mockApi({
+      'GET /tasks': () => weekWith(items)(),
+      'POST /tasks': () => {
+        items = [TASK];
+        return apiOk(TASK, 201);
+      },
+    });
+    renderBoard();
+    await screen.findAllByText('Sin tareas');
+    await user.click(screen.getByRole('button', { name: 'Añadir tarea el domingo, 1 de noviembre de 2026' }));
+    await user.type(screen.getByLabelText('Título'), 'Comprar pan');
+    await user.click(screen.getByRole('button', { name: 'Crear tarea' }));
+    const sunday = screen.getByRole('region', { name: 'domingo, 1 de noviembre de 2026' });
+    expect(await within(sunday).findByText('Comprar pan')).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('RF-52: la tarea creada fuera de la semana visible se confirma con su fecha', async () => {
+    const user = userEvent.setup({ advanceTimers: advance });
+    mockApi({
+      'GET /tasks': weekWith([]),
+      'POST /tasks': () => apiOk({ ...TASK, date: '2026-11-12' }, 201),
+    });
+    renderBoard();
+    await screen.findAllByText('Sin tareas');
+    await user.click(screen.getByRole('button', { name: 'Nueva tarea' }));
+    await user.type(screen.getByLabelText('Título'), 'Comprar pan');
+    const date = screen.getByLabelText('Fecha');
+    await user.clear(date);
+    await user.type(date, '2026-11-12');
+    await user.click(screen.getByRole('button', { name: 'Crear tarea' }));
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      'Tarea creada para el jueves, 12 de noviembre de 2026.',
+    );
+  });
 });

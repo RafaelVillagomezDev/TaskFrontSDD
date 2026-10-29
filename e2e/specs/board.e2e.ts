@@ -76,11 +76,27 @@ test.describe('HU-02: ver las tareas de mi semana', () => {
     freshAccount,
   }) => {
     const board = await openBoard(page, freshAccount);
-    await board.nextWeek.focus();
+    const scrollLeft = () => board.board.evaluate((element) => element.scrollLeft);
+
+    // Semana actual: Tab recorre los «Añadir tarea» de cada columna y el tablero se desplaza hasta el último
+    const lastDay = addDays(todayKey(), WEEK_LENGTH - 1);
+    await board.addTaskTo(todayKey()).focus();
+    for (let column = 1; column < WEEK_LENGTH; column += 1) await page.keyboard.press('Tab');
+    await expect(board.addTaskTo(lastDay)).toBeFocused();
+    await expect(board.addTaskTo(lastDay)).toBeInViewport();
+
+    // Semana pasada, sin controles: el navegador hace enfocable la zona y se desplaza con las flechas
+    await board.previousWeek.click();
+    await expect(board.board.getByText('Día cerrado')).toHaveCount(WEEK_LENGTH);
+    await board.board.evaluate((element) => {
+      element.scrollLeft = 0;
+    });
+    await board.newTask.focus();
     await page.keyboard.press('Tab');
     await expect(board.board).toBeFocused();
     await page.keyboard.press('ArrowRight');
-    await expect.poll(() => board.board.evaluate((element) => element.scrollLeft)).toBeGreaterThan(0);
+    await expect.poll(scrollLeft).toBeGreaterThan(0);
+
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(0);
   });

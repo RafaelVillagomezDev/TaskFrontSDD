@@ -3,9 +3,9 @@ import { ROUTES } from '../../../shared/router/routes.constants';
 import { Button } from '../../../shared/ui/button.component';
 import { ErrorMessage } from '../../../shared/ui/error-message.component';
 import { Input } from '../../../shared/ui/input.component';
+import { Notice } from '../../../shared/ui/notice.component';
 import { PasswordInput } from '../../../shared/ui/password-input.component';
 import { Text } from '../../../shared/ui/text.component';
-import { AuthNotice } from '../components/auth-notice.component';
 import { AuthSwitch } from '../components/auth-switch.component';
 import { useLoginForm } from '../hooks/use-login-form.hook';
 import { AUTH_TEXTS } from '../texts/auth.texts';
@@ -19,8 +19,8 @@ export function LoginPage() {
       <Text as="h1" variant="h3">
         {AUTH_TEXTS.login.title}
       </Text>
-      {notice === 'registered' && <AuthNotice>{AUTH_TEXTS.login.registered}</AuthNotice>}
-      {notice === 'expired' && <AuthNotice>{AUTH_TEXTS.login.expired}</AuthNotice>}
+      {notice === 'registered' && <Notice>{AUTH_TEXTS.login.registered}</Notice>}
+      {notice === 'expired' && <Notice>{AUTH_TEXTS.login.expired}</Notice>}
       <form noValidate onSubmit={onSubmit} className="flex flex-col gap-4">
         <Input
           {...form.register('email')}

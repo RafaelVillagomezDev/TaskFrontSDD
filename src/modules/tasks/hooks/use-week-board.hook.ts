@@ -71,6 +71,7 @@ export function useWeekBoard() {
   else if (isError) status = 'error';
 
   return {
+    today,
     weekStart,
     weekEnd: addDays(weekStart, WEEK_LENGTH - 1),
     isCurrentWeek: weekOffset === 0,

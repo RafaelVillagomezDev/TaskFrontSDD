@@ -1,15 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 
-import { AuthNotice } from '../auth-notice.component';
 import { AuthSwitch } from '../auth-switch.component';
-
-describe('AuthNotice', () => {
-  it('anuncia su contenido como estado', () => {
-    render(<AuthNotice>Cuenta creada.</AuthNotice>);
-    expect(screen.getByRole('status')).toHaveTextContent('Cuenta creada.');
-  });
-});
 
 describe('AuthSwitch', () => {
   it('pregunta y enlace a la otra pantalla, con 44 px de alto en móvil', () => {

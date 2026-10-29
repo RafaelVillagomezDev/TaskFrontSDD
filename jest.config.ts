@@ -2,7 +2,8 @@ import type { Config } from 'jest';
 
 // Modo ESM como en TaskApiSDD: ts-jest transforma TypeScript y TSX como módulos ES
 const config: Config = {
-  testEnvironment: 'jsdom',
+  // jsdom con el fetch de Node (jest/jsdom-fetch.environment.js)
+  testEnvironment: '<rootDir>/jest/jsdom-fetch.environment.js',
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   transform: {
     '^.+\\.tsx?$': ['ts-jest', { useESM: true, tsconfig: 'tsconfig.json' }],

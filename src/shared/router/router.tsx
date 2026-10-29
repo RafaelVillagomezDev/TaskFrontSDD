@@ -1,8 +1,7 @@
 import { Navigate, type RouteObject } from 'react-router';
 
-import { AuthLayout } from '../layout/auth-layout.layout';
-import { GUEST_PAGE_TEXTS, NAVIGATION_TEXTS } from '../texts/navigation.texts';
-import { Text } from '../ui/text.component';
+import { LoginPage, RegisterPage } from '../../modules/auth';
+import { NAVIGATION_TEXTS } from '../texts/navigation.texts';
 import { PlaceholderPage } from './placeholder.page';
 import { PrivateLayout } from './private.layout';
 import { ProtectedRoute } from './protected-route.component';
@@ -13,26 +12,8 @@ export const APP_ROUTES: RouteObject[] = [
   {
     element: <ProtectedRoute access="guest" />,
     children: [
-      {
-        path: ROUTES.login,
-        element: (
-          <AuthLayout>
-            <Text as="h1" variant="h3">
-              {GUEST_PAGE_TEXTS.login}
-            </Text>
-          </AuthLayout>
-        ),
-      },
-      {
-        path: ROUTES.register,
-        element: (
-          <AuthLayout>
-            <Text as="h1" variant="h3">
-              {GUEST_PAGE_TEXTS.register}
-            </Text>
-          </AuthLayout>
-        ),
-      },
+      { path: ROUTES.login, element: <LoginPage /> },
+      { path: ROUTES.register, element: <RegisterPage /> },
     ],
   },
   {

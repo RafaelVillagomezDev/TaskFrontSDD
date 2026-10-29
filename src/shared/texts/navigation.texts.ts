@@ -11,9 +11,3 @@ export const NAVIGATION_TEXTS = {
   account: 'Cuenta',
   checkingSession: 'Comprobando la sesión…',
 };
-
-// Títulos provisionales de las pantallas de invitado hasta que existan sus módulos (T045)
-export const GUEST_PAGE_TEXTS = {
-  login: 'Iniciar sesión',
-  register: 'Crear cuenta',
-};

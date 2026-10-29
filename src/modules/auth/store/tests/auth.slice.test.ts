@@ -13,6 +13,7 @@ import {
   selectCurrentUser,
   selectIsAuthenticated,
   selectSessionExpired,
+  selectSignedOut,
   selectUserDisplayName,
 } from '../auth.selectors';
 
@@ -21,12 +22,18 @@ const ana = { id: 'u1', email: 'ana@example.com', name: 'Ana', createdAt: '2026-
 describe('slice auth', () => {
   it('empieza con la sesión sin comprobar', () => {
     const state = authReducer(undefined, { type: '@@init' });
-    expect(state).toEqual({ status: 'unknown', user: null, csrfToken: null, expired: false });
+    expect(state).toEqual({ status: 'unknown', user: null, csrfToken: null, expired: false, signedOut: false });
   });
 
   it('sessionStarted guarda el usuario y el token CSRF solo en memoria (RNF-06)', () => {
     const state = authReducer(undefined, sessionStarted({ user: ana, csrfToken: 'csrf-1' }));
-    expect(state).toEqual({ status: 'authenticated', user: ana, csrfToken: 'csrf-1', expired: false });
+    expect(state).toEqual({
+      status: 'authenticated',
+      user: ana,
+      csrfToken: 'csrf-1',
+      expired: false,
+      signedOut: false,
+    });
   });
 
   it('csrfTokenSet cambia solo el token', () => {
@@ -40,14 +47,17 @@ describe('slice auth', () => {
     expect(updated.user?.name).toBe('Ana García');
   });
 
-  it('RF-07: sessionEnded deja la sesión anónima y olvida usuario y token', () => {
+  it('sessionEnded deja la sesión anónima, olvida usuario y token y marca que la cerró el usuario', () => {
     const started = authReducer(undefined, sessionStarted({ user: ana, csrfToken: 'csrf-1' }));
     expect(authReducer(started, sessionEnded())).toEqual({
       status: 'anonymous',
       user: null,
       csrfToken: null,
       expired: false,
+      signedOut: true,
     });
+    const again = authReducer(authReducer(started, sessionEnded()), sessionStarted({ user: ana, csrfToken: 'c' }));
+    expect(again.signedOut).toBe(false);
   });
 
   it('RF-08: sessionCheckFailed deja sin sesión solo si aún no se sabía', () => {
@@ -63,6 +73,7 @@ describe('slice auth', () => {
       user: null,
       csrfToken: null,
       expired: true,
+      signedOut: false,
     });
   });
 });
@@ -77,6 +88,11 @@ describe('selectores de auth', () => {
     expect(selectCsrfToken(authenticated)).toBe('csrf-1');
     expect(selectIsAuthenticated(authenticated)).toBe(true);
     expect(selectIsAuthenticated(anonymous)).toBe(false);
+  });
+
+  it('selectSignedOut indica si el usuario cerró la sesión', () => {
+    expect(selectSignedOut(anonymous)).toBe(true);
+    expect(selectSignedOut(authenticated)).toBe(false);
   });
 
   it('RF-07: selectSessionExpired indica si la sesión caducó', () => {

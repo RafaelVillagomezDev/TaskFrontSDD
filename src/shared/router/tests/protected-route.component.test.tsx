@@ -3,13 +3,13 @@ import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { MemoryRouter, useLocation, useRoutes } from 'react-router';
 
-import { sessionEnded, sessionExpired, sessionStarted } from '../../../modules/auth';
+import { sessionCheckFailed, sessionEnded, sessionExpired, sessionStarted } from '../../../modules/auth';
 import { createAppStore } from '../../store/store';
 import { APP_ROUTES } from '../router';
 
 const USER = { id: 'u1', email: 'ana@example.com', name: 'Ana', createdAt: '2026-10-29T10:00:00.000Z' };
 
-type Session = 'unknown' | 'anonymous' | 'authenticated' | 'expired';
+type Session = 'unknown' | 'anonymous' | 'authenticated' | 'expired' | 'signedOut';
 
 // URL actual, pintada por una sonda (los routers de datos necesitan Request, que jsdom no tiene)
 function App() {
@@ -24,7 +24,8 @@ function App() {
 
 function renderAt(path: string, session: Session) {
   const store = createAppStore();
-  if (session === 'anonymous') store.dispatch(sessionEnded());
+  if (session === 'anonymous') store.dispatch(sessionCheckFailed());
+  if (session === 'signedOut') store.dispatch(sessionEnded());
   if (session === 'expired') store.dispatch(sessionExpired());
   if (session === 'authenticated') store.dispatch(sessionStarted({ user: USER, csrfToken: 'csrf-1' }));
   render(
@@ -59,6 +60,11 @@ describe('RF-08: ProtectedRoute', () => {
     const params = currentUrl().searchParams;
     expect(params.get('returnTo')).toBe('/alerts');
     expect(params.get('reason')).toBe('expired');
+  });
+
+  it('tras cerrar sesión el usuario, lleva a /login sin returnTo', () => {
+    renderAt('/history', 'signedOut');
+    expect(`${currentUrl().pathname}${currentUrl().search}`).toBe('/login');
   });
 
   it("con status 'unknown' muestra el cargador y no redirige", () => {

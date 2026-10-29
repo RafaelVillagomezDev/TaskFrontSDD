@@ -12,7 +12,7 @@
 | Tokens de diseño (`src/styles/design-tokens.css`) | Listos, sin compilar todavía |
 | Referencia de diseño del tablero (`docs/design/`) | Lista |
 | Proyecto Vite + React, Docker, SonarQube, hooks de git | Pendiente |
-| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | `spec.md` aprobada, `plan.md` aprobado y `tasks.md` creado (114 tareas + 1 externa); implementación en curso: 46 de 114 (fase 0 «Base» completa, T001–T046) |
+| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | `spec.md` aprobada, `plan.md` aprobado y `tasks.md` creado (114 tareas + 1 externa); implementación en curso: 55 de 114 (fase 0 «Base» y fase H1 «Crear mi cuenta y entrar» completas, salvo T054, que espera al cambio de la API) |
 | Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Pendiente (bloquea la recarga sin volver a iniciar sesión) |
 
 ## Funcionalidades previstas
@@ -63,6 +63,7 @@
 ├── sonar-project.properties   # Fuentes, tests, exclusiones y cobertura
 ├── scripts/                   # sonar-setup.sh, sonar-scan.sh, sonar-issues.sh
 ├── .githooks/                 # pre-commit (README vivo) y pre-push (E2E de Chromium + quality gate)
+├── jest/                      # Entorno jsdom con el fetch de Node, setup y utilidades de test (mockApi, render con store y router)
 ├── vite.config.ts · jest.config.ts · playwright.config.ts
 ├── .env.example               # Variables sin valor (versionado)
 ├── .claude/ · .claudeignore   # Configuración de Claude Code (permisos, hooks, skills)
@@ -110,11 +111,14 @@ git config core.hooksPath .githooks                                  # Activar l
 
 Safari no acepta cookies `Secure` en `http://localhost`: para desarrollar usa Chrome o Firefox.
 
+En los tests unitarios ninguna petición llega a la red: `jest/setup.ts` hace fallar todo `fetch` sin simular, y cada test simula la API con `mockApi` (`jest/mock-api.ts`).
+
 ### Pruebas end-to-end
 - El servicio `e2e` usa la imagen oficial `mcr.microsoft.com/playwright` con la **misma versión** que `@playwright/test`.
 - Usa `network_mode: host` para que el navegador vea la app en `localhost:5173` y la API en `localhost:3000`. Solo así coinciden el origen con `CORS_ORIGIN` y se aceptan las cookies `Secure`.
 - En Docker Desktop (macOS/Windows) requiere activar **Settings → Resources → Network → Enable host networking**.
 - Antes de ejecutarlas: `web` levantado, TaskApiSDD levantada y el usuario de prueba creado.
+- Los tests que necesitan una cuenta propia la registran por API con un email único (`e2e-…@kompitu.test`) y la borran al terminar (`e2e/fixtures/auth.fixture.ts`). Cada pantalla pasa por `expectResponsive` (`e2e/fixtures/responsive.fixture.ts`).
 ```bash
 docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:e2e         # Todas, en Chromium y Firefox
 docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:e2e:report  # Informe HTML del último run

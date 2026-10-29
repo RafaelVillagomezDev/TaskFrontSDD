@@ -13,9 +13,11 @@ export interface AuthState {
   csrfToken: string | null;
   // La sesión terminó porque no se pudo renovar, no por cerrar sesión: el inicio de sesión lo avisa (RF-07)
   expired: boolean;
+  // La sesión la cerró el usuario: la ruta privada lleva a /login sin returnTo (plan §5.1)
+  signedOut: boolean;
 }
 
-const initialState: AuthState = { status: 'unknown', user: null, csrfToken: null, expired: false };
+const initialState: AuthState = { status: 'unknown', user: null, csrfToken: null, expired: false, signedOut: false };
 
 const authSlice = createSlice({
   name: 'auth',
@@ -27,6 +29,7 @@ const authSlice = createSlice({
         user: action.payload.user,
         csrfToken: action.payload.csrfToken,
         expired: false,
+        signedOut: false,
       };
     },
     csrfTokenSet(state, action: PayloadAction<string>) {
@@ -36,7 +39,7 @@ const authSlice = createSlice({
       state.user = action.payload;
     },
     sessionEnded(): AuthState {
-      return { status: 'anonymous', user: null, csrfToken: null, expired: false };
+      return { status: 'anonymous', user: null, csrfToken: null, expired: false, signedOut: true };
     },
     // La comprobación inicial de GET /me falló: sin sesión, salvo que otra acción ya la haya resuelto
     sessionCheckFailed(state) {
@@ -49,6 +52,7 @@ const authSlice = createSlice({
       user: null,
       csrfToken: null,
       expired: true,
+      signedOut: false,
     }));
   },
 });

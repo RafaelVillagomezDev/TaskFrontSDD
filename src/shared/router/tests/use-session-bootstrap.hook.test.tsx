@@ -4,6 +4,7 @@ import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { createMemoryRouter } from 'react-router';
 
+import { apiFail, apiOk, mockApi } from '../../../../jest/mock-api';
 import { sessionEnded, sessionStarted } from '../../../modules/auth';
 import { createAppStore, type AppStore } from '../../store/store';
 import { AppRoot } from '../app-root.component';
@@ -26,9 +27,19 @@ afterEach(() => {
 });
 
 describe('RF-08: useSessionBootstrap', () => {
-  it('con la sesión sin comprobar consulta GET /me; si falla, queda sin sesión', async () => {
-    // jsdom no tiene fetch: la consulta falla como un 401 y RTK Query lo registra en consola
-    jest.spyOn(console, 'error').mockImplementation(() => undefined);
+  it('con la sesión sin comprobar consulta GET /me; con 200 abre la sesión', async () => {
+    mockApi({ 'GET /me': () => apiOk({ user: USER, csrfToken: 'csrf-1' }) });
+    const store = createAppStore();
+    const { result } = renderHook(() => useSessionBootstrap(), { wrapper: wrapperFor(store) });
+    expect(result.current).toBe('unknown');
+    await waitFor(() => {
+      expect(result.current).toBe('authenticated');
+    });
+    expect(store.getState().auth.csrfToken).toBe('csrf-1');
+  });
+
+  it('con 401 queda sin sesión', async () => {
+    mockApi({ 'GET /me': () => apiFail(401, 'MISSING_TOKEN') });
     const store = createAppStore();
     const { result } = renderHook(() => useSessionBootstrap(), { wrapper: wrapperFor(store) });
     expect(result.current).toBe('unknown');

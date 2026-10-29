@@ -1,6 +1,7 @@
 import { Menu, X } from 'lucide-react';
 import { Outlet } from 'react-router';
 
+import { LogoutButton } from '../../modules/auth';
 import { AppShell } from '../layout/app-shell.layout';
 import { MainNavigation } from '../layout/main-navigation.component';
 import { Navbar } from '../layout/navbar.component';
@@ -20,7 +21,9 @@ export function PrivateLayout() {
         <Text as="p" variant="h4" tone="primary" className="px-4">
           {NAVIGATION_TEXTS.appName}
         </Text>
-        <MainNavigation />
+        <MainNavigation>
+          <LogoutButton />
+        </MainNavigation>
       </Sidebar>
       <AppShell.Body>
         <Navbar>
@@ -36,7 +39,9 @@ export function PrivateLayout() {
                     <Icon icon={X} />
                   </Drawer.Close>
                 </div>
-                <MainNavigation />
+                <MainNavigation>
+                  <LogoutButton />
+                </MainNavigation>
               </Drawer.Content>
             </Drawer>
           </div>

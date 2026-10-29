@@ -1,6 +1,6 @@
 import { useLocation, useSearchParams } from 'react-router';
 
-import { selectAuthStatus, selectSessionExpired } from '../../modules/auth';
+import { selectAuthStatus, selectSessionExpired, selectSignedOut } from '../../modules/auth';
 import { useAppSelector } from '../store/hooks';
 import { REASON_EXPIRED, REASON_PARAM, RETURN_TO_PARAM, ROUTES } from './routes.constants';
 
@@ -17,10 +17,12 @@ function safeReturnTo(value: string | null): string {
 // Decide qué hace una ruta según la sesión (RF-08):
 // - Privada sin sesión → /login con la pantalla a la que volver y, si caducó, el motivo (RF-07).
 // - De invitado (login, registro) con sesión → la pantalla de returnTo o el tablero.
+// - Privada tras cerrar sesión el usuario → /login sin returnTo.
 // - Mientras se comprueba la sesión al arrancar → cargando.
 export function useRouteAccess(access: RouteAccess): RouteDecision {
   const status = useAppSelector(selectAuthStatus);
   const expired = useAppSelector(selectSessionExpired);
+  const signedOut = useAppSelector(selectSignedOut);
   const { pathname, search } = useLocation();
   const [searchParams] = useSearchParams();
 
@@ -31,6 +33,7 @@ export function useRouteAccess(access: RouteAccess): RouteDecision {
       : { kind: 'allow' };
   }
   if (status === 'authenticated') return { kind: 'allow' };
+  if (signedOut) return { kind: 'redirect', to: ROUTES.login };
 
   const params = new URLSearchParams({ [RETURN_TO_PARAM]: `${pathname}${search}` });
   if (expired) params.set(REASON_PARAM, REASON_EXPIRED);

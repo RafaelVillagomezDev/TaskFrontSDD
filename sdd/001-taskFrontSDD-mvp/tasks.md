@@ -214,39 +214,48 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
 ## Fase H1 — Crear mi cuenta y entrar (HU-01, P1)
 
 ### Tests (deben fallar)
-- [ ] T047 [P] [H1] Tests de esquemas de registro e inicio de sesión: cada regla de RF-46 en su frontera (email 254/255, contraseña 11/12/128/129 sin recortar, nombre 100/101 recortado; en el inicio de sesión, solo obligatorios y formato de email, S-12) (RF-02, RF-46) — `auth/schemas/tests/register.schema.test.ts`, `login.schema.test.ts`
+- [x] T047 [P] [H1] Tests de esquemas de registro e inicio de sesión: cada regla de RF-46 en su frontera (email 254/255, contraseña 11/12/128/129 sin recortar, nombre 100/101 recortado; en el inicio de sesión, solo obligatorios y formato de email, S-12) (RF-02, RF-46) — `auth/schemas/tests/register.schema.test.ts`, `login.schema.test.ts`
   - Verifica: `dce pnpm test src/modules/auth/schemas` **falla**.
-- [ ] T048 [P] [H1] Tests de `auth.api`: `login` pide antes `GET /auth/csrf`; `register`, `logout` y `me` validan su respuesta con Zod (D-5) — `auth/api/tests/auth.api.test.ts`
+  - Hecho (2026-10-29): 16 casos con cada frontera de RF-46 (email 254/255 recortado, contraseña 11/12/128/129 sin recortar, nombre 100/101 recortado) y S-12 en el inicio de sesión.
+- [x] T048 [P] [H1] Tests de `auth.api`: `login` pide antes `GET /auth/csrf`; `register`, `logout` y `me` validan su respuesta con Zod (D-5) — `auth/api/tests/auth.api.test.ts`
   - Verifica: `dce pnpm test src/modules/auth/api` **falla**.
-- [ ] T049 [P] [H1] Tests de hooks:
+  - Hecho (2026-10-29): 13 casos en entorno node, con `fetch` simulado: el token previo de `GET /auth/csrf` va en `X-CSRF-Token`, el login abre la sesión, una respuesta fuera de contrato es `INTERNAL_ERROR` y `logout` envía el token de la sesión.
+- [x] T049 [P] [H1] Tests de hooks:
   - `use-register-form`: éxito → `/login` con el email y el mensaje (RF-01); `EMAIL_ALREADY_REGISTERED` → error en email sin borrar el resto (RF-03).
   - `use-login-form`: mensaje genérico (RF-04); `TOO_MANY_ATTEMPTS` (RF-05); vuelta a `returnTo` (RF-07).
   - `use-logout`: vacía la sesión y la caché y navega con `replace`.
   — `auth/hooks/tests/`
   - Verifica: `dce pnpm test src/modules/auth/hooks` **falla**.
-- [ ] T050 [P] [H1] E2E en 6 proyectos:
+  - Hecho (2026-10-29): 15 casos con el store real y `fetch` simulado (`jest/mock-api.ts`). `jest/jsdom-fetch.environment.js` añade a jsdom el `fetch`, `Request`, `Response` y `AbortController` de Node, y `jest/setup.ts` hace fallar cualquier petición sin simular. Además, tests de las páginas (con `APP_ROUTES` y un router de datos en memoria) y de `AuthNotice`, `AuthSwitch` y `LogoutButton`.
+- [x] T050 [P] [H1] E2E en 6 proyectos:
   - `register.e2e.ts`: registro con email nuevo → inicio de sesión con el email ya escrito.
   - `login.e2e.ts`: entrar, mensaje genérico, cerrar sesión y «atrás» no vuelve, `returnTo`.
   - `fields-auth.e2e.ts`: cada campo de registro e inicio de sesión de RF-46 con valor válido, cada regla y solo teclado.
   (RF-01 a RF-08, RF-46) — `e2e/specs/`, `e2e/pages/login.po.ts`, `register.po.ts`, `e2e/fixtures/auth.fixture.ts`
   - Verifica: `dre pnpm test:e2e e2e/specs/register e2e/specs/login e2e/specs/fields-auth --project=chromium-desktop` **falla**.
+  - Hecho (2026-10-29): 21 tests × 6 proyectos = 126, en verde. `e2e/fixtures/api-client.ts` registra y borra por API cuentas únicas (`freshAccount`, `accountsToDelete`); `e2e/fixtures/responsive.fixture.ts` (`expectResponsive`) se adelanta de T109 y comprueba cada pantalla (sin desplazamiento horizontal, cada elemento interactivo dentro de la pantalla y 44×44 px en móvil). Las pruebas del mensaje genérico usan una cuenta nueva o un email inexistente para no bloquear al usuario de prueba (API-002 RF-09).
 
 ### Implementación
-- [ ] T051 [H1] Esquemas de usuario, registro e inicio de sesión — `auth/schemas/user.schema.ts`, `register.schema.ts`, `login.schema.ts`
+- [x] T051 [H1] Esquemas de usuario, registro e inicio de sesión — `auth/schemas/user.schema.ts`, `register.schema.ts`, `login.schema.ts`
   - Verifica: `dce pnpm test src/modules/auth/schemas` pasa.
-- [ ] T052 [H1] Endpoints de `auth` con `injectEndpoints` — `auth/api/auth.api.ts`
+  - Hecho (2026-10-29): validación con `pipe`, para mostrar un único error por campo en el orden obligatorio → longitud → formato. Límites en `auth.constants.ts`.
+- [x] T052 [H1] Endpoints de `auth` con `injectEndpoints` — `auth/api/auth.api.ts`
   - Verifica: `dce pnpm test src/modules/auth/api` pasa.
-- [ ] T053 [H1] Hooks de formulario y de cierre de sesión, y textos (RF-01 a RF-05, RF-07) — `auth/hooks/`, `auth/texts/auth.texts.ts`
+  - Hecho (2026-10-29): `register` y `login` son `queryFn` que piden antes el token previo; toda respuesta se valida con `shared/api/validated-result.util.ts` (fuera de contrato → `INTERNAL_ERROR`, sin excepciones). El login y `me` guardan la sesión en el propio `queryFn`.
+- [x] T053 [H1] Hooks de formulario y de cierre de sesión, y textos (RF-01 a RF-05, RF-07) — `auth/hooks/`, `auth/texts/auth.texts.ts`
   - Verifica: `dce pnpm test src/modules/auth/hooks` pasa.
+  - Hecho (2026-10-29): el login no navega: con la sesión abierta, la ruta de invitado lleva a `returnTo` o al tablero (RF-07). El registro lleva a `/login` con el email en el estado de la navegación, no en la URL. El cierre de sesión marca `signedOut` en el slice: la ruta privada lleva entonces a `/login` sin `returnTo`, porque React Router aplica sus navegaciones como transiciones y la redirección de la ruta protegida se adelantaba a la del hook.
 - [ ] T054 [H1] **(bloqueada por X001)** `use-session-bootstrap` recupera `csrfToken` de `GET /me` (D-1) — `src/shared/router/use-session-bootstrap.hook.ts`, `auth/schemas/user.schema.ts`
   - Verifica: tras iniciar sesión y recargar, crear una tarea funciona sin volver a entrar.
   - Avance (2026-10-29): el código ya valida `GET /me` con el contrato de la spec 003 de la API (`data: { user, csrfToken }`, `sessionSchema`). Mientras la API no lo implemente, la respuesta no cumple el esquema y la recarga lleva al inicio de sesión, como prevé D-1. Solo queda la verificación.
-- [ ] T055 [H1] Páginas de registro e inicio de sesión con `AuthLayout`; cerrar sesión en la navegación (RF-01, RF-50) — `auth/pages/register.page.tsx`, `login.page.tsx`, `auth/index.ts`
+- [x] T055 [H1] Páginas de registro e inicio de sesión con `AuthLayout`; cerrar sesión en la navegación (RF-01, RF-50) — `auth/pages/register.page.tsx`, `login.page.tsx`, `auth/index.ts`
   - Verifica: `dre pnpm test:e2e e2e/specs/register e2e/specs/login e2e/specs/fields-auth --project=chromium-desktop` pasa.
+  - Hecho (2026-10-29): `LoginPage` y `RegisterPage` sustituyen a las páginas provisionales; `LogoutButton` va en la navegación (Sidebar y Drawer). El enlace entre pantallas mide 44 px de alto en móvil. Los textos de contraseña son objetos (`fields.password.label`…) para que SonarQube no los tome por credenciales (S2068).
 
 ### Checkpoint H1
-- [ ] T056 [H1] Registro, inicio y cierre de sesión completos.
+- [x] T056 [H1] Registro, inicio y cierre de sesión completos.
   - Verifica: `dce pnpm test src/modules/auth src/shared` y `dre pnpm test:e2e e2e/specs/register e2e/specs/login e2e/specs/fields-auth` (6 proyectos) pasan.
+  - Hecho (2026-10-29): lint, typecheck, 348 tests (cobertura 99,5 % de líneas), build, 126 E2E en los 6 proyectos y quality gate de SonarQube en verde. T054 sigue pendiente de X001.
 
 ---
 
@@ -551,3 +560,4 @@ Los criterios de éxito se comprueban en:
 
 - **2026-10-29** — Creación de las tareas a partir del plan aprobado.
 - **2026-10-29** — Fase 0 (Base) terminada: T038–T046. Avance de T054 (falta la verificación con X001).
+- **2026-10-29** — Fase H1 terminada salvo T054 (bloqueada por X001): T047–T053, T055 y T056.

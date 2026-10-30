@@ -28,7 +28,7 @@ export function Textarea({
         id={ids.controlId}
         aria-invalid={errorText === undefined ? undefined : true}
         aria-describedby={ids.describedBy}
-        className={cn(controlClassName(errorText !== undefined, false), 'min-h-24', className)}
+        className={cn(controlClassName(errorText !== undefined, 'textarea'), 'min-h-24', className)}
       />
     </Field>
   );

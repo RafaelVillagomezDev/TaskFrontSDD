@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 
 import { Badge } from '../../../shared/ui/badge.component';
@@ -12,6 +13,8 @@ import { TASKS_TEXTS } from '../texts/tasks.texts';
 
 interface TaskCardProps {
   task: Task;
+  // Datos extra antes del estado, por ejemplo la fecha en el historial (RF-31)
+  children?: ReactNode;
   // Con onToggleCompleted la tarea se puede completar y desmarcar: solo las de hoy (RF-13, RF-20 a RF-22)
   onToggleCompleted?: (() => void) | undefined;
   // Mientras se guarda el cambio, la casilla no admite otro
@@ -52,6 +55,7 @@ function TaskTitle({ task, as }: Readonly<TaskTitleProps>) {
 // como la tarea; la casilla mide 44×44 px en móvil (VII.4)
 export function TaskCard({
   task,
+  children,
   onToggleCompleted,
   isUpdating = false,
   keepFocus = false,
@@ -81,6 +85,7 @@ export function TaskCard({
       )}
       {/* Estado con las variantes de DESIGN.md (Status → Badge Mapping) */}
       <div className="flex flex-wrap items-center gap-2">
+        {children}
         {task.completed ? (
           <Badge variant="success">{TASKS_TEXTS.status.completed}</Badge>
         ) : (

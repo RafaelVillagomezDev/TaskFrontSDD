@@ -430,27 +430,33 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
 ## Fase H8 — Consultar mi historial con filtros (HU-08, P2)
 
 ### Tests (deben fallar)
-- [ ] T089 [P] [H8] Tests de `history-filters.schema`: estado `all`/`completed`/`pending`, fechas válidas, «desde» igual a «hasta» válido, «desde» posterior a «hasta» rechazado (RF-32, RF-33, RF-46) — `tasks/schemas/tests/history-filters.schema.test.ts`
+- [x] T089 [P] [H8] Tests de `history-filters.schema`: estado `all`/`completed`/`pending`, fechas válidas, «desde» igual a «hasta» válido, «desde» posterior a «hasta» rechazado (RF-32, RF-33, RF-46) — `tasks/schemas/tests/history-filters.schema.test.ts`
   - Verifica: `dce pnpm test src/modules/tasks/schemas/tests/history-filters` **falla**.
-- [ ] T090 [P] [H8] Tests de `use-history` (RF-31 a RF-34):
+  - Hecho (2026-10-30): el error de «desde» posterior a «hasta» va en «desde».
+- [x] T090 [P] [H8] Tests de `use-history` (RF-31 a RF-34):
   - Filtros y página sincronizados con la URL (D-8).
   - `pageSize=50` (S-06).
   - Página fuera de rango → última página.
   — `tasks/hooks/tests/use-history.hook.test.ts`
   - Verifica: `dce pnpm test src/modules/tasks/hooks/tests/use-history` **falla**.
-- [ ] T091 [P] [H8] Tests de `HistoryFilters` y `HistoryList`: fecha y estado de cada tarea, estado vacío, `Pagination` — `tasks/components/tests/history-filters.component.test.tsx`, `history-list.component.test.tsx`
+  - Hecho (2026-10-30): también filtros de la URL no válidos (se ignoran), quitar filtros, cambiar de página conservando los filtros y error con reintento.
+- [x] T091 [P] [H8] Tests de `HistoryFilters` y `HistoryList`: fecha y estado de cada tarea, estado vacío, `Pagination` — `tasks/components/tests/history-filters.component.test.tsx`, `history-list.component.test.tsx`
   - Verifica: `dce pnpm test src/modules/tasks/components/tests/history` **falla**.
-- [ ] T092 [P] [H8] E2E en 6 proyectos (RF-31 a RF-34, RF-46):
+  - Hecho (2026-10-30): `HistoryList` reutiliza `TaskCard` en solo lectura, con la fecha como `children`; prueba de la página `/history` en `history.page.test.tsx`.
+- [x] T092 [P] [H8] E2E en 6 proyectos (RF-31 a RF-34, RF-46):
   - `history.e2e.ts`: filtro por estado, rango y paginación.
   - `fields-history.e2e.ts`: «desde» y «hasta».
   — `e2e/specs/`, `e2e/pages/history.po.ts`
   - Verifica: `dre pnpm test:e2e e2e/specs/history e2e/specs/fields-history --project=chromium-desktop` **falla**.
+  - Hecho (2026-10-30): `history.e2e.ts` cubre también el acceso desde la navegación, la recarga con filtros (D-8), la página fuera de rango y el historial vacío.
 
 ### Implementación
-- [ ] T093 [H8] Esquema de filtros y consulta `getTasks` con estado, rango y página — `tasks/schemas/history-filters.schema.ts`, `tasks/api/tasks.api.ts`
+- [x] T093 [H8] Esquema de filtros y consulta `getTasks` con estado, rango y página — `tasks/schemas/history-filters.schema.ts`, `tasks/api/tasks.api.ts`
   - Verifica: `dce pnpm test src/modules/tasks/schemas src/modules/tasks/api` pasa.
-- [ ] T094 [H8] `useHistory`, `HistoryFilters`, `HistoryList` y página `/history` con acceso en la navegación — `tasks/hooks/use-history.hook.ts`, `tasks/components/history-*.component.tsx`, `tasks/pages/history.page.tsx`
+  - Hecho (2026-10-30): `getTasks` solo envía `from`/`to` si tienen valor; `HISTORY_PAGE_SIZE = 50`.
+- [x] T094 [H8] `useHistory`, `HistoryFilters`, `HistoryList` y página `/history` con acceso en la navegación — `tasks/hooks/use-history.hook.ts`, `tasks/components/history-*.component.tsx`, `tasks/pages/history.page.tsx`
   - Verifica: `dre pnpm test:e2e e2e/specs/history e2e/specs/fields-history --project=chromium-desktop` pasa.
+  - Hecho (2026-10-30): la ruta `/history` usa `HistoryPage` (el enlace ya estaba en la navegación). Arreglo de paso: `controlClassName` recibe el tipo de control y el `select` no lleva padding vertical, que recortaba su texto en 40 px. 587 tests y 408 E2E en los 6 proyectos en verde.
 
 ---
 
@@ -610,3 +616,4 @@ Los criterios de éxito se comprueban en:
 - **2026-10-30** — Nueva paleta (decisión del usuario): neutros cálidos (papel y tinta en claro, carbón `#191816` en oscuro), acento Tide (`#0F6E66` / `#5CC8B8`) y estados en tonos de tierra (arcilla, hoja y miel), partiendo de la estructura de WattVision. Cambian `DESIGN.md`, `design-tokens.css` (botones y badges con valor claro y oscuro, `on-primary` / `on-destructive`) y el test de contraste, que comprueba también 3:1 en bordes de campos y foco. `EmptyState` pasa a borde discontinuo sin relleno.
 - **2026-10-30** — Fase H6 terminada: T080–T085, con el progreso de hoy calculado en `useWeekBoard` (plan §5.5). Historias P1 completas.
 - **2026-10-30** — Fase H7 terminada: T086–T088.
+- **2026-10-30** — Fase H8 terminada: T089–T094.

@@ -18,12 +18,17 @@ interface FieldProps {
 
 // Estilo común de los controles según DESIGN.md (Inputs): borde Gray 300, foco de 2 px en primary,
 // borde de peligro con error; en móvil, al menos 44 px de alto (CONSTITUTION.md VII.4)
-export function controlClassName(hasError: boolean, fixedHeight = true): string {
+// Un textarea crece con su contenido; un select centra su texto en la altura fija, sin padding vertical que
+// lo recorte
+export type ControlKind = 'input' | 'textarea' | 'select';
+
+export function controlClassName(hasError: boolean, kind: ControlKind = 'input'): string {
   return cn(
-    'w-full rounded-md border bg-surface px-4 py-3 text-body text-foreground anim-fast transition-colors',
+    'w-full rounded-md border bg-surface px-4 text-body text-foreground anim-fast transition-colors',
     'focus:outline-2 focus:-outline-offset-1 focus:outline-primary disabled:opacity-40',
     'min-h-touch',
-    fixedHeight && 'md:h-control-md md:min-h-0',
+    kind !== 'select' && 'py-3',
+    kind !== 'textarea' && 'md:h-control-md md:min-h-0',
     hasError ? 'border-danger' : 'border-border-input',
   );
 }

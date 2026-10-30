@@ -6,3 +6,6 @@ export const FIRST_PAGE = 1;
 // Límites de los campos de una tarea (spec RF-46, API-001 RF-04 y RF-05)
 export const TITLE_MAX_LENGTH = 200;
 export const DESCRIPTION_MAX_LENGTH = 1000;
+
+// Tamaño de página del historial (spec S-06; API-001 RF-39)
+export const HISTORY_PAGE_SIZE = 50;

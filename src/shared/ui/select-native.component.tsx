@@ -20,7 +20,7 @@ export function SelectNative({ label, helperText, errorText, id, className, ...r
         id={ids.controlId}
         aria-invalid={errorText === undefined ? undefined : true}
         aria-describedby={ids.describedBy}
-        className={cn(controlClassName(errorText !== undefined), className)}
+        className={cn(controlClassName(errorText !== undefined, 'select'), className)}
       />
     </Field>
   );

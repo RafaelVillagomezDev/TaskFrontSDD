@@ -131,6 +131,43 @@ describe('D-5: tasksApi.getDayTasks', () => {
   });
 });
 
+describe('D-5: tasksApi.getTasks (historial)', () => {
+  const QUERY = { status: 'all', from: '', to: '', page: 1 } as const;
+
+  it('RF-31 y RF-34: pide la página con pageSize=50, sin fechas vacías, y devuelve los datos de paginación', async () => {
+    const api = mockApi({
+      'GET /tasks': () =>
+        apiOk({ items: [task('a', '2026-10-29')], page: 1, pageSize: 50, totalItems: 1, totalPages: 1 }),
+    });
+    const result = await store.dispatch(tasksApi.endpoints.getTasks.initiate(QUERY, { subscribe: false }));
+    expect(result.data).toEqual({
+      items: [task('a', '2026-10-29')],
+      page: 1,
+      pageSize: 50,
+      totalItems: 1,
+      totalPages: 1,
+    });
+    expect(queryOf(api.requests[0] ?? new Request('http://x'))).toEqual({ status: 'all', page: '1', pageSize: '50' });
+  });
+
+  it('RF-32: envía el estado y el rango', async () => {
+    const api = mockApi({ 'GET /tasks': () => page([], 2, 0) });
+    await store.dispatch(
+      tasksApi.endpoints.getTasks.initiate(
+        { status: 'pending', from: '2026-10-01', to: '2026-10-31', page: 2 },
+        { subscribe: false },
+      ),
+    );
+    expect(queryOf(api.requests[0] ?? new Request('http://x'))).toEqual({
+      status: 'pending',
+      from: '2026-10-01',
+      to: '2026-10-31',
+      page: '2',
+      pageSize: '50',
+    });
+  });
+});
+
 describe('D-5: tasksApi.createTask', () => {
   const USER = { id: 'u1', email: 'ana@example.com', name: 'Ana', createdAt: '2026-10-29T10:00:00.000Z' };
   const VALUES = { title: 'Comprar pan', description: '', date: '2026-10-30' };

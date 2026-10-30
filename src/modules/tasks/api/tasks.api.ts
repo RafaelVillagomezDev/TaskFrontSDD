@@ -5,14 +5,35 @@ import { baseApi } from '../../../shared/api/base.api';
 import { validatedResult, type ApiResult, type BoundBaseQuery } from '../../../shared/api/validated-result.util';
 import { addDays } from '../../../shared/date/day.util';
 import type { TaskFormValues } from '../schemas/task-form.schema';
+import type { Page } from '../../../shared/api/api-envelope.schema';
+import type { HistoryStatus } from '../schemas/history-filters.schema';
 import { taskPageSchema, taskSchema, type Task } from '../schemas/task.schema';
-import { FIRST_PAGE, WEEK_LENGTH, WEEK_PAGE_SIZE } from '../schemas/tasks.constants';
+import { FIRST_PAGE, HISTORY_PAGE_SIZE, WEEK_LENGTH, WEEK_PAGE_SIZE } from '../schemas/tasks.constants';
 
 // Cambios de una tarea que acepta PATCH /tasks/{id} (API-001: title, description y completed)
 export interface TaskChanges {
   title?: string;
   description?: string | null;
   completed?: boolean;
+}
+
+// Consulta del historial (plan §5.6): estado, rango opcional (cadena vacía = sin límite) y página
+export interface HistoryQuery {
+  status: HistoryStatus;
+  from: string;
+  to: string;
+  page: number;
+}
+
+// Solo los parámetros con valor: la API no acepta fechas vacías
+function historyParams({ status, from, to, page }: HistoryQuery) {
+  return {
+    status,
+    ...(from === '' ? {} : { from }),
+    ...(to === '' ? {} : { to }),
+    page,
+    pageSize: HISTORY_PAGE_SIZE,
+  };
 }
 
 export interface UpdateTaskArgs {
@@ -88,6 +109,12 @@ export const tasksApi = baseApi.injectEndpoints({
       queryFn: (day, _api, _extra, baseQuery) => fetchAllTasks(baseQuery, { date: day }),
       providesTags: ['Task'],
     }),
+    // Una página del historial (RF-31, RF-32, RF-34), en el orden de la API: fecha y creación (API-001 RF-41)
+    getTasks: build.query<Page<Task>, HistoryQuery>({
+      queryFn: async (query, _api, _extra, baseQuery) =>
+        validatedResult(await baseQuery({ url: '/tasks', params: historyParams(query) }), taskPageSchema),
+      providesTags: ['Task'],
+    }),
     // Crear espera a la API e invalida la semana y la racha (plan D-7); la descripción vacía se guarda como null
     createTask: build.mutation<Task, TaskFormValues>({
       queryFn: async ({ title, description, date }, _api, _extra, baseQuery) => {
@@ -139,6 +166,7 @@ export const tasksApi = baseApi.injectEndpoints({
 export const {
   useGetWeekTasksQuery,
   useGetDayTasksQuery,
+  useGetTasksQuery,
   useCreateTaskMutation,
   useUpdateTaskMutation,
   useDeleteTaskMutation,

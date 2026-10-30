@@ -29,6 +29,11 @@ function fromOf(request: Request | undefined): string | null {
   return request === undefined ? null : new URL(request.url).searchParams.get('from');
 }
 
+// Última petición de una semana (from/to); la del progreso de hoy fuera de la semana actual usa date
+function lastWeekRequest(requests: Request[]): Request | undefined {
+  return requests.filter((request) => new URL(request.url).searchParams.has('from')).at(-1);
+}
+
 function setup() {
   const store = freshStore();
   const view = renderHook(() => useWeekBoard(), { wrapper: appWrapper(store, '/') });
@@ -112,7 +117,7 @@ describe('useWeekBoard', () => {
       expect(result.current.status).toBe('ready');
     });
     expect(result.current.columns.every((column) => column.kind === 'past')).toBe(true);
-    expect(fromOf(api.requests.at(-1))).toBe('2026-10-22');
+    expect(fromOf(lastWeekRequest(api.requests))).toBe('2026-10-22');
   });
 
   it('RF-12 y RF-47: avanzar muestra los 7 días siguientes y «Hoy» vuelve a la semana actual', async () => {
@@ -135,7 +140,7 @@ describe('useWeekBoard', () => {
     expect(result.current.weekStart).toBe('2026-10-29');
     expect(result.current.isCurrentWeek).toBe(true);
     await waitFor(() => {
-      expect(fromOf(api.requests.at(-1))).toBe('2026-11-12');
+      expect(fromOf(lastWeekRequest(api.requests))).toBe('2026-11-12');
     });
   });
 
@@ -190,7 +195,7 @@ describe('useWeekBoard', () => {
     expect(result.current.columns[0]?.kind).toBe('today');
     expect(dispatch).toHaveBeenCalledWith(baseApi.util.invalidateTags(['Task', 'Streak']));
     await waitFor(() => {
-      expect(fromOf(api.requests.at(-1))).toBe('2026-10-30');
+      expect(fromOf(lastWeekRequest(api.requests))).toBe('2026-10-30');
     });
   });
 
@@ -222,5 +227,43 @@ describe('useWeekBoard', () => {
       window.dispatchEvent(new Event('focus'));
     });
     expect(dispatch).not.toHaveBeenCalledWith(baseApi.util.invalidateTags(['Task', 'Streak']));
+  });
+  it('RF-26: el progreso de hoy sale de la columna de hoy, sin pedir nada más', async () => {
+    const api = mockApi({
+      'GET /tasks': weekOf([task('a', '2026-10-29', true), task('b', '2026-10-29'), task('c', '2026-10-30')]),
+    });
+    const { result } = setup();
+    await waitFor(() => {
+      expect(result.current.todayProgress).toEqual({ done: 1, total: 2 });
+    });
+    expect(api.requests).toHaveLength(1);
+  });
+
+  it('RF-26: en otra semana, el progreso de hoy pide solo las tareas de hoy', async () => {
+    const api = mockApi({
+      'GET /tasks': (request) =>
+        new URL(request.url).searchParams.get('date') === '2026-10-29'
+          ? weekOf([task('a', '2026-10-29')])()
+          : weekOf([task('z', '2026-11-05', true)])(),
+    });
+    const { result } = setup();
+    await waitFor(() => {
+      expect(result.current.todayProgress).toEqual({ done: 0, total: 0 });
+    });
+    act(() => {
+      result.current.goToNextWeek();
+    });
+    await waitFor(() => {
+      expect(result.current.todayProgress).toEqual({ done: 0, total: 1 });
+    });
+    const dayRequests = api.requests.filter((request) => new URL(request.url).searchParams.has('date'));
+    expect(dayRequests).toHaveLength(1);
+    expect(fromOf(dayRequests[0])).toBeNull();
+  });
+
+  it('RF-26: sin datos de hoy todavía, no hay progreso', () => {
+    mockApi({ 'GET /tasks': () => new Promise<Response>(() => undefined) });
+    const { result } = setup();
+    expect(result.current.todayProgress).toBeUndefined();
   });
 });

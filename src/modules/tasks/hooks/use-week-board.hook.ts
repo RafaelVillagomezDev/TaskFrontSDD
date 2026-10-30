@@ -5,7 +5,8 @@ import { baseApi } from '../../../shared/api/base.api';
 import { addDays, compareDays, dayRange } from '../../../shared/date/day.util';
 import { useCurrentDay } from '../../../shared/date/use-current-day.hook';
 import { useAppDispatch } from '../../../shared/store/hooks';
-import { useGetWeekTasksQuery } from '../api/tasks.api';
+import type { TodayProgress } from '../../streaks';
+import { useGetDayTasksQuery, useGetWeekTasksQuery } from '../api/tasks.api';
 import type { Task } from '../schemas/task.schema';
 import { WEEK_LENGTH } from '../schemas/tasks.constants';
 
@@ -55,6 +56,18 @@ function useInvalidateOnDayChange(today: string): void {
   }, [today, dispatch]);
 }
 
+function progressOf(tasks: Task[]): TodayProgress {
+  return { done: tasks.filter((task) => task.completed).length, total: tasks.length };
+}
+
+// Progreso de hoy para el panel de rachas (plan §5.5, RF-26). Si la semana visible empieza hoy, sale de su
+// caché, que ya refleja al instante completar o desmarcar (CE-02); si no, se piden solo las tareas de hoy
+function useTodayProgress(today: string, weekTasks: Task[] | undefined, isCurrentWeek: boolean) {
+  const { currentData: dayTasks } = useGetDayTasksQuery(today, { skip: isCurrentWeek });
+  const todayTasks = isCurrentWeek ? weekTasks?.filter((task) => task.date === today) : dayTasks;
+  return todayTasks === undefined ? undefined : progressOf(todayTasks);
+}
+
 // Tablero semanal (plan §5.3): 7 días desde hoy y navegación de 7 en 7 (RF-09 a RF-14, RF-47, S-02).
 // El estado es la distancia en semanas a hoy: al cambiar el día, el tablero sigue a hoy (casos límite de RF-14)
 export function useWeekBoard() {
@@ -66,6 +79,8 @@ export function useWeekBoard() {
   // currentData: solo las tareas de la semana pedida, nunca las de la anterior mientras carga (RF-40)
   const { currentData, error, isError, refetch } = useGetWeekTasksQuery(weekStart);
   const tasks = currentData ?? NO_TASKS;
+  const isCurrentWeek = weekOffset === 0;
+  const todayProgress = useTodayProgress(today, currentData, isCurrentWeek);
   let status: WeekBoardStatus = 'loading';
   if (currentData !== undefined) status = 'ready';
   else if (isError) status = 'error';
@@ -74,8 +89,9 @@ export function useWeekBoard() {
     today,
     weekStart,
     weekEnd: addDays(weekStart, WEEK_LENGTH - 1),
-    isCurrentWeek: weekOffset === 0,
+    isCurrentWeek,
     columns: buildColumns(weekStart, today, tasks),
+    todayProgress,
     status,
     errorMessage: status === 'error' ? errorMessage(toApiError(error).code) : undefined,
     // El resultado del reintento llega por la propia consulta (status y columnas)

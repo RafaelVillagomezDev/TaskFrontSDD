@@ -13,6 +13,8 @@ export class BoardPage {
   readonly newTask: Locator;
   readonly notice: Locator;
   readonly dismissNotice: Locator;
+  readonly streakPanel: Locator;
+  readonly createTodayTask: Locator;
 
   constructor(page: Page) {
     this.heading = page.getByRole('heading', { level: 1, name: 'Tablero' });
@@ -24,6 +26,8 @@ export class BoardPage {
     this.newTask = page.getByRole('button', { name: 'Nueva tarea' });
     this.notice = page.getByRole('status');
     this.dismissNotice = page.getByRole('button', { name: 'Cerrar aviso' });
+    this.streakPanel = page.getByRole('region', { name: 'Racha y progreso de hoy' });
+    this.createTodayTask = this.streakPanel.getByRole('button', { name: 'Crear una tarea' });
   }
 
   // Nombre accesible de la columna de un día AAAA-MM-DD: «jueves, 29 de octubre de 2026»

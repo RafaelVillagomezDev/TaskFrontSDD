@@ -2,7 +2,7 @@ import { jest } from '@jest/globals';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
+import { apiFail, apiOk, mockApi, type MockedApi } from '../../../../../jest/mock-api';
 import { AppUnderTest, freshStore, routerAt } from '../../../../../jest/render-app';
 import { sessionStarted } from '../../../auth';
 import { APP_ROUTES } from '../../../../shared/router/router';
@@ -22,6 +22,11 @@ const TASK = {
 
 function weekWith(items: unknown[]) {
   return () => apiOk({ items, page: 1, pageSize: 100, totalItems: items.length, totalPages: 1 });
+}
+
+// El tablero también pide la racha del panel (S-10): racha 0, sin aviso de racha en juego
+function mockBoardApi(handlers: Parameters<typeof mockApi>[0]): MockedApi {
+  return mockApi({ 'GET /streak': () => apiOk({ current: 0, best: 0 }), ...handlers });
 }
 
 function renderBoard() {
@@ -46,7 +51,7 @@ afterEach(() => {
 
 describe('BoardPage', () => {
   it('RF-09: en / muestra el título y 7 columnas desde hoy, cada tarea en la columna de su día', async () => {
-    mockApi({ 'GET /tasks': weekWith([TASK]) });
+    mockBoardApi({ 'GET /tasks': weekWith([TASK]) });
     renderBoard();
     expect(screen.getByRole('heading', { level: 1, name: 'Tablero' })).toBeInTheDocument();
     const sunday = await screen.findByRole('region', { name: 'domingo, 1 de noviembre de 2026' });
@@ -57,21 +62,25 @@ describe('BoardPage', () => {
   });
 
   it('RNF-03: el tablero se desplaza solo dentro de su zona', async () => {
-    mockApi({ 'GET /tasks': weekWith([]) });
+    mockBoardApi({ 'GET /tasks': weekWith([]) });
     renderBoard();
     const board = await screen.findByRole('region', { name: 'Tareas de la semana' });
     expect(board.className).toContain('overflow-x-auto');
   });
 
   it('RF-40: mientras carga muestra un indicador en la zona del tablero', () => {
-    mockApi({ 'GET /tasks': () => new Promise<Response>(() => undefined) });
+    mockBoardApi({ 'GET /tasks': () => new Promise<Response>(() => undefined) });
     renderBoard();
-    expect(screen.getByRole('status', { name: 'Cargando…' })).toBeInTheDocument();
+    const panel = screen.getByRole('region', { name: 'Racha y progreso de hoy' });
+    const outsidePanel = screen
+      .getAllByRole('status', { name: 'Cargando…' })
+      .filter((spinner) => !panel.contains(spinner));
+    expect(outsidePanel).toHaveLength(1);
   });
 
   it('RF-13: al retroceder una semana todas las columnas indican que el día está cerrado', async () => {
     const user = userEvent.setup({ advanceTimers: advance });
-    mockApi({ 'GET /tasks': weekWith([]) });
+    mockBoardApi({ 'GET /tasks': weekWith([]) });
     renderBoard();
     await screen.findAllByText('Sin tareas');
     await user.click(screen.getByRole('button', { name: 'Semana anterior' }));
@@ -82,7 +91,7 @@ describe('BoardPage', () => {
   it('RF-44: si la consulta falla muestra el mensaje y reintenta', async () => {
     const user = userEvent.setup({ advanceTimers: advance });
     let calls = 0;
-    mockApi({
+    mockBoardApi({
       'GET /tasks': () => {
         calls += 1;
         return calls === 1 ? apiFail(503, 'INTERNAL_ERROR') : weekWith([TASK])();
@@ -100,7 +109,7 @@ describe('BoardPage', () => {
 
   it('RF-51: «Nueva tarea» abre el formulario con la fecha de hoy', async () => {
     const user = userEvent.setup({ advanceTimers: advance });
-    mockApi({ 'GET /tasks': weekWith([]) });
+    mockBoardApi({ 'GET /tasks': weekWith([]) });
     renderBoard();
     await screen.findAllByText('Sin tareas');
     await user.click(screen.getByRole('button', { name: 'Nueva tarea' }));
@@ -110,7 +119,7 @@ describe('BoardPage', () => {
 
   it('RF-11 y RF-15: cada columna de hoy o futura ofrece añadir una tarea con su fecha; las pasadas no', async () => {
     const user = userEvent.setup({ advanceTimers: advance });
-    mockApi({ 'GET /tasks': weekWith([]) });
+    mockBoardApi({ 'GET /tasks': weekWith([]) });
     renderBoard();
     await screen.findAllByText('Sin tareas');
     expect(screen.getAllByRole('button', { name: /^Añadir tarea el / })).toHaveLength(7);
@@ -126,7 +135,7 @@ describe('BoardPage', () => {
   it('RF-18: la tarea creada en la semana visible aparece en su columna', async () => {
     const user = userEvent.setup({ advanceTimers: advance });
     let items: unknown[] = [];
-    mockApi({
+    mockBoardApi({
       'GET /tasks': () => weekWith(items)(),
       'POST /tasks': () => {
         items = [TASK];
@@ -145,7 +154,7 @@ describe('BoardPage', () => {
 
   it('RF-52: la tarea creada fuera de la semana visible se confirma con su fecha', async () => {
     const user = userEvent.setup({ advanceTimers: advance });
-    mockApi({
+    mockBoardApi({
       'GET /tasks': weekWith([]),
       'POST /tasks': () => apiOk({ ...TASK, date: '2026-11-12' }, 201),
     });
@@ -167,7 +176,7 @@ describe('BoardPage', () => {
   it('RF-20: completar una tarea de hoy la pasa a «Completadas» sin esperar a la API', async () => {
     const user = userEvent.setup({ advanceTimers: advance });
     const today = { ...TASK, date: '2026-10-29' };
-    mockApi({
+    mockBoardApi({
       'GET /tasks': weekWith([today]),
       'PATCH /tasks/t1': () => new Promise<Response>(() => undefined),
     });
@@ -182,7 +191,7 @@ describe('BoardPage', () => {
   });
 
   it('RF-22: una tarea de un día futuro no ofrece completarla', async () => {
-    mockApi({ 'GET /tasks': weekWith([TASK]) });
+    mockBoardApi({ 'GET /tasks': weekWith([TASK]) });
     renderBoard();
     const sunday = await screen.findByRole('region', { name: 'domingo, 1 de noviembre de 2026' });
     await within(sunday).findByText('Comprar pan');
@@ -192,7 +201,7 @@ describe('BoardPage', () => {
   it('RF-42: si el día ya está cerrado lo explica en una alerta que se puede cerrar', async () => {
     const user = userEvent.setup({ advanceTimers: advance });
     const today = { ...TASK, date: '2026-10-29' };
-    mockApi({ 'GET /tasks': weekWith([today]), 'PATCH /tasks/t1': () => apiFail(409, 'DAY_CLOSED') });
+    mockBoardApi({ 'GET /tasks': weekWith([today]), 'PATCH /tasks/t1': () => apiFail(409, 'DAY_CLOSED') });
     renderBoard();
     await user.click(await screen.findByRole('checkbox', { name: 'Comprar pan' }));
     const alert = await screen.findByRole('alert');
@@ -204,7 +213,7 @@ describe('BoardPage', () => {
   it('RF-23 y RF-24: eliminar pide confirmación con el título y, al confirmar, la tarea desaparece del tablero', async () => {
     const user = userEvent.setup({ advanceTimers: advance });
     let items: unknown[] = [TASK];
-    mockApi({
+    mockBoardApi({
       'GET /tasks': () => weekWith(items)(),
       'DELETE /tasks/t1': () => {
         items = [];
@@ -224,12 +233,45 @@ describe('BoardPage', () => {
 
   it('RF-23: cancelar la confirmación deja la tarea igual', async () => {
     const user = userEvent.setup({ advanceTimers: advance });
-    const api = mockApi({ 'GET /tasks': weekWith([TASK]) });
+    const api = mockBoardApi({ 'GET /tasks': weekWith([TASK]) });
     renderBoard();
     await user.click(await screen.findByRole('button', { name: 'Eliminar «Comprar pan»' }));
     await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancelar' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByText('Comprar pan')).toBeInTheDocument();
     expect(api.requests.some((request) => request.method === 'DELETE')).toBe(false);
+  });
+  it('S-10 y CE-02: completar la única tarea de hoy cambia «0 de 1» a «1 de 1» y vuelve a pedir la racha', async () => {
+    const user = userEvent.setup({ advanceTimers: advance });
+    const today = { ...TASK, date: '2026-10-29' };
+    let current = 2;
+    mockApi({
+      'GET /streak': () => apiOk({ current, best: 5 }),
+      'GET /tasks': weekWith([today]),
+      'PATCH /tasks/t1': () => {
+        current = 3;
+        return apiOk({ ...today, completed: true });
+      },
+    });
+    renderBoard();
+    const panel = screen.getByRole('region', { name: 'Racha y progreso de hoy' });
+    expect(await within(panel).findByText('0 de 1 tareas completadas')).toBeInTheDocument();
+    expect(within(panel).getByRole('status')).toHaveTextContent('Tu racha está en juego');
+    await user.click(await screen.findByRole('checkbox', { name: 'Comprar pan' }));
+    expect(within(panel).getByText('1 de 1 tareas completadas')).toBeInTheDocument();
+    expect(await within(panel).findByText('3 días')).toBeInTheDocument();
+    expect(within(panel).queryByText('Tu racha está en juego')).not.toBeInTheDocument();
+  });
+
+  it('RF-28: sin tareas hoy, «Crear una tarea» del panel abre el formulario con la fecha de hoy', async () => {
+    const user = userEvent.setup({ advanceTimers: advance });
+    mockBoardApi({ 'GET /tasks': weekWith([]) });
+    renderBoard();
+    const panel = screen.getByRole('region', { name: 'Racha y progreso de hoy' });
+    expect(await within(panel).findByText('Sin tareas hoy')).toBeInTheDocument();
+    await user.click(within(panel).getByRole('button', { name: 'Crear una tarea' }));
+    expect(within(screen.getByRole('dialog', { name: 'Nueva tarea' })).getByLabelText('Fecha')).toHaveValue(
+      '2026-10-29',
+    );
   });
 });

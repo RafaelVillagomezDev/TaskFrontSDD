@@ -118,6 +118,19 @@ describe('D-5: tasksApi.getWeekTasks', () => {
   });
 });
 
+describe('D-5: tasksApi.getDayTasks', () => {
+  it('RF-26: pide solo las tareas de un día con date, sin from ni to', async () => {
+    const api = mockApi({ 'GET /tasks': () => page([task('a', '2026-10-29')], 1, 1) });
+    const result = await store.dispatch(tasksApi.endpoints.getDayTasks.initiate('2026-10-29', { subscribe: false }));
+    expect(result.data).toEqual([task('a', '2026-10-29')]);
+    expect(queryOf(api.requests[0] ?? new Request('http://x'))).toEqual({
+      date: '2026-10-29',
+      page: '1',
+      pageSize: '100',
+    });
+  });
+});
+
 describe('D-5: tasksApi.createTask', () => {
   const USER = { id: 'u1', email: 'ana@example.com', name: 'Ana', createdAt: '2026-10-29T10:00:00.000Z' };
   const VALUES = { title: 'Comprar pan', description: '', date: '2026-10-30' };
@@ -245,6 +258,18 @@ describe('D-7: tasksApi.updateTask (completar y desmarcar)', () => {
     await store.dispatch(tasksApi.endpoints.updateTask.initiate({ id: 't1', changes: { completed: false } }));
     expect(cachedWeek()?.[0]?.completed).toBe(false);
     week.unsubscribe();
+  });
+
+  it('RF-26 y D-7: también cambia el día en caché, del que sale el progreso de hoy fuera de la semana actual', async () => {
+    mockApi({
+      'GET /tasks': () => page([task('t1', WEEK)], 1, 1),
+      'PATCH /tasks/t1': () => apiOk(task('t1', WEEK, true)),
+    });
+    const day = store.dispatch(tasksApi.endpoints.getDayTasks.initiate(WEEK));
+    await day;
+    await store.dispatch(tasksApi.endpoints.updateTask.initiate({ id: 't1', changes: { completed: true } }));
+    expect(tasksApi.endpoints.getDayTasks.select(WEEK)(store.getState()).data?.[0]?.completed).toBe(true);
+    day.unsubscribe();
   });
 
   it('D-7: si la API rechaza, deshace el cambio optimista', async () => {

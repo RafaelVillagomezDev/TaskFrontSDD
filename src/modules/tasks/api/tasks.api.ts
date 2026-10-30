@@ -34,31 +34,39 @@ function updateTaskTags(error: unknown, changes: TaskChanges): ('Task' | 'Streak
   return changes.completed === undefined ? ['Task'] : ['Streak'];
 }
 
-// Cambio optimista sobre las tareas de una semana en caché (D-7)
+// Cambio optimista sobre una lista de tareas en caché (D-7)
 function markCompleted(tasks: Task[], id: string, completed: boolean): void {
   const target = tasks.find((task) => task.id === id);
   if (target !== undefined) target.completed = completed;
 }
 
-interface WeekRange {
-  from: string;
-  to: string;
+// Consultas en caché que guardan una lista de tareas, a las que se aplica el cambio optimista
+interface TaskListCache {
+  endpointName: 'getWeekTasks' | 'getDayTasks';
+  arg: string;
 }
 
-function fetchWeekPage(baseQuery: BoundBaseQuery, range: WeekRange, page: number) {
-  return Promise.resolve(baseQuery({ url: '/tasks', params: { ...range, page, pageSize: WEEK_PAGE_SIZE } })).then(
+function isTaskListCache(entry: { endpointName: string; arg: unknown }): entry is TaskListCache {
+  const isTaskList = entry.endpointName === 'getWeekTasks' || entry.endpointName === 'getDayTasks';
+  return isTaskList && typeof entry.arg === 'string';
+}
+
+// Filtro de GET /tasks: un día (date) o un rango de días (from/to), sin combinarlos (API-001 RF-43)
+type TaskFilter = { date: string } | { from: string; to: string };
+
+function fetchTaskPage(baseQuery: BoundBaseQuery, filter: TaskFilter, page: number) {
+  return Promise.resolve(baseQuery({ url: '/tasks', params: { ...filter, page, pageSize: WEEK_PAGE_SIZE } })).then(
     (result) => validatedResult(result, taskPageSchema),
   );
 }
 
-// Tareas de los 7 días desde weekStart (plan §5.3). Con más de 100 se piden el resto de páginas y se concatenan
-// en el orden de la API (R-4); si falla cualquiera, la semana entera es un error
-async function fetchWeekTasks(baseQuery: BoundBaseQuery, weekStart: string): Promise<ApiResult<Task[]>> {
-  const range = { from: weekStart, to: addDays(weekStart, WEEK_LENGTH - 1) };
-  const first = await fetchWeekPage(baseQuery, range, FIRST_PAGE);
+// Todas las tareas del filtro: con más de 100 se piden el resto de páginas y se concatenan en el orden de la
+// API (R-4); si falla cualquiera, el conjunto entero es un error
+async function fetchAllTasks(baseQuery: BoundBaseQuery, filter: TaskFilter): Promise<ApiResult<Task[]>> {
+  const first = await fetchTaskPage(baseQuery, filter, FIRST_PAGE);
   if (first.error !== undefined) return first;
   const nextPages = Array.from({ length: Math.max(first.data.totalPages - FIRST_PAGE, 0) }, (_, index) =>
-    fetchWeekPage(baseQuery, range, FIRST_PAGE + index + 1),
+    fetchTaskPage(baseQuery, filter, FIRST_PAGE + index + 1),
   );
   const rest = await Promise.all(nextPages);
   const failed = rest.find((page) => page.error !== undefined);
@@ -69,8 +77,15 @@ async function fetchWeekTasks(baseQuery: BoundBaseQuery, weekStart: string): Pro
 // Endpoints de tareas sobre la API base única (plan D-2); cada respuesta se valida con Zod (D-5)
 export const tasksApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
+    // Tareas de los 7 días desde weekStart (plan §5.3)
     getWeekTasks: build.query<Task[], string>({
-      queryFn: (weekStart, _api, _extra, baseQuery) => fetchWeekTasks(baseQuery, weekStart),
+      queryFn: (weekStart, _api, _extra, baseQuery) =>
+        fetchAllTasks(baseQuery, { from: weekStart, to: addDays(weekStart, WEEK_LENGTH - 1) }),
+      providesTags: ['Task'],
+    }),
+    // Tareas de un solo día: el progreso de hoy cuando la semana visible no incluye hoy (plan §5.5)
+    getDayTasks: build.query<Task[], string>({
+      queryFn: (day, _api, _extra, baseQuery) => fetchAllTasks(baseQuery, { date: day }),
       providesTags: ['Task'],
     }),
     // Crear espera a la API e invalida la semana y la racha (plan D-7); la descripción vacía se guarda como null
@@ -89,14 +104,17 @@ export const tasksApi = baseApi.injectEndpoints({
       async onQueryStarted({ id, changes }, api) {
         const { completed } = changes;
         if (completed === undefined) return;
-        const weeks = tasksApi.util
+        // Semanas y días en caché: el progreso de hoy también sale de la consulta de un día (plan §5.5)
+        const cached = tasksApi.util
           .selectInvalidatedBy(api.getState(), ['Task'])
-          .filter((entry) => entry.endpointName === 'getWeekTasks')
-          .map((entry): unknown => entry.originalArgs)
-          .filter((week): week is string => typeof week === 'string');
-        const patches = weeks.map((week) =>
+          .map((entry): { endpointName: string; arg: unknown } => ({
+            endpointName: entry.endpointName,
+            arg: entry.originalArgs,
+          }))
+          .filter(isTaskListCache);
+        const patches = cached.map(({ endpointName, arg }) =>
           api.dispatch(
-            tasksApi.util.updateQueryData('getWeekTasks', week, (tasks) => {
+            tasksApi.util.updateQueryData(endpointName, arg, (tasks) => {
               markCompleted(tasks, id, completed);
             }),
           ),
@@ -118,4 +136,10 @@ export const tasksApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useGetWeekTasksQuery, useCreateTaskMutation, useUpdateTaskMutation, useDeleteTaskMutation } = tasksApi;
+export const {
+  useGetWeekTasksQuery,
+  useGetDayTasksQuery,
+  useCreateTaskMutation,
+  useUpdateTaskMutation,
+  useDeleteTaskMutation,
+} = tasksApi;

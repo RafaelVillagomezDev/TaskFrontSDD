@@ -39,6 +39,23 @@ test.describe('HU-04: completar y desmarcar tareas', () => {
     await expect(today.getByRole('checkbox', { name: 'Comprar pan' })).not.toBeChecked();
   });
 
+  test('RF-25, RF-26 y CE-02: completar la única tarea de hoy sube la racha y cambia «0 de 1» a «1 de 1»', async ({
+    page,
+  }, testInfo) => {
+    const board = new BoardPage(page);
+    // Cuenta nueva: racha 0 y ninguna tarea completada todavía
+    await expect(board.streakPanel).toContainText(/Racha actual\s*0 días/);
+    await expect(board.streakPanel).toContainText(/Mejor racha\s*0 días/);
+    await expect(board.streakPanel).toContainText('0 de 1 tareas completadas');
+    await expectResponsive(page, testInfo, [board.streakPanel]);
+
+    await board.column(todayKey()).getByRole('checkbox', { name: 'Comprar pan' }).click();
+    // Sin recargar la página
+    await expect(board.streakPanel).toContainText('1 de 1 tareas completadas');
+    await expect(board.streakPanel).toContainText(/Racha actual\s*1 día/);
+    await expect(board.streakPanel).toContainText(/Mejor racha\s*1 día/);
+  });
+
   test('RF-22: la tarea de mañana no ofrece completarla', async ({ page }) => {
     const tomorrow = new BoardPage(page).column(addDays(todayKey(), 1));
     await expect(tomorrow.getByText('Revisar el informe')).toBeVisible();

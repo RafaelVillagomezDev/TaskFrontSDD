@@ -379,9 +379,10 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
 ## Fase H6 — Ver mi racha y el progreso de hoy (HU-06, P1)
 
 ### Tests (deben fallar)
-- [ ] T080 [P] [H6] Tests de `streak.schema` y `getStreak` — `streaks/schemas/tests/streak.schema.test.ts`, `streaks/api/tests/streaks.api.test.ts`
+- [x] T080 [P] [H6] Tests de `streak.schema` y `getStreak` — `streaks/schemas/tests/streak.schema.test.ts`, `streaks/api/tests/streaks.api.test.ts`
   - Verifica: `dce pnpm test src/modules/streaks/schemas src/modules/streaks/api` **falla**.
-- [ ] T081 [P] [H6] Tests de `use-streak-panel` (RF-25 a RF-28):
+  - Hecho (2026-10-30): `streakSchema` (enteros ≥ 0) y `getStreak` (cabeceras de hora, contrato, error e invalidación de `Streak`).
+- [x] T081 [P] [H6] Tests de `use-streak-panel` (RF-25 a RF-28):
   - Racha de la API sin recalcular.
   - «X de Y».
   - `atRisk` solo con 0 completadas y racha mayor que 0.
@@ -389,18 +390,23 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
   - Semana visible sin hoy → consulta de hoy.
   — `streaks/hooks/tests/use-streak-panel.hook.test.ts`
   - Verifica: `dce pnpm test src/modules/streaks/hooks` **falla**.
-- [ ] T082 [P] [H6] Tests de `StreakPanel` y ampliar `complete-task.e2e.ts`: completar la única tarea de hoy sube la racha y cambia «0 de 1» a «1 de 1» (RF-25 a RF-28, CE-02) — `streaks/components/tests/streak-panel.component.test.tsx`, `e2e/specs/complete-task.e2e.ts`
+  - Hecho (2026-10-30): el caso «semana visible sin hoy → consulta de hoy» se prueba en `use-week-board.hook.test.tsx`, porque el progreso lo calcula el tablero (plan §5.5).
+- [x] T082 [P] [H6] Tests de `StreakPanel` y ampliar `complete-task.e2e.ts`: completar la única tarea de hoy sube la racha y cambia «0 de 1» a «1 de 1» (RF-25 a RF-28, CE-02) — `streaks/components/tests/streak-panel.component.test.tsx`, `e2e/specs/complete-task.e2e.ts`
   - Verifica: `dce pnpm test src/modules/streaks/components` **falla**.
+  - Hecho (2026-10-30): además, `board.e2e.ts` prueba el panel sin tareas (racha 0, «Sin tareas hoy» y «Crear una tarea» con teclado) y `board.page.test.tsx` la integración (CE-02 y RF-28).
 
 ### Implementación
-- [ ] T083 [H6] Esquema, consulta con etiqueta `Streak` y `useStreakPanel` — `streaks/schemas/streak.schema.ts`, `streaks/api/streaks.api.ts`, `streaks/hooks/use-streak-panel.hook.ts`
+- [x] T083 [H6] Esquema, consulta con etiqueta `Streak` y `useStreakPanel` — `streaks/schemas/streak.schema.ts`, `streaks/api/streaks.api.ts`, `streaks/hooks/use-streak-panel.hook.ts`
   - Verifica: `dce pnpm test src/modules/streaks/schemas src/modules/streaks/api src/modules/streaks/hooks` pasa.
-- [ ] T084 [H6] `StreakPanel` en la cabecera del tablero (S-10) — `streaks/components/streak-panel.component.tsx`, `streaks/index.ts`, `tasks/pages/board.page.tsx`
+  - Hecho (2026-10-30): `useStreakPanel(progress)` recibe el progreso de `useWeekBoard` (`todayProgress`), que sale de la caché de la semana o, fuera de la semana actual, de `getDayTasks` (`?date=hoy`). El cambio optimista de `updateTask` se aplica también a esa consulta.
+- [x] T084 [H6] `StreakPanel` en la cabecera del tablero (S-10) — `streaks/components/streak-panel.component.tsx`, `streaks/index.ts`, `tasks/pages/board.page.tsx`
   - Verifica: `dce pnpm test src/modules/streaks` y `dre pnpm test:e2e e2e/specs/complete-task --project=chromium-desktop` pasan.
+  - Hecho (2026-10-30): panel plano bajo la cabecera con racha actual, mejor racha y progreso; aviso de racha en juego con badge Warning en un `<output>`; «Crear una tarea» abre el formulario con hoy. `tasks` importa de `streaks` y no al revés.
 
 ### Checkpoint P1
-- [ ] T085 [H6] Historias P1 completas en Chromium.
+- [x] T085 [H6] Historias P1 completas en Chromium.
   - Verifica: `dce pnpm test:coverage` (≥ 80 %) y `dre pnpm test:e2e --project=chromium-mobile --project=chromium-tablet --project=chromium-desktop` pasan.
+  - Hecho (2026-10-30): 539 tests con 99,8 % de líneas cubiertas y 294 E2E en los 6 proyectos, en verde.
 
 ---
 
@@ -599,3 +605,4 @@ Los criterios de éxito se comprueban en:
 - **2026-10-30** — Fase H4 terminada: T071–T075.
 - **2026-10-30** — Fase H5 terminada: T076–T079.
 - **2026-10-30** — Nueva paleta (decisión del usuario): neutros cálidos (papel y tinta en claro, carbón `#191816` en oscuro), acento Tide (`#0F6E66` / `#5CC8B8`) y estados en tonos de tierra (arcilla, hoja y miel), partiendo de la estructura de WattVision. Cambian `DESIGN.md`, `design-tokens.css` (botones y badges con valor claro y oscuro, `on-primary` / `on-destructive`) y el test de contraste, que comprueba también 3:1 en bordes de campos y foco. `EmptyState` pasa a borde discontinuo sin relleno.
+- **2026-10-30** — Fase H6 terminada: T080–T085, con el progreso de hoy calculado en `useWeekBoard` (plan §5.5). Historias P1 completas.

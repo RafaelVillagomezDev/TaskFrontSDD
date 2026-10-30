@@ -7,6 +7,7 @@ import { ErrorMessage } from '../../../shared/ui/error-message.component';
 import { Icon } from '../../../shared/ui/icon.component';
 import { Notice } from '../../../shared/ui/notice.component';
 import { Spinner } from '../../../shared/ui/spinner.component';
+import { StreakPanel, useStreakPanel } from '../../streaks';
 import { AddTaskButton } from '../components/add-task-button.component';
 import { DayColumn } from '../components/day-column.component';
 import { DeleteTaskDialog } from '../components/delete-task-dialog.component';
@@ -45,11 +46,15 @@ function BoardContent({ board, onAddTask, actions }: Readonly<BoardContentProps>
   );
 }
 
-// Tablero semanal en / (RF-09 a RF-24, RF-47, RF-51, RF-52; plan §6.2)
+// Tablero semanal en / con el panel de racha y progreso de hoy (RF-09 a RF-28, RF-47, RF-51, RF-52; plan §6.2)
 export function BoardPage() {
   const board = useWeekBoard();
   const taskForm = useTaskForm({ today: board.today, weekStart: board.weekStart, weekEnd: board.weekEnd });
   const actions = useTaskActions();
+  const streakPanel = useStreakPanel(board.todayProgress);
+  const createTodayTask = () => {
+    taskForm.openFor(board.today);
+  };
   return (
     <PageContainer>
       <PageHeader>
@@ -63,16 +68,14 @@ export function BoardPage() {
             onToday={board.goToToday}
           />
           {/* Botón general: propone la fecha de hoy (RF-51) */}
-          <Button
-            onClick={() => {
-              taskForm.openFor(board.today);
-            }}
-          >
+          <Button onClick={createTodayTask}>
             <Icon icon={Plus} />
             {TASKS_TEXTS.board.newTask}
           </Button>
         </PageHeader.Actions>
       </PageHeader>
+      {/* Debajo de la cabecera (S-10, plan §6.2); «Crear una tarea» propone hoy, como «Nueva tarea» (RF-28) */}
+      <StreakPanel panel={streakPanel} onCreateTask={createTodayTask} />
       {taskForm.notice !== undefined && <Notice onDismiss={taskForm.dismissNotice}>{taskForm.notice}</Notice>}
       {actions.error !== undefined && (
         <ErrorMessage message={actions.error} onRetry={actions.retry} onDismiss={actions.dismissError} />

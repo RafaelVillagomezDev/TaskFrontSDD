@@ -6,6 +6,7 @@ import { expect, test } from '../fixtures/auth.fixture';
 import { expectResponsive } from '../fixtures/responsive.fixture';
 import { BoardPage } from '../pages/board.po';
 import { LoginPage } from '../pages/login.po';
+import { TaskFormDialog } from '../pages/task-form.po';
 
 const WEEK_LENGTH = 7;
 const IN_THREE_DAYS = 3;
@@ -91,7 +92,8 @@ test.describe('HU-02: ver las tareas de mi semana', () => {
     await board.board.evaluate((element) => {
       element.scrollLeft = 0;
     });
-    await board.newTask.focus();
+    // El último control antes del tablero es «Crear una tarea» del panel de rachas (cuenta sin tareas hoy)
+    await board.createTodayTask.focus();
     await page.keyboard.press('Tab');
     await expect(board.board).toBeFocused();
     await page.keyboard.press('ArrowRight');
@@ -99,5 +101,25 @@ test.describe('HU-02: ver las tareas de mi semana', () => {
 
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(0);
+  });
+});
+
+test.describe('HU-06: ver mi racha y el progreso de hoy', () => {
+  test('RF-25 y RF-28: sin tareas, racha a 0 y «Sin tareas hoy» con la opción de crear una para hoy', async ({
+    page,
+    freshAccount,
+  }, testInfo) => {
+    const board = await openBoard(page, freshAccount);
+    await expect(board.streakPanel).toContainText(/Racha actual\s*0 días/);
+    await expect(board.streakPanel).toContainText(/Mejor racha\s*0 días/);
+    await expect(board.streakPanel).toContainText('Sin tareas hoy');
+    await expectResponsive(page, testInfo, [board.createTodayTask]);
+
+    // Solo con teclado
+    await board.createTodayTask.focus();
+    await page.keyboard.press('Enter');
+    const form = new TaskFormDialog(page);
+    await expect(form.dialog).toBeVisible();
+    await expect(form.date).toHaveValue(todayKey());
   });
 });

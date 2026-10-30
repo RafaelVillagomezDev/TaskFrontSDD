@@ -5,7 +5,9 @@ import { BoardColumn } from '../../../shared/layout/board-column.component';
 import { EmptyState } from '../../../shared/layout/empty-state.component';
 import { Badge } from '../../../shared/ui/badge.component';
 import { Text } from '../../../shared/ui/text.component';
+import type { TaskCompletion } from '../hooks/use-task-actions.hook';
 import type { DayColumnModel } from '../hooks/use-week-board.hook';
+import type { Task } from '../schemas/task.schema';
 import { TASKS_TEXTS } from '../texts/tasks.texts';
 import { TaskCard } from './task-card.component';
 
@@ -13,11 +15,43 @@ interface DayColumnProps {
   column: DayColumnModel;
   // Acciones del día (crear una tarea): solo se muestran si el día no está cerrado (RF-11, RF-13)
   children?: ReactNode;
+  // Completar y desmarcar: solo en la columna de hoy (RF-13, RF-20 a RF-22)
+  completion?: TaskCompletion | undefined;
+}
+
+interface TaskListProps {
+  label: string;
+  tasks: Task[];
+  completion: TaskCompletion | undefined;
+}
+
+function TaskList({ label, tasks, completion }: Readonly<TaskListProps>) {
+  if (tasks.length === 0) return null;
+  return (
+    <BoardColumn.List aria-label={label}>
+      {tasks.map((task) => (
+        <TaskCard
+          key={task.id}
+          task={task}
+          onToggleCompleted={
+            completion === undefined
+              ? undefined
+              : () => {
+                  completion.toggleCompleted(task);
+                }
+          }
+          isUpdating={completion?.isUpdating(task.id)}
+          keepFocus={completion?.keepsFocus(task.id)}
+        />
+      ))}
+    </BoardColumn.List>
+  );
 }
 
 // Columna de un día del tablero sobre BoardColumn (RF-09 a RF-11, RF-13)
-export function DayColumn({ column, children }: Readonly<DayColumnProps>) {
+export function DayColumn({ column, children, completion }: Readonly<DayColumnProps>) {
   const isClosed = column.kind === 'past';
+  const dayCompletion = column.kind === 'today' ? completion : undefined;
   return (
     <BoardColumn aria-label={formatDayLong(column.day)}>
       <BoardColumn.Header>
@@ -40,20 +74,8 @@ export function DayColumn({ column, children }: Readonly<DayColumnProps>) {
           </Text>
         </EmptyState>
       )}
-      {column.pending.length > 0 && (
-        <BoardColumn.List aria-label={TASKS_TEXTS.column.pending}>
-          {column.pending.map((task) => (
-            <TaskCard key={task.id} task={task} />
-          ))}
-        </BoardColumn.List>
-      )}
-      {column.completed.length > 0 && (
-        <BoardColumn.List aria-label={TASKS_TEXTS.column.completed}>
-          {column.completed.map((task) => (
-            <TaskCard key={task.id} task={task} />
-          ))}
-        </BoardColumn.List>
-      )}
+      <TaskList label={TASKS_TEXTS.column.pending} tasks={column.pending} completion={dayCompletion} />
+      <TaskList label={TASKS_TEXTS.column.completed} tasks={column.completed} completion={dayCompletion} />
       {!isClosed && children}
     </BoardColumn>
   );

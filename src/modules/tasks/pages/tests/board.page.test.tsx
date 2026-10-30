@@ -163,4 +163,41 @@ describe('BoardPage', () => {
     await user.click(screen.getByRole('button', { name: 'Cerrar aviso' }));
     expect(screen.queryByText('Tarea creada para el jueves, 12 de noviembre de 2026.')).not.toBeInTheDocument();
   });
+
+  it('RF-20: completar una tarea de hoy la pasa a «Completadas» sin esperar a la API', async () => {
+    const user = userEvent.setup({ advanceTimers: advance });
+    const today = { ...TASK, date: '2026-10-29' };
+    mockApi({
+      'GET /tasks': weekWith([today]),
+      'PATCH /tasks/t1': () => new Promise<Response>(() => undefined),
+    });
+    renderBoard();
+    const column = await screen.findByRole('region', { name: 'jueves, 29 de octubre de 2026' });
+    await user.click(await within(column).findByRole('checkbox', { name: 'Comprar pan' }));
+    expect(within(column).getByRole('list', { name: 'Completadas' })).toHaveTextContent('Comprar pan');
+    const checkbox = within(column).getByRole('checkbox', { name: 'Comprar pan' });
+    expect(checkbox).toBeChecked();
+    // Cambió de lista y conserva el foco para seguir con el teclado
+    expect(checkbox).toHaveFocus();
+  });
+
+  it('RF-22: una tarea de un día futuro no ofrece completarla', async () => {
+    mockApi({ 'GET /tasks': weekWith([TASK]) });
+    renderBoard();
+    const sunday = await screen.findByRole('region', { name: 'domingo, 1 de noviembre de 2026' });
+    await within(sunday).findByText('Comprar pan');
+    expect(within(sunday).queryByRole('checkbox')).not.toBeInTheDocument();
+  });
+
+  it('RF-42: si el día ya está cerrado lo explica en una alerta que se puede cerrar', async () => {
+    const user = userEvent.setup({ advanceTimers: advance });
+    const today = { ...TASK, date: '2026-10-29' };
+    mockApi({ 'GET /tasks': weekWith([today]), 'PATCH /tasks/t1': () => apiFail(409, 'DAY_CLOSED') });
+    renderBoard();
+    await user.click(await screen.findByRole('checkbox', { name: 'Comprar pan' }));
+    const alert = await screen.findByRole('alert');
+    expect(alert).toHaveTextContent('Ese día ya está cerrado: sus tareas no se pueden cambiar.');
+    await user.click(within(alert).getByRole('button', { name: 'Cerrar aviso' }));
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
 });

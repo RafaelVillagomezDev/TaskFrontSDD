@@ -47,6 +47,14 @@ describe('RF-41 y RF-44: ErrorMessage', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('No hay conexión con el servidor.');
   });
 
+  it('con onDismiss ofrece cerrarlo', async () => {
+    const user = userEvent.setup();
+    const onDismiss = jest.fn();
+    render(<ErrorMessage message="Error" onDismiss={onDismiss} />);
+    await user.click(screen.getByRole('button', { name: 'Cerrar aviso' }));
+    expect(onDismiss).toHaveBeenCalledTimes(1);
+  });
+
   it('sin onRetry no ofrece reintentar', () => {
     render(<ErrorMessage message="Error" />);
     expect(screen.queryByRole('button', { name: 'Reintentar' })).not.toBeInTheDocument();

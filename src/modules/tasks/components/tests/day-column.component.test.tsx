@@ -1,3 +1,4 @@
+import { jest } from '@jest/globals';
 import { render, screen, within } from '@testing-library/react';
 
 import type { DayColumnModel } from '../../hooks/use-week-board.hook';
@@ -85,5 +86,24 @@ describe('DayColumn', () => {
     const region = renderColumn(column({ kind: 'past' }));
     expect(region).toHaveTextContent('Sin tareas');
     expect(within(region).queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ['today', 1],
+    ['future', 0],
+    ['past', 0],
+  ] as const)('RF-13, RF-20 y RF-22: en un día %s hay %i casillas de completar', (kind, checkboxes) => {
+    const completion = { toggleCompleted: jest.fn(), isUpdating: () => false, keepsFocus: () => false };
+    render(<DayColumn column={column({ kind, pending: [task('a')], total: 1 })} completion={completion} />);
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(checkboxes);
+  });
+
+  it('RF-20: la casilla de hoy completa su tarea y se anuncia deshabilitada mientras se guarda', () => {
+    const toggleCompleted = jest.fn();
+    const completion = { toggleCompleted, isUpdating: (id: string) => id === 'b', keepsFocus: () => false };
+    render(<DayColumn column={column({ pending: [task('a'), task('b')], total: 2 })} completion={completion} />);
+    screen.getByRole('checkbox', { name: 'Tarea a' }).click();
+    expect(toggleCompleted).toHaveBeenCalledWith(task('a'));
+    expect(screen.getByRole('checkbox', { name: 'Tarea b' })).toHaveAttribute('aria-disabled', 'true');
   });
 });

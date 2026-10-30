@@ -1,4 +1,6 @@
+import { jest } from '@jest/globals';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 import type { Task } from '../../schemas/task.schema';
 import { TaskCard } from '../task-card.component';
@@ -53,5 +55,62 @@ describe('TaskCard (lectura)', () => {
     const title = screen.getByText('a'.repeat(200));
     expect(title.className).toContain('break-words');
     expect(title.className).toContain('line-clamp-2');
+  });
+});
+
+describe('TaskCard (completar)', () => {
+  it('RF-13 y RF-22: sin onToggleCompleted no ofrece completar', () => {
+    render(
+      <ul>
+        <TaskCard task={TASK} />
+      </ul>,
+    );
+    expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
+  });
+
+  it('RF-20: la casilla se llama como la tarea, refleja su estado y avisa al pulsarla, también con teclado', async () => {
+    const user = userEvent.setup();
+    const onToggleCompleted = jest.fn();
+    render(
+      <ul>
+        <TaskCard task={TASK} onToggleCompleted={onToggleCompleted} />
+      </ul>,
+    );
+    const checkbox = screen.getByRole('checkbox', { name: 'Comprar pan' });
+    expect(checkbox).not.toBeChecked();
+    await user.click(checkbox);
+    expect(onToggleCompleted).toHaveBeenCalledTimes(1);
+    checkbox.focus();
+    await user.keyboard(' ');
+    expect(onToggleCompleted).toHaveBeenCalledTimes(2);
+  });
+
+  it('RF-21: una tarea completada aparece marcada', () => {
+    render(
+      <ul>
+        <TaskCard task={{ ...TASK, completed: true }} onToggleCompleted={jest.fn()} />
+      </ul>,
+    );
+    expect(screen.getByRole('checkbox', { name: 'Comprar pan' })).toBeChecked();
+  });
+
+  it('con keepFocus la casilla toma el foco al montarse en su nueva lista', () => {
+    render(
+      <ul>
+        <TaskCard task={{ ...TASK, completed: true }} onToggleCompleted={jest.fn()} keepFocus />
+      </ul>,
+    );
+    expect(screen.getByRole('checkbox', { name: 'Comprar pan' })).toHaveFocus();
+  });
+
+  it('mientras se guarda, la casilla se anuncia deshabilitada pero conserva el foco', () => {
+    render(
+      <ul>
+        <TaskCard task={TASK} onToggleCompleted={jest.fn()} isUpdating />
+      </ul>,
+    );
+    const checkbox = screen.getByRole('checkbox', { name: 'Comprar pan' });
+    expect(checkbox).toHaveAttribute('aria-disabled', 'true');
+    expect(checkbox).toBeEnabled();
   });
 });

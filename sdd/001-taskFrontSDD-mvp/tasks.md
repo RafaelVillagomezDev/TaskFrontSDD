@@ -336,18 +336,23 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
 ## Fase H4 — Completar y desmarcar tareas (HU-04, P1)
 
 ### Tests (deben fallar)
-- [ ] T071 [P] [H4] Tests de `use-task-actions`: completar y desmarcar con actualización optimista y reversión si la API rechaza; invalida `Streak` (RF-20, RF-21, D-7); `DAY_CLOSED` / `DAY_NOT_STARTED` → mensaje e invalidación (RF-42); `TASK_NOT_FOUND` → mensaje y la quita (RF-45) — `tasks/hooks/tests/use-task-actions.hook.test.ts`
+- [x] T071 [P] [H4] Tests de `use-task-actions`: completar y desmarcar con actualización optimista y reversión si la API rechaza; invalida `Streak` (RF-20, RF-21, D-7); `DAY_CLOSED` / `DAY_NOT_STARTED` → mensaje e invalidación (RF-42); `TASK_NOT_FOUND` → mensaje y la quita (RF-45) — `tasks/hooks/tests/use-task-actions.hook.test.ts`
   - Verifica: `dce pnpm test src/modules/tasks/hooks/tests/use-task-actions` **falla**.
-- [ ] T072 [P] [H4] Tests de `TaskCard`: casilla de completar solo en tareas de hoy, sin ella en futuras (RF-22) y en pasadas (RF-13) — `tasks/components/tests/task-card.component.test.tsx`
+  - Hecho (2026-10-30): 8 casos del hook más 7 de `updateTask` en `tasks.api.test.ts`: cambio optimista antes de la respuesta, reversión, sin volver a pedir la semana al acertar y nueva consulta con `DAY_CLOSED`, `DAY_NOT_STARTED` y `TASK_NOT_FOUND`. Además, 3 de la página: completar mueve la tarea a «Completadas» y conserva el foco, una futura no ofrece completar y la alerta de RF-42 se puede cerrar.
+- [x] T072 [P] [H4] Tests de `TaskCard`: casilla de completar solo en tareas de hoy, sin ella en futuras (RF-22) y en pasadas (RF-13) — `tasks/components/tests/task-card.component.test.tsx`
   - Verifica: `dce pnpm test src/modules/tasks/components/tests/task-card` **falla**.
-- [ ] T073 [P] [H4] E2E `complete-task.e2e.ts` en 6 proyectos: completar y desmarcar hoy; la tarea de mañana no ofrece completar (RF-20 a RF-22) — `e2e/specs/complete-task.e2e.ts`
+  - Hecho (2026-10-30): 5 casos en `TaskCard` y 4 en `DayColumn` (casilla solo en la columna de hoy).
+- [x] T073 [P] [H4] E2E `complete-task.e2e.ts` en 6 proyectos: completar y desmarcar hoy; la tarea de mañana no ofrece completar (RF-20 a RF-22) — `e2e/specs/complete-task.e2e.ts`
   - Verifica: `dre pnpm test:e2e e2e/specs/complete-task --project=chromium-desktop` **falla**.
+  - Hecho (2026-10-30): 3 tests × 6 proyectos: completar y desmarcar con recarga para comprobar que se guardó, mañana sin casilla y solo con teclado.
 
 ### Implementación
-- [ ] T074 [H4] Mutación `updateTask` con `onQueryStarted` optimista sobre la consulta de la semana — `tasks/api/tasks.api.ts`
+- [x] T074 [H4] Mutación `updateTask` con `onQueryStarted` optimista sobre la consulta de la semana — `tasks/api/tasks.api.ts`
   - Verifica: `dce pnpm test src/modules/tasks/api` pasa.
-- [ ] T075 [H4] `useTaskActions` y la casilla de `TaskCard` — `tasks/hooks/use-task-actions.hook.ts`, `tasks/components/task-card.component.tsx`
+  - Hecho (2026-10-30): `updateTask` cambia `completed` en todas las semanas en caché (`selectInvalidatedBy` sobre `Task`) y lo deshace si la API rechaza. Si acierta, invalida `Streak`; con `DAY_CLOSED`, `DAY_NOT_STARTED` o `TASK_NOT_FOUND`, invalida `Task` para mostrar el estado real (RF-42, RF-45).
+- [x] T075 [H4] `useTaskActions` y la casilla de `TaskCard` — `tasks/hooks/use-task-actions.hook.ts`, `tasks/components/task-card.component.tsx`
   - Verifica: `dre pnpm test:e2e e2e/specs/complete-task --project=chromium-desktop` pasa.
+  - Hecho (2026-10-30): `useTaskActions` descarta un segundo cambio de la misma tarea mientras se guarda y da el mensaje del rechazo, con «Reintentar» solo sin conexión o ante un fallo inesperado (RF-44). `ErrorMessage` admite `onDismiss`. Nuevo `Checkbox` en `shared/ui`: casilla nativa de 24 px con zona pulsable de 44×44 en móvil (VII.4). Usa `aria-disabled` en vez de `disabled` para no perder el foco, y la tarea que cambia de lista recupera el foco al montarse (`keepsFocus`). Lint, typecheck, 485 tests (99,8 % de líneas), build, 264 E2E en los 6 proyectos y quality gate en verde.
 
 ---
 
@@ -587,4 +592,5 @@ Los criterios de éxito se comprueban en:
   - Los errores de campo de la API muestran «Revisa este campo.» en lugar del texto de `details` (`fieldErrors` → `invalidFields`, `showApiError`; plan §5.9).
   - `DESIGN.md`: «Añadir tarea» con icono y texto.
   - Las E2E necesitan 12 GB en Docker.
+- **2026-10-30** — Fase H4 terminada: T071–T075.
 - **2026-10-30** — Nueva paleta (decisión del usuario): neutros cálidos (papel y tinta en claro, carbón `#191816` en oscuro), acento Tide (`#0F6E66` / `#5CC8B8`) y estados en tonos de tierra (arcilla, hoja y miel), partiendo de la estructura de WattVision. Cambian `DESIGN.md`, `design-tokens.css` (botones y badges con valor claro y oscuro, `on-primary` / `on-destructive`) y el test de contraste, que comprueba también 3:1 en bordes de campos y foco. `EmptyState` pasa a borde discontinuo sin relleno.

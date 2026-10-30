@@ -11,6 +11,7 @@ import { AddTaskButton } from '../components/add-task-button.component';
 import { DayColumn } from '../components/day-column.component';
 import { TaskFormDialog } from '../components/task-form-dialog.component';
 import { WeekNavigator } from '../components/week-navigator.component';
+import { useTaskActions, type TaskCompletion } from '../hooks/use-task-actions.hook';
 import { useTaskForm } from '../hooks/use-task-form.hook';
 import { useWeekBoard } from '../hooks/use-week-board.hook';
 import { TASKS_TEXTS } from '../texts/tasks.texts';
@@ -21,10 +22,11 @@ interface BoardContentProps {
   board: WeekBoard;
   // Abre el formulario de crear con la fecha de la columna (RF-15)
   onAddTask: (day: string) => void;
+  completion: TaskCompletion;
 }
 
 // Zona del tablero: carga y error solo aquí, sin bloquear el resto de la pantalla (RF-40, RF-44)
-function BoardContent({ board, onAddTask }: Readonly<BoardContentProps>) {
+function BoardContent({ board, onAddTask, completion }: Readonly<BoardContentProps>) {
   if (board.status === 'loading') return <Spinner />;
   if (board.status === 'error') {
     return <ErrorMessage message={board.errorMessage ?? ''} onRetry={board.retry} />;
@@ -34,7 +36,7 @@ function BoardContent({ board, onAddTask }: Readonly<BoardContentProps>) {
     // Chrome y Firefox (RNF-04) hacen enfocable con teclado una zona desplazable sin controles (RNF-02)
     <section aria-label={TASKS_TEXTS.board.region} className="focus-ring flex gap-6 overflow-x-auto rounded-md pb-4">
       {board.columns.map((column) => (
-        <DayColumn key={column.day} column={column}>
+        <DayColumn key={column.day} column={column} completion={completion}>
           <AddTaskButton day={column.day} onAdd={onAddTask} />
         </DayColumn>
       ))}
@@ -42,10 +44,11 @@ function BoardContent({ board, onAddTask }: Readonly<BoardContentProps>) {
   );
 }
 
-// Tablero semanal en / (RF-09 a RF-19, RF-47, RF-51, RF-52; plan §6.2)
+// Tablero semanal en / (RF-09 a RF-22, RF-47, RF-51, RF-52; plan §6.2)
 export function BoardPage() {
   const board = useWeekBoard();
   const taskForm = useTaskForm({ today: board.today, weekStart: board.weekStart, weekEnd: board.weekEnd });
+  const actions = useTaskActions();
   return (
     <PageContainer>
       <PageHeader>
@@ -70,7 +73,10 @@ export function BoardPage() {
         </PageHeader.Actions>
       </PageHeader>
       {taskForm.notice !== undefined && <Notice onDismiss={taskForm.dismissNotice}>{taskForm.notice}</Notice>}
-      <BoardContent board={board} onAddTask={taskForm.openFor} />
+      {actions.error !== undefined && (
+        <ErrorMessage message={actions.error} onRetry={actions.retry} onDismiss={actions.dismissError} />
+      )}
+      <BoardContent board={board} onAddTask={taskForm.openFor} completion={actions} />
       <TaskFormDialog taskForm={taskForm} />
     </PageContainer>
   );

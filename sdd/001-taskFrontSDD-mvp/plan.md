@@ -259,6 +259,7 @@ No hay componentes previos: todos son nuevos y se crean una sola vez.
 | `Box` | `shared/ui` | Polimórfico, contenedor con `variant` (`card`, `surface`) | Tarjetas, paneles |
 | `Icon` | `shared/ui` | Único acceso a Lucide; tamaño y grosor desde constantes (VII.2) | Todas |
 | `Field`, `Input`, `Textarea`, `DateInput`, `SelectNative`, `PasswordInput` | `shared/ui` | Campos accesibles; `PasswordInput` con «mostrar» (S-11) | Todos los formularios |
+| `Checkbox` | `shared/ui` | Casilla nativa con la casilla visible de DESIGN.md y zona pulsable de 44×44 px en móvil | Completar tareas |
 | `Badge` | `shared/ui` | `variant` = variantes de `DESIGN.md` | Estado de tarea, tipo de aviso, contadores |
 | `Dialog` | `shared/ui` | Compound (`Dialog.Trigger`, `.Content`, `.Title`, `.Actions`) con contexto interno | Crear/editar, eliminar, borrar cuenta |
 | `Drawer` | `shared/ui` | Compound | Navegación móvil |
@@ -375,3 +376,4 @@ Todas con versión exacta publicada hace al menos dos semanas. Se instalan dentr
 - **2026-10-29** — Plan aprobado por el usuario, incluidas las dependencias de la sección 8, las rutas en inglés y la actualización optimista solo al completar o desmarcar (D-7). Estado → *Aprobado*.
 - **2026-10-29** — Sección 8: añadida `@jest/globals` (aprobada por el usuario), porque en modo ESM Jest no inyecta el objeto `jest`.
 - **2026-10-30** — §3 y §5.9: los errores de campo de la API se muestran con un mensaje propio del cliente («Revisa este campo.») en lugar del texto de `details`, que llega en español pero a veces es técnico (RF-41). `fieldErrors` pasa a `invalidFields` y se añade `showApiError` (decisión del usuario).
+- **2026-10-30** — §6.3: añadido `Checkbox` (`shared/ui`), necesario para completar tareas con el objetivo táctil de VII.4.

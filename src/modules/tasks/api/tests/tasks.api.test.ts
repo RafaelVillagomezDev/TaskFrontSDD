@@ -173,3 +173,111 @@ describe('D-5: tasksApi.createTask', () => {
     expect(toApiError(result.error)).toEqual({ code: 'VALIDATION_ERROR', invalidFields: ['title'] });
   });
 });
+
+describe('D-7: tasksApi.updateTask (completar y desmarcar)', () => {
+  const USER = { id: 'u1', email: 'ana@example.com', name: 'Ana', createdAt: '2026-10-29T10:00:00.000Z' };
+  const WEEK = '2026-10-29';
+
+  beforeEach(() => {
+    store.dispatch(sessionStarted({ user: USER, csrfToken: 'sesion-1' }));
+  });
+
+  function cachedWeek() {
+    return tasksApi.endpoints.getWeekTasks.select(WEEK)(store.getState()).data;
+  }
+
+  // Carga la semana y devuelve cómo dejar de observarla (devolver la petición la desenvolvería, es thenable)
+  async function loadWeek() {
+    const week = store.dispatch(tasksApi.endpoints.getWeekTasks.initiate(WEEK));
+    await week;
+    return {
+      unsubscribe: () => {
+        week.unsubscribe();
+      },
+    };
+  }
+
+  async function settle() {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.all(store.dispatch(tasksApi.util.getRunningQueriesThunk()));
+  }
+
+  it('RF-20: envía PATCH /tasks/{id} con completed y el token CSRF', async () => {
+    const api = mockApi({ 'PATCH /tasks/t1': () => apiOk(task('t1', WEEK, true)) });
+    const result = await store.dispatch(
+      tasksApi.endpoints.updateTask.initiate({ id: 't1', changes: { completed: true } }),
+    );
+    expect(result.data).toEqual(task('t1', WEEK, true));
+    expect(api.requests[0]?.headers.get('X-CSRF-Token')).toBe('sesion-1');
+    expect(api.requests[0]?.headers.get('X-Client-Time')).not.toBeNull();
+    expect(await api.bodyOf('PATCH /tasks/t1')).toEqual({ completed: true });
+  });
+
+  it('RF-20 y D-7: la semana en caché la muestra completada antes de que responda la API, sin volver a pedirla', async () => {
+    let release: (response: Response) => void = () => undefined;
+    const api = mockApi({
+      'GET /tasks': () => page([task('t1', WEEK), task('t2', WEEK)], 1, 1),
+      'PATCH /tasks/t1': () =>
+        new Promise<Response>((resolve) => {
+          release = resolve;
+        }),
+    });
+    const week = await loadWeek();
+    const update = store.dispatch(tasksApi.endpoints.updateTask.initiate({ id: 't1', changes: { completed: true } }));
+    expect(cachedWeek()?.map((item) => item.completed)).toEqual([true, false]);
+
+    // La petición llega a fetch en un turno posterior: se espera a ella antes de responder
+    while (!api.requests.some((request) => request.method === 'PATCH')) await settle();
+    release(apiOk(task('t1', WEEK, true)));
+    await update;
+    await settle();
+    expect(cachedWeek()?.map((item) => item.completed)).toEqual([true, false]);
+    expect(api.requests.filter((request) => request.method === 'GET')).toHaveLength(1);
+    week.unsubscribe();
+  });
+
+  it('RF-21: desmarcar la vuelve a pendiente en la caché', async () => {
+    mockApi({
+      'GET /tasks': () => page([task('t1', WEEK, true)], 1, 1),
+      'PATCH /tasks/t1': () => apiOk(task('t1', WEEK)),
+    });
+    const week = await loadWeek();
+    await store.dispatch(tasksApi.endpoints.updateTask.initiate({ id: 't1', changes: { completed: false } }));
+    expect(cachedWeek()?.[0]?.completed).toBe(false);
+    week.unsubscribe();
+  });
+
+  it('D-7: si la API rechaza, deshace el cambio optimista', async () => {
+    mockApi({
+      'GET /tasks': () => page([task('t1', WEEK)], 1, 1),
+      'PATCH /tasks/t1': () => apiFail(500, 'INTERNAL_ERROR'),
+    });
+    const week = await loadWeek();
+    const result = await store.dispatch(
+      tasksApi.endpoints.updateTask.initiate({ id: 't1', changes: { completed: true } }),
+    );
+    expect(toApiError(result.error).code).toBe('INTERNAL_ERROR');
+    expect(cachedWeek()?.[0]?.completed).toBe(false);
+    week.unsubscribe();
+  });
+
+  it.each(['DAY_CLOSED', 'DAY_NOT_STARTED', 'TASK_NOT_FOUND'])(
+    'RF-42 y RF-45: con %s vuelve a pedir la semana para mostrar el estado real',
+    async (code) => {
+      let calls = 0;
+      const api = mockApi({
+        'GET /tasks': () => {
+          calls += 1;
+          return page(calls === 1 ? [task('t1', WEEK)] : [], 1, calls === 1 ? 1 : 0);
+        },
+        'PATCH /tasks/t1': () => apiFail(code === 'TASK_NOT_FOUND' ? 404 : 409, code),
+      });
+      const week = await loadWeek();
+      await store.dispatch(tasksApi.endpoints.updateTask.initiate({ id: 't1', changes: { completed: true } }));
+      await settle();
+      expect(api.requests.filter((request) => request.method === 'GET')).toHaveLength(2);
+      expect(cachedWeek()).toEqual([]);
+      week.unsubscribe();
+    },
+  );
+});

@@ -12,7 +12,7 @@ interface NavItemProps {
 }
 
 // Ítem de navegación de DESIGN.md: icono de 20 px + etiqueta Body SM 500, padding 12 px 16 px. El activo lleva
-// borde izquierdo de 3 px en Nova Blue y fondo azul claro; NavLink le pone aria-current="page" (RF-54)
+// borde izquierdo de 3 px en el acento y fondo tintado; NavLink le pone aria-current="page" (RF-54)
 export function NavItem({ to, icon, children }: Readonly<NavItemProps>) {
   return (
     <NavLink

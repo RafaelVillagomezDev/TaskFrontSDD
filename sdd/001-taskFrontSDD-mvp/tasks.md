@@ -587,3 +587,4 @@ Los criterios de éxito se comprueban en:
   - Los errores de campo de la API muestran «Revisa este campo.» en lugar del texto de `details` (`fieldErrors` → `invalidFields`, `showApiError`; plan §5.9).
   - `DESIGN.md`: «Añadir tarea» con icono y texto.
   - Las E2E necesitan 12 GB en Docker.
+- **2026-10-30** — Nueva paleta (decisión del usuario): neutros cálidos (papel y tinta en claro, carbón `#191816` en oscuro), acento Tide (`#0F6E66` / `#5CC8B8`) y estados en tonos de tierra (arcilla, hoja y miel), partiendo de la estructura de WattVision. Cambian `DESIGN.md`, `design-tokens.css` (botones y badges con valor claro y oscuro, `on-primary` / `on-destructive`) y el test de contraste, que comprueba también 3:1 en bordes de campos y foco. `EmptyState` pasa a borde discontinuo sin relleno.

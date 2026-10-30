@@ -9,7 +9,7 @@
 | Elemento | Estado |
 | :--- | :--- |
 | `CONSTITUTION.md`, `AGENTS.md`, `DESIGN.md` | Listos |
-| Tokens de diseño (`src/styles/design-tokens.css`) | Listos, sin compilar todavía |
+| Tokens de diseño (`src/styles/design-tokens.css`) | Paleta cálida (papel, tinta y carbón con acento Tide) en claro y oscuro; el contraste de cada pareja se comprueba con un test |
 | Referencia de diseño del tablero (`docs/design/`) | Lista |
 | Proyecto Vite + React, Docker, SonarQube, hooks de git | Pendiente |
 | Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | `spec.md` aprobada, `plan.md` aprobado y `tasks.md` creado (114 tareas + 1 externa); implementación en curso: 70 de 114 (fase 0 «Base» y fases H1 a H3 completas: cuenta, tablero semanal y crear tareas) |

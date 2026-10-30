@@ -9,29 +9,28 @@
 
 ## Color Palette
 
-### Primary Colors
-| Name | Hex | Usage |
-|------|-----|-------|
-| Nova Blue | `#2563EB` | Primary actions, links, CTAs |
-| Nova Dark | `#0F172A` | Backgrounds, headers |
-| Nova Light | `#F8FAFC` | Page backgrounds, cards |
+Warm and human: paper and ink in light mode, warm charcoal in dark mode, an unhurried teal accent and earthy status colors. No pure grays, no pure black and no pure white text: every neutral carries a little warmth, so the interface feels made by people rather than generated. Saturated color appears only where state lives (status badges, the active item, primary actions).
 
-### Accent Colors
-| Name | Hex | Usage |
-|------|-----|-------|
-| Spark Orange | `#F97316` | Highlights, badges, alerts |
-| Spark Green | `#22C55E` | Success states, confirmations |
-| Spark Red | `#EF4444` | Error borders and icons; error text in dark mode |
-| Red 700 | `#B91C1C` | Destructive button background; error text in light mode |
+### Accent and Status Colors
+| Name | Light | Dark | Usage |
+|------|-------|------|-------|
+| Tide | `#0F6E66` | `#5CC8B8` (text and links `#6FD3C4`) | Primary actions, links, active item, focus ring |
+| Clay | `#B03A24` | `#F07A63` | Errors, destructive actions |
+| Leaf | `#2F7046` | `#6CC489` | Success, completed tasks |
+| Honey | `#8A5A0C` | `#E8B25A` | Warnings, highlights |
+
+On a filled accent, text is Paper 0 (`#FFFDFA`) in light mode and Coal 950 (`#191816`) in dark mode: the dark accents are light enough to need dark text.
 
 ### Neutral Colors
-| Name | Hex | Usage |
-|------|-----|-------|
-| Gray 900 | `#111827` | Primary text |
-| Gray 600 | `#4B5563` | Secondary text |
-| Gray 500 | `#6B7280` | Placeholder text |
-| Gray 300 | `#D1D5DB` | Borders, dividers |
-| Gray 100 | `#F3F4F6` | Subtle backgrounds |
+| Role | Light | Dark |
+|------|-------|------|
+| Page background | Paper 50 `#F7F5F2` | Coal 950 `#191816` |
+| Surface (cards, inputs, modals) | Paper 0 `#FFFDFA` | Coal 900 `#22201E` |
+| Subtle background | Paper 100 `#EFEBE6` | Coal 800 `#2C2A27` |
+| Primary text | Ink 900 `#2A2622` | Coal 100 `#EEEAE4` |
+| Secondary text and placeholder | Ink 500 `#6B645C` | Coal 400 `#A8A29A` |
+| Borders and dividers | Paper 200 `#E7E2DB` | Coal 750 `#34312D` |
+| Input border | Paper 500 `#948C82` | Coal 500 `#7A746C` |
 
 ---
 
@@ -100,7 +99,7 @@ Based on a **4px base unit**.
 
 | Token | Light | Dark | Usage |
 |-------|-------|------|-------|
-| `overlay` | `rgba(15,23,42,0.5)` (Nova Dark 50%) | `rgba(0,0,0,0.6)` | Backdrop behind modals and drawers |
+| `overlay` | `rgba(42,38,34,0.4)` (Ink 900 at 40%) | `rgba(0,0,0,0.6)` | Backdrop behind modals and drawers |
 
 ---
 
@@ -109,10 +108,10 @@ Based on a **4px base unit**.
 ### Buttons
 
 #### Variants
-- **Primary** — Filled, Nova Blue background
-- **Secondary** — Outlined, Nova Blue border
+- **Primary** — Filled, Tide background with its on-accent text (`#FFFDFA` in light, `#191816` in dark)
+- **Secondary** — Outlined, Tide border and text
 - **Ghost** — No border, transparent background
-- **Destructive** — Filled, Red 700 background (`#B91C1C`) with white text
+- **Destructive** — Filled, Clay background with its on-accent text (`#FFFDFA` in light, `#191816` in dark)
 - **Link** — No background, underline on hover
 
 #### Sizes
@@ -124,26 +123,27 @@ Based on a **4px base unit**.
 
 #### States
 - Default → Hover (10% darker) → Active (20% darker) → Disabled (40% opacity)
-- Focus: 2px offset ring in Nova Blue
+- Press: scales to 0.97 on `:active` with `anim-fast`, so the button confirms the touch; no scale with reduced motion and none on Link
+- Focus: 2px offset ring in Tide
 
 ---
 
 ### Inputs
 
 - Height: **40px** (MD), **48px** (LG)
-- Border: `1px solid #D1D5DB`
-- Focus border: `2px solid #2563EB`
+- Border: `1px solid` input border (Paper 500 / Coal 500, at least 3:1 against the surface)
+- Focus border: `2px solid` Tide
 - Border radius: `radius-md`
 - Padding: `12px 16px`
-- Placeholder color: `Gray 500`
-- Error state: Spark Red border + error message below (Red 700 in light mode, Spark Red in dark mode)
+- Placeholder color: secondary text
+- Error state: Clay border + error message below in Clay
 
 ---
 
 ### Cards
 
-- Background: `#FFFFFF`
-- Border: `1px solid #E5E7EB`
+- Background: surface (`#FFFDFA` / `#22201E`)
+- Border: `1px solid` border (`#E7E2DB` / `#34312D`)
 - Border radius: `radius-lg`
 - Padding: `space-6`
 - Shadow: `shadow-md`
@@ -153,13 +153,15 @@ Based on a **4px base unit**.
 
 ### Badges / Tags
 
-| Variant | Background | Text |
-|---------|------------|------|
-| Default | `#E5E7EB` | `#374151` |
-| Primary | `#DBEAFE` | `#1D4ED8` |
-| Success | `#DCFCE7` | `#15803D` |
-| Warning | `#FEF3C7` | `#B45309` |
-| Danger | `#FEE2E2` | `#B91C1C` |
+Tinted background and text in the same hue, per theme: a soft tint with deep text in light mode, a dark tint with bright text in dark mode.
+
+| Variant | Light background / text | Dark background / text |
+|---------|-------------------------|------------------------|
+| Default | `#EFEBE6` / `#4A443D` | `#2C2A27` / `#D6D1CA` |
+| Primary | `#E0F0EC` / `#0F6E66` | `#173A35` / `#6FD3C4` |
+| Success | `#E3F1E7` / `#2F7046` | `#1C3524` / `#6CC489` |
+| Warning | `#FBEFD9` / `#8A5A0C` | `#3B2C14` / `#E8B25A` |
+| Danger | `#FBE6E0` / `#A3361F` | `#3D211B` / `#F07A63` |
 
 ---
 
@@ -167,7 +169,7 @@ Based on a **4px base unit**.
 
 - Sidebar width: **240px** (expanded), **64px** (collapsed)
 - Top navbar height: **64px**
-- Active item: Nova Blue left border (3px) + light blue background
+- Active item: Tide left border (3px) + tinted background (`#E0F0EC` / `#2C2A27`)
 - Item padding: `12px 16px`
 - Icon size: `20px`
 
@@ -214,22 +216,14 @@ Based on a **4px base unit**.
 
 ## Dark Mode
 
-| Light Token | Dark Equivalent |
-|-------------|-----------------|
-| `#FFFFFF` background | `#0F172A` |
-| `#F3F4F6` subtle bg | `#1E293B` |
-| `#111827` text | `#F1F5F9` |
-| `#4B5563` muted text | `#94A3B8` |
-| `#E5E7EB` border | `#334155` |
-| `#6B7280` placeholder | `#94A3B8` |
-| `#2563EB` primary text (links, active tab, active nav item) | `#60A5FA` (Blue 400) |
-| `#B91C1C` error text | `#EF4444` |
+The app follows the operating system theme (spec RNF-05). Every color role in **Color Palette** has a light and a dark value; components only use the semantic tokens, never a literal color. Dark mode is warm charcoal, not black: `#191816` page, `#22201E` surfaces, `#34312D` borders, `#EEEAE4` text (never pure white, which glares on dark backgrounds) and the softer Tide `#5CC8B8`.
 
 ---
 
 ## Accessibility
 
 - Minimum contrast ratio: **4.5:1** for body text, **3:1** for large text. Every text/background token pair is checked automatically in both themes (`src/styles/tests/design-tokens.contrast.test.ts`)
+- Input borders and the focus ring: at least **3:1** against their background (WCAG 1.4.11), also checked in both themes
 - All interactive elements have visible focus rings
 - Touch targets minimum: **44x44px**
 - All icons paired with aria-labels or visible text
@@ -245,7 +239,7 @@ Adapted from the reference in `docs/design/task-board.taste.md` (image: `docs/de
 - **Tone, not elevation:** the shell is flat. Task cards sit on the page background with a 1px border and **no shadow at rest**.
 - **Color only for status:** shell text and icons stay neutral. Saturated color appears only in status badges, column counters and the active tab or nav item.
 - **Fixed columns:** board columns have a fixed width. Card height follows content.
-- **One shell surface:** sidebar, top navbar and board share the `#F8FAFC` page background, separated by 1px `#E5E7EB` dividers. No dark or contrasting sidebar.
+- **One shell surface:** sidebar, top navbar and board share the page background (`#F7F5F2` / `#191816`), separated by 1px border dividers. No contrasting sidebar.
 
 ### App Shell
 | Region | Spec |
@@ -258,11 +252,11 @@ Adapted from the reference in `docs/design/task-board.taste.md` (image: `docs/de
 - User block at top: 40px avatar, name (Body SM, 600), role (Caption, muted).
 - Section label: Caption, uppercase, muted text, wide letter-spacing, with a collapse chevron.
 - Item: 20px icon + label (Body SM, 500) + optional counter on the right; padding `12px 16px`.
-- Counter: Caption, `radius-full`, Primary badge colors (`#DBEAFE` / `#1D4ED8`), height 20px.
+- Counter: Caption, `radius-full`, Primary badge colors, height 20px.
 
 ### Page Header
 - Title: H1, followed by an optional ghost icon button (edit).
-- View tabs: Body SM 500, gap `space-6`. Inactive: muted text. Active: Nova Blue text + 2px Nova Blue bottom border.
+- View tabs: Body SM 500, gap `space-6`. Inactive: muted text. Active: Tide text + 2px Tide bottom border.
 - Toolbar row (`space-6` below title):
   - Segmented control (Board View / List View): MD height, `radius-md`, 1px border.
   - Filters and search input (MD).
@@ -272,13 +266,14 @@ Adapted from the reference in `docs/design/task-board.taste.md` (image: `docs/de
 - Column width: **264px**, gap `space-6` (24px).
 - Column header: title (Body, 600) + count pill (Caption, `radius-full`, same tint as the column status badge) + ghost "more" icon button on the right.
 - Space from header to first card: `space-6`.
+- Empty column: a dashed 1px border box with no fill and muted text, so it weighs less than real cards.
 - "Add task" button at the end of each column: full column width, 32px tall (44px on mobile), surface background, 1px dashed border, `radius-md`, centered 20px plus icon followed by the label "Añadir tarea" (Body SM, muted). Its accessible name starts with the visible label and adds the day ("Añadir tarea el jueves, 29 de octubre de 2026").
 
 ### Task Card
 | Property | Value |
 |----------|-------|
-| Background | `#FFFFFF` (surface) |
-| Border | `1px solid #E5E7EB` |
+| Background | surface |
+| Border | `1px solid` border |
 | Radius | `radius-md` |
 | Padding | `space-4` |
 | Gap between cards | `space-4` |
@@ -288,7 +283,7 @@ Adapted from the reference in `docs/design/task-board.taste.md` (image: `docs/de
 Content order:
 1. **Title:** Body SM 500, max 2 lines, then ellipsis.
 2. **Tags row** (gap `space-2`):
-   - ID tag: Caption, outlined (`1px #E5E7EB`, transparent background).
+   - ID tag: Caption, outlined (`1px` border, transparent background).
    - Status badge (see mapping below).
 3. **Footer row**, `space-3` below the tags:
    - Left: assignee avatars, 24px, overlapping by 8px; extra count shown as "+N".

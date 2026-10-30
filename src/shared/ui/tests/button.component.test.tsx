@@ -60,6 +60,15 @@ describe('Button', () => {
     expect(button.className).toContain('disabled:opacity-40');
   });
 
+  it('al pulsar encoge un 3 %, salvo con movimiento reducido y en la variante de enlace', () => {
+    const { rerender } = render(<Button>Guardar</Button>);
+    const button = screen.getByRole('button', { name: 'Guardar' });
+    expect(button.className).toContain('active:scale-97');
+    expect(button.className).toContain('motion-reduce:active:scale-100');
+    rerender(<Button variant="link">Guardar</Button>);
+    expect(screen.getByRole('button', { name: 'Guardar' }).className).not.toContain('active:scale-97');
+  });
+
   it('pasa la ref al elemento', () => {
     const ref = createRef<HTMLButtonElement>();
     render(<Button ref={ref}>Acción</Button>);

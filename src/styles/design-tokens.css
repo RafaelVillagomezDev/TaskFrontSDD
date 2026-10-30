@@ -27,41 +27,45 @@
   --color-current: currentColor;
   --color-white: #ffffff;
 
-  /* Primary */
-  --color-nova-blue: #2563eb;
-  --color-nova-dark: #0f172a;
-  --color-nova-light: #f8fafc;
+  /* Neutros cálidos: papel y tinta en claro, carbón en oscuro (nunca grises puros ni negro absoluto) */
+  --color-paper-0: #fffdfa; /* Superficie en claro: tarjetas, campos y modales */
+  --color-paper-50: #f7f5f2; /* Fondo de página en claro */
+  --color-paper-100: #efebe6; /* Fondo sutil y badge default en claro */
+  --color-paper-200: #e7e2db; /* Bordes y divisores en claro */
+  --color-paper-500: #948c82; /* Borde de campos en claro (3:1 sobre paper-0) */
+  --color-ink-500: #6b645c; /* Texto secundario y placeholder en claro (4.91:1 sobre paper-100) */
+  --color-ink-700: #4a443d; /* Texto del badge default en claro */
+  --color-ink-900: #2a2622; /* Texto principal en claro */
+  --color-coal-100: #eeeae4; /* Texto principal en oscuro: blanco roto, no blanco puro */
+  --color-coal-200: #d6d1ca; /* Texto del badge default en oscuro */
+  --color-coal-400: #a8a29a; /* Texto secundario y placeholder en oscuro */
+  --color-coal-500: #7a746c; /* Borde de campos en oscuro (3:1 sobre coal-900) */
+  --color-coal-750: #34312d; /* Bordes y divisores en oscuro */
+  --color-coal-800: #2c2a27; /* Fondo sutil, badge default e ítem activo en oscuro */
+  --color-coal-900: #22201e; /* Superficie en oscuro */
+  --color-coal-950: #191816; /* Fondo de página en oscuro */
 
-  /* Accent */
-  --color-spark-orange: #f97316;
-  --color-spark-green: #22c55e;
-  --color-spark-red: #ef4444;
+  /* Acento Tide: verde azulado profundo en claro, aguamarina suave en oscuro */
+  --color-tide-700: #0f6e66; /* Acento en claro (6.01:1 con texto paper-0) */
+  --color-tide-50: #e0f0ec; /* Badge primary e ítem activo en claro */
+  --color-tide-300: #5cc8b8; /* Botón principal en oscuro */
+  --color-tide-200: #6fd3c4; /* Enlaces y texto de acento en oscuro */
+  --color-tide-950: #173a35; /* Badge primary en oscuro */
 
-  /* Neutral */
-  --color-gray-900: #111827;
-  --color-gray-700: #374151; /* Badge default text */
-  --color-gray-600: #4b5563;
-  --color-gray-500: #6b7280; /* Placeholder (DESIGN.md: "Gray 500", 4.83:1 sobre blanco) */
-  --color-gray-300: #d1d5db;
-  --color-gray-200: #e5e7eb; /* Card border, badge default bg */
-  --color-gray-100: #f3f4f6;
-
-  /* Badges */
-  --color-blue-100: #dbeafe;
-  --color-blue-700: #1d4ed8;
-  --color-green-100: #dcfce7;
-  --color-green-700: #15803d;
-  --color-amber-100: #fef3c7;
-  --color-amber-700: #b45309;
-  --color-red-100: #fee2e2;
-  --color-red-700: #b91c1c; /* Botón destructivo y texto de error en claro */
-
-  /* Dark mode */
-  --color-slate-800: #1e293b;
-  --color-slate-700: #334155;
-  --color-slate-400: #94a3b8;
-  --color-slate-100: #f1f5f9;
-  --color-blue-400: #60a5fa; /* Texto primario en modo oscuro (7.02:1 sobre nova-dark) */
+  /* Estados en tonos de tierra: arcilla (error), hoja (éxito) y miel (aviso) */
+  --color-clay-700: #b03a24; /* Error y botón destructivo en claro */
+  --color-clay-800: #a3361f; /* Texto del badge danger en claro */
+  --color-clay-50: #fbe6e0;
+  --color-clay-300: #f07a63; /* Error y botón destructivo en oscuro */
+  --color-clay-950: #3d211b;
+  --color-leaf-700: #2f7046; /* Éxito en claro */
+  --color-leaf-50: #e3f1e7;
+  --color-leaf-300: #6cc489; /* Éxito en oscuro */
+  --color-leaf-950: #1c3524;
+  --color-honey-700: #8a5a0c; /* Aviso en claro */
+  --color-honey-50: #fbefd9;
+  --color-honey-300: #e8b25a; /* Aviso en oscuro */
+  --color-honey-950: #3b2c14;
 
   /* --- Tipografía --- */
   --font-*: initial;
@@ -195,20 +199,42 @@
   :root {
     color-scheme: light dark;
 
-    --background: light-dark(var(--color-white), var(--color-nova-dark));
-    --page: light-dark(var(--color-nova-light), var(--color-nova-dark));
-    --surface: light-dark(var(--color-white), var(--color-nova-dark));
-    --surface-subtle: light-dark(var(--color-gray-100), var(--color-slate-800));
-    --foreground: light-dark(var(--color-gray-900), var(--color-slate-100));
-    --foreground-muted: light-dark(var(--color-gray-600), var(--color-slate-400));
-    --border: light-dark(var(--color-gray-200), var(--color-slate-700));
-    --border-input: light-dark(var(--color-gray-300), var(--color-slate-700));
-    --placeholder: light-dark(var(--color-gray-500), var(--color-slate-400));
-    --primary-text: light-dark(var(--color-nova-blue), var(--color-blue-400));
-    --danger-text: light-dark(var(--color-red-700), var(--color-spark-red));
-    --nav-active: light-dark(var(--color-blue-100), var(--color-slate-800));
+    --background: light-dark(var(--color-paper-0), var(--color-coal-950));
+    --page: light-dark(var(--color-paper-50), var(--color-coal-950));
+    --surface: light-dark(var(--color-paper-0), var(--color-coal-900));
+    --surface-subtle: light-dark(var(--color-paper-100), var(--color-coal-800));
+    --foreground: light-dark(var(--color-ink-900), var(--color-coal-100));
+    --foreground-muted: light-dark(var(--color-ink-500), var(--color-coal-400));
+    --border: light-dark(var(--color-paper-200), var(--color-coal-750));
+    --border-input: light-dark(var(--color-paper-500), var(--color-coal-500));
+    --placeholder: light-dark(var(--color-ink-500), var(--color-coal-400));
+    --primary-text: light-dark(var(--color-tide-700), var(--color-tide-200));
+    --danger-text: light-dark(var(--color-clay-700), var(--color-clay-300));
+    --nav-active: light-dark(var(--color-tide-50), var(--color-coal-800));
+
+    /* Acciones: en oscuro el acento y la arcilla son claros, así que su texto es oscuro */
+    --primary: light-dark(var(--color-tide-700), var(--color-tide-300));
+    --on-primary: light-dark(var(--color-paper-0), var(--color-coal-950));
+    --destructive: light-dark(var(--color-clay-700), var(--color-clay-300));
+    --on-destructive: light-dark(var(--color-paper-0), var(--color-coal-950));
+    --success: light-dark(var(--color-leaf-700), var(--color-leaf-300));
+    --highlight: light-dark(var(--color-honey-700), var(--color-honey-300));
+    --danger: light-dark(var(--color-clay-700), var(--color-clay-300));
+
+    /* Badges: fondo tintado y texto del mismo tono en cada modo */
+    --badge-default-bg: light-dark(var(--color-paper-100), var(--color-coal-800));
+    --badge-default-fg: light-dark(var(--color-ink-700), var(--color-coal-200));
+    --badge-primary-bg: light-dark(var(--color-tide-50), var(--color-tide-950));
+    --badge-primary-fg: light-dark(var(--color-tide-700), var(--color-tide-200));
+    --badge-success-bg: light-dark(var(--color-leaf-50), var(--color-leaf-950));
+    --badge-success-fg: light-dark(var(--color-leaf-700), var(--color-leaf-300));
+    --badge-warning-bg: light-dark(var(--color-honey-50), var(--color-honey-950));
+    --badge-warning-fg: light-dark(var(--color-honey-700), var(--color-honey-300));
+    --badge-danger-bg: light-dark(var(--color-clay-50), var(--color-clay-950));
+    --badge-danger-fg: light-dark(var(--color-clay-800), var(--color-clay-300));
+
     /* Fondo detrás de modales y drawers (DESIGN.md Overlay) */
-    --overlay: light-dark(rgba(15, 23, 42, 0.5), rgba(0, 0, 0, 0.6));
+    --overlay: light-dark(rgba(42, 38, 34, 0.4), rgba(0, 0, 0, 0.6)); /* Tinta al 40 % en claro */
 
     --duration-fast: 100ms;
     --duration-base: 200ms;
@@ -235,29 +261,31 @@
   --color-overlay: var(--overlay);
 
   /* Acciones y estados */
-  --color-primary: var(--color-nova-blue);
-  --color-primary-hover: color-mix(in oklab, var(--color-nova-blue) 90%, black); /* 10% más oscuro */
-  --color-primary-active: color-mix(in oklab, var(--color-nova-blue) 80%, black); /* 20% más oscuro */
-  --color-destructive: var(--color-red-700);
-  --color-destructive-hover: color-mix(in oklab, var(--color-red-700) 90%, black);
-  --color-destructive-active: color-mix(in oklab, var(--color-red-700) 80%, black);
-  --color-success: var(--color-spark-green);
-  --color-highlight: var(--color-spark-orange);
-  --color-danger: var(--color-spark-red); /* Bordes e iconos de error */
+  --color-primary: var(--primary);
+  --color-primary-hover: color-mix(in oklab, var(--primary) 90%, black); /* 10% más oscuro */
+  --color-primary-active: color-mix(in oklab, var(--primary) 80%, black); /* 20% más oscuro */
+  --color-on-primary: var(--on-primary);
+  --color-destructive: var(--destructive);
+  --color-destructive-hover: color-mix(in oklab, var(--destructive) 90%, black);
+  --color-destructive-active: color-mix(in oklab, var(--destructive) 80%, black);
+  --color-on-destructive: var(--on-destructive);
+  --color-success: var(--success);
+  --color-highlight: var(--highlight);
+  --color-danger: var(--danger); /* Bordes e iconos de error */
   --color-danger-text: var(--danger-text);
   --color-primary-text: var(--primary-text); /* Enlaces, pestaña e ítem de navegación activos */
 
   /* Badges */
-  --color-badge-default-bg: var(--color-gray-200);
-  --color-badge-default-fg: var(--color-gray-700);
-  --color-badge-primary-bg: var(--color-blue-100);
-  --color-badge-primary-fg: var(--color-blue-700);
-  --color-badge-success-bg: var(--color-green-100);
-  --color-badge-success-fg: var(--color-green-700);
-  --color-badge-warning-bg: var(--color-amber-100);
-  --color-badge-warning-fg: var(--color-amber-700);
-  --color-badge-danger-bg: var(--color-red-100);
-  --color-badge-danger-fg: var(--color-red-700);
+  --color-badge-default-bg: var(--badge-default-bg);
+  --color-badge-default-fg: var(--badge-default-fg);
+  --color-badge-primary-bg: var(--badge-primary-bg);
+  --color-badge-primary-fg: var(--badge-primary-fg);
+  --color-badge-success-bg: var(--badge-success-bg);
+  --color-badge-success-fg: var(--badge-success-fg);
+  --color-badge-warning-bg: var(--badge-warning-bg);
+  --color-badge-warning-fg: var(--badge-warning-fg);
+  --color-badge-danger-bg: var(--badge-danger-bg);
+  --color-badge-danger-fg: var(--badge-danger-fg);
 }
 
 /* ------------------------------------------------------------------ */
@@ -282,10 +310,10 @@
   transition-timing-function: var(--ease-spring);
 }
 
-/* Focus: anillo de 2px con offset en Nova Blue */
+/* Focus: anillo de 2px con offset en el acento (DESIGN.md Accessibility) */
 @utility focus-ring {
   &:focus-visible {
-    outline: 2px solid var(--color-nova-blue);
+    outline: 2px solid var(--primary);
     outline-offset: 2px;
   }
 }

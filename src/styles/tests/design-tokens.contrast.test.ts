@@ -61,8 +61,10 @@ const textPairs: [string, string][] = [
   ]),
   ['foreground', 'surface-subtle'],
   ['foreground-muted', 'surface-subtle'],
-  ['white', 'primary'],
-  ['white', 'destructive'],
+  ['foreground', 'nav-active'],
+  ['primary-text', 'nav-active'],
+  ['on-primary', 'primary'],
+  ['on-destructive', 'destructive'],
   ['badge-default-fg', 'badge-default-bg'],
   ['badge-primary-fg', 'badge-primary-bg'],
   ['badge-success-fg', 'badge-success-bg'],
@@ -77,6 +79,25 @@ describe('RNF-02: contraste mínimo de 4.5:1 entre texto y fondo', () => {
     'RNF-02: $text sobre $bg en modo $theme',
     ({ theme, text, bg }) => {
       expect(contrast(resolve(text, theme), resolve(bg, theme))).toBeGreaterThanOrEqual(MIN_TEXT_CONTRAST);
+    },
+  );
+});
+
+// Bordes de los campos y anillo de foco: componentes de la interfaz, 3:1 frente a lo que los rodea (WCAG 1.4.11)
+const MIN_UI_CONTRAST = 3;
+
+const uiPairs: [string, string][] = [
+  ['border-input', 'surface'],
+  ['border-input', 'background'],
+  ['primary', 'page'],
+  ['primary', 'surface'],
+];
+
+describe('RNF-02: contraste mínimo de 3:1 en bordes de campos y foco', () => {
+  it.each(themes.flatMap((theme) => uiPairs.map(([ui, bg]) => ({ theme, ui, bg }))))(
+    'RNF-02: $ui sobre $bg en modo $theme',
+    ({ theme, ui, bg }) => {
+      expect(contrast(resolve(ui, theme), resolve(bg, theme))).toBeGreaterThanOrEqual(MIN_UI_CONTRAST);
     },
   );
 });

@@ -78,6 +78,13 @@ describe('EmptyState', () => {
     render(<EmptyState>No hay avisos todavía.</EmptyState>);
     expect(screen.getByText('No hay avisos todavía.').className).toContain('text-center');
   });
+
+  it('pesa menos que el contenido: borde discontinuo y sin relleno', () => {
+    render(<EmptyState>Sin tareas</EmptyState>);
+    const box = screen.getByText('Sin tareas');
+    expect(box.className).toContain('border-dashed');
+    expect(box.className).not.toContain('bg-');
+  });
 });
 
 describe('BoardColumn', () => {

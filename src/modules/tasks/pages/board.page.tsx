@@ -9,9 +9,10 @@ import { Notice } from '../../../shared/ui/notice.component';
 import { Spinner } from '../../../shared/ui/spinner.component';
 import { AddTaskButton } from '../components/add-task-button.component';
 import { DayColumn } from '../components/day-column.component';
+import { DeleteTaskDialog } from '../components/delete-task-dialog.component';
 import { TaskFormDialog } from '../components/task-form-dialog.component';
 import { WeekNavigator } from '../components/week-navigator.component';
-import { useTaskActions, type TaskCompletion } from '../hooks/use-task-actions.hook';
+import { useTaskActions, type TaskCardActions } from '../hooks/use-task-actions.hook';
 import { useTaskForm } from '../hooks/use-task-form.hook';
 import { useWeekBoard } from '../hooks/use-week-board.hook';
 import { TASKS_TEXTS } from '../texts/tasks.texts';
@@ -22,11 +23,11 @@ interface BoardContentProps {
   board: WeekBoard;
   // Abre el formulario de crear con la fecha de la columna (RF-15)
   onAddTask: (day: string) => void;
-  completion: TaskCompletion;
+  actions: TaskCardActions;
 }
 
 // Zona del tablero: carga y error solo aquí, sin bloquear el resto de la pantalla (RF-40, RF-44)
-function BoardContent({ board, onAddTask, completion }: Readonly<BoardContentProps>) {
+function BoardContent({ board, onAddTask, actions }: Readonly<BoardContentProps>) {
   if (board.status === 'loading') return <Spinner />;
   if (board.status === 'error') {
     return <ErrorMessage message={board.errorMessage ?? ''} onRetry={board.retry} />;
@@ -36,7 +37,7 @@ function BoardContent({ board, onAddTask, completion }: Readonly<BoardContentPro
     // Chrome y Firefox (RNF-04) hacen enfocable con teclado una zona desplazable sin controles (RNF-02)
     <section aria-label={TASKS_TEXTS.board.region} className="focus-ring flex gap-6 overflow-x-auto rounded-md pb-4">
       {board.columns.map((column) => (
-        <DayColumn key={column.day} column={column} completion={completion}>
+        <DayColumn key={column.day} column={column} actions={actions}>
           <AddTaskButton day={column.day} onAdd={onAddTask} />
         </DayColumn>
       ))}
@@ -44,7 +45,7 @@ function BoardContent({ board, onAddTask, completion }: Readonly<BoardContentPro
   );
 }
 
-// Tablero semanal en / (RF-09 a RF-22, RF-47, RF-51, RF-52; plan §6.2)
+// Tablero semanal en / (RF-09 a RF-24, RF-47, RF-51, RF-52; plan §6.2)
 export function BoardPage() {
   const board = useWeekBoard();
   const taskForm = useTaskForm({ today: board.today, weekStart: board.weekStart, weekEnd: board.weekEnd });
@@ -76,8 +77,9 @@ export function BoardPage() {
       {actions.error !== undefined && (
         <ErrorMessage message={actions.error} onRetry={actions.retry} onDismiss={actions.dismissError} />
       )}
-      <BoardContent board={board} onAddTask={taskForm.openFor} completion={actions} />
+      <BoardContent board={board} onAddTask={taskForm.openFor} actions={actions} />
       <TaskFormDialog taskForm={taskForm} />
+      <DeleteTaskDialog deletion={actions} />
     </PageContainer>
   );
 }

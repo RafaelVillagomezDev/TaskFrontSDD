@@ -200,4 +200,36 @@ describe('BoardPage', () => {
     await user.click(within(alert).getByRole('button', { name: 'Cerrar aviso' }));
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
+
+  it('RF-23 y RF-24: eliminar pide confirmación con el título y, al confirmar, la tarea desaparece del tablero', async () => {
+    const user = userEvent.setup({ advanceTimers: advance });
+    let items: unknown[] = [TASK];
+    mockApi({
+      'GET /tasks': () => weekWith(items)(),
+      'DELETE /tasks/t1': () => {
+        items = [];
+        return apiOk(null);
+      },
+    });
+    renderBoard();
+    await user.click(await screen.findByRole('button', { name: 'Eliminar «Comprar pan»' }));
+    const dialog = screen.getByRole('dialog', { name: '¿Eliminar la tarea?' });
+    expect(dialog).toHaveTextContent('«Comprar pan»');
+    await user.click(within(dialog).getByRole('button', { name: 'Eliminar' }));
+    await waitFor(() => {
+      expect(screen.queryByText('Comprar pan')).not.toBeInTheDocument();
+    });
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('RF-23: cancelar la confirmación deja la tarea igual', async () => {
+    const user = userEvent.setup({ advanceTimers: advance });
+    const api = mockApi({ 'GET /tasks': weekWith([TASK]) });
+    renderBoard();
+    await user.click(await screen.findByRole('button', { name: 'Eliminar «Comprar pan»' }));
+    await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Cancelar' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByText('Comprar pan')).toBeInTheDocument();
+    expect(api.requests.some((request) => request.method === 'DELETE')).toBe(false);
+  });
 });

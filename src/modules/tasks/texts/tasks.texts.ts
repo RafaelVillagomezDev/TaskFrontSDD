@@ -32,6 +32,14 @@ export const TASKS_TEXTS = {
     creating: 'Creando…',
     createdOutsideWeek: (dayLong: string): string => `Tarea creada para el ${dayLong}.`,
   },
+  delete: {
+    // Nombre accesible del botón de cada tarjeta: distingue las tareas entre sí
+    action: (title: string): string => `Eliminar «${title}»`,
+    title: '¿Eliminar la tarea?',
+    body: (title: string): string => `«${title}» desaparecerá del tablero y del historial. No se puede deshacer.`,
+    confirm: 'Eliminar',
+    deleting: 'Eliminando…',
+  },
   validation: {
     titleRequired: 'Escribe un título.',
     titleTooLong: 'El título no puede tener más de 200 caracteres.',

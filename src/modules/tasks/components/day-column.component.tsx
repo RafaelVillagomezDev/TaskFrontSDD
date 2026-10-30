@@ -5,8 +5,8 @@ import { BoardColumn } from '../../../shared/layout/board-column.component';
 import { EmptyState } from '../../../shared/layout/empty-state.component';
 import { Badge } from '../../../shared/ui/badge.component';
 import { Text } from '../../../shared/ui/text.component';
-import type { TaskCompletion } from '../hooks/use-task-actions.hook';
-import type { DayColumnModel } from '../hooks/use-week-board.hook';
+import type { TaskCardActions } from '../hooks/use-task-actions.hook';
+import type { DayColumnModel, DayKind } from '../hooks/use-week-board.hook';
 import type { Task } from '../schemas/task.schema';
 import { TASKS_TEXTS } from '../texts/tasks.texts';
 import { TaskCard } from './task-card.component';
@@ -15,18 +15,22 @@ interface DayColumnProps {
   column: DayColumnModel;
   // Acciones del día (crear una tarea): solo se muestran si el día no está cerrado (RF-11, RF-13)
   children?: ReactNode;
-  // Completar y desmarcar: solo en la columna de hoy (RF-13, RF-20 a RF-22)
-  completion?: TaskCompletion | undefined;
+  // Acciones sobre las tareas: completar solo hoy (RF-20 a RF-22) y eliminar hoy y días futuros (RF-23);
+  // un día cerrado no ofrece ninguna (RF-13)
+  actions?: TaskCardActions | undefined;
 }
 
 interface TaskListProps {
   label: string;
   tasks: Task[];
-  completion: TaskCompletion | undefined;
+  kind: DayKind;
+  actions: TaskCardActions | undefined;
 }
 
-function TaskList({ label, tasks, completion }: Readonly<TaskListProps>) {
+function TaskList({ label, tasks, kind, actions }: Readonly<TaskListProps>) {
   if (tasks.length === 0) return null;
+  const canComplete = actions !== undefined && kind === 'today';
+  const canDelete = actions !== undefined && kind !== 'past';
   return (
     <BoardColumn.List aria-label={label}>
       {tasks.map((task) => (
@@ -34,14 +38,21 @@ function TaskList({ label, tasks, completion }: Readonly<TaskListProps>) {
           key={task.id}
           task={task}
           onToggleCompleted={
-            completion === undefined
-              ? undefined
-              : () => {
-                  completion.toggleCompleted(task);
+            canComplete
+              ? () => {
+                  actions.toggleCompleted(task);
                 }
+              : undefined
           }
-          isUpdating={completion?.isUpdating(task.id)}
-          keepFocus={completion?.keepsFocus(task.id)}
+          isUpdating={actions?.isUpdating(task.id)}
+          keepFocus={actions?.keepsFocus(task.id)}
+          onDelete={
+            canDelete
+              ? () => {
+                  actions.requestDelete(task);
+                }
+              : undefined
+          }
         />
       ))}
     </BoardColumn.List>
@@ -49,9 +60,8 @@ function TaskList({ label, tasks, completion }: Readonly<TaskListProps>) {
 }
 
 // Columna de un día del tablero sobre BoardColumn (RF-09 a RF-11, RF-13)
-export function DayColumn({ column, children, completion }: Readonly<DayColumnProps>) {
+export function DayColumn({ column, children, actions }: Readonly<DayColumnProps>) {
   const isClosed = column.kind === 'past';
-  const dayCompletion = column.kind === 'today' ? completion : undefined;
   return (
     <BoardColumn aria-label={formatDayLong(column.day)}>
       <BoardColumn.Header>
@@ -74,8 +84,8 @@ export function DayColumn({ column, children, completion }: Readonly<DayColumnPr
           </Text>
         </EmptyState>
       )}
-      <TaskList label={TASKS_TEXTS.column.pending} tasks={column.pending} completion={dayCompletion} />
-      <TaskList label={TASKS_TEXTS.column.completed} tasks={column.completed} completion={dayCompletion} />
+      <TaskList label={TASKS_TEXTS.column.pending} tasks={column.pending} kind={column.kind} actions={actions} />
+      <TaskList label={TASKS_TEXTS.column.completed} tasks={column.completed} kind={column.kind} actions={actions} />
       {!isClosed && children}
     </BoardColumn>
   );

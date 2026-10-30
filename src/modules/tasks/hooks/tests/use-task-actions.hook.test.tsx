@@ -142,4 +142,94 @@ describe('useTaskActions', () => {
     });
     expect(result.current.error).toBeUndefined();
   });
+
+  it('RF-23: pedir eliminar guarda la tarea que hay que confirmar, sin llamar a la API; cancelar la olvida', () => {
+    const api = mockApi({});
+    const { result } = setup();
+    act(() => {
+      result.current.requestDelete(task('t1'));
+    });
+    expect(result.current.pendingDelete).toEqual(task('t1'));
+    act(() => {
+      result.current.cancelDelete();
+    });
+    expect(result.current.pendingDelete).toBeUndefined();
+    expect(api.requests).toHaveLength(0);
+  });
+
+  it('RF-24: confirmar elimina la tarea y cierra la confirmación', async () => {
+    const api = mockApi({ 'DELETE /tasks/t1': () => apiOk(null) });
+    const { result } = setup();
+    act(() => {
+      result.current.requestDelete(task('t1'));
+    });
+    act(() => {
+      result.current.confirmDelete();
+    });
+    expect(result.current.isDeleting).toBe(true);
+    await waitFor(() => {
+      expect(result.current.pendingDelete).toBeUndefined();
+    });
+    expect(result.current.isDeleting).toBe(false);
+    expect(api.requests.map((request) => request.method)).toEqual(['DELETE']);
+  });
+
+  it('RF-19: confirmar dos veces seguidas elimina una sola vez', async () => {
+    const api = mockApi({ 'DELETE /tasks/t1': () => apiOk(null) });
+    const { result } = setup();
+    act(() => {
+      result.current.requestDelete(task('t1'));
+    });
+    act(() => {
+      result.current.confirmDelete();
+      result.current.confirmDelete();
+    });
+    await waitFor(() => {
+      expect(result.current.pendingDelete).toBeUndefined();
+    });
+    expect(api.requests).toHaveLength(1);
+  });
+
+  it('RF-42: si el día ya está cerrado, cierra la confirmación y lo explica', async () => {
+    mockApi({ 'DELETE /tasks/t1': () => apiFail(409, 'DAY_CLOSED') });
+    const { result } = setup();
+    act(() => {
+      result.current.requestDelete(task('t1'));
+    });
+    act(() => {
+      result.current.confirmDelete();
+    });
+    await waitFor(() => {
+      expect(result.current.error).toBe('Ese día ya está cerrado: sus tareas no se pueden cambiar.');
+    });
+    expect(result.current.pendingDelete).toBeUndefined();
+    expect(result.current.retry).toBeUndefined();
+  });
+
+  it('RF-44: sin conexión ofrece reintentar la eliminación ya confirmada', async () => {
+    let calls = 0;
+    const api = mockApi({
+      'DELETE /tasks/t1': () => {
+        calls += 1;
+        return calls === 1 ? Promise.reject(new TypeError('Failed to fetch')) : apiOk(null);
+      },
+    });
+    const { result } = setup();
+    act(() => {
+      result.current.requestDelete(task('t1'));
+    });
+    act(() => {
+      result.current.confirmDelete();
+    });
+    await waitFor(() => {
+      expect(result.current.retry).toBeDefined();
+    });
+    act(() => {
+      result.current.retry?.();
+    });
+    await waitFor(() => {
+      expect(result.current.error).toBeUndefined();
+    });
+    expect(api.requests).toHaveLength(2);
+  });
 });

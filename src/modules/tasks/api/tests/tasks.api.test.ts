@@ -281,3 +281,63 @@ describe('D-7: tasksApi.updateTask (completar y desmarcar)', () => {
     },
   );
 });
+
+describe('D-7: tasksApi.deleteTask', () => {
+  const USER = { id: 'u1', email: 'ana@example.com', name: 'Ana', createdAt: '2026-10-29T10:00:00.000Z' };
+  const WEEK = '2026-10-29';
+
+  beforeEach(() => {
+    store.dispatch(sessionStarted({ user: USER, csrfToken: 'sesion-1' }));
+  });
+
+  async function settle() {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    await Promise.all(store.dispatch(tasksApi.util.getRunningQueriesThunk()));
+  }
+
+  it('RF-24: envía DELETE /tasks/{id} con el token CSRF y la semana se vuelve a pedir sin ella', async () => {
+    let deleted = false;
+    const api = mockApi({
+      'GET /tasks': () => page(deleted ? [] : [task('t1', WEEK)], 1, deleted ? 0 : 1),
+      'DELETE /tasks/t1': () => {
+        deleted = true;
+        return apiOk(null);
+      },
+    });
+    const week = store.dispatch(tasksApi.endpoints.getWeekTasks.initiate(WEEK));
+    await week;
+    const result = await store.dispatch(tasksApi.endpoints.deleteTask.initiate('t1'));
+    expect(result.error).toBeUndefined();
+    expect(api.requests.find((request) => request.method === 'DELETE')?.headers.get('X-CSRF-Token')).toBe('sesion-1');
+    await settle();
+    expect(tasksApi.endpoints.getWeekTasks.select(WEEK)(store.getState()).data).toEqual([]);
+    week.unsubscribe();
+  });
+
+  it('RF-45: si la tarea ya no existe, la semana también se vuelve a pedir', async () => {
+    const api = mockApi({
+      'GET /tasks': () => page([], 1, 0),
+      'DELETE /tasks/t1': () => apiFail(404, 'TASK_NOT_FOUND'),
+    });
+    const week = store.dispatch(tasksApi.endpoints.getWeekTasks.initiate(WEEK));
+    await week;
+    const result = await store.dispatch(tasksApi.endpoints.deleteTask.initiate('t1'));
+    expect(toApiError(result.error).code).toBe('TASK_NOT_FOUND');
+    await settle();
+    expect(api.requests.filter((request) => request.method === 'GET')).toHaveLength(2);
+    week.unsubscribe();
+  });
+
+  it('RF-44: un fallo inesperado no vuelve a pedir la semana', async () => {
+    const api = mockApi({
+      'GET /tasks': () => page([task('t1', WEEK)], 1, 1),
+      'DELETE /tasks/t1': () => apiFail(500, 'INTERNAL_ERROR'),
+    });
+    const week = store.dispatch(tasksApi.endpoints.getWeekTasks.initiate(WEEK));
+    await week;
+    await store.dispatch(tasksApi.endpoints.deleteTask.initiate('t1'));
+    await settle();
+    expect(api.requests.filter((request) => request.method === 'GET')).toHaveLength(1);
+    week.unsubscribe();
+  });
+});

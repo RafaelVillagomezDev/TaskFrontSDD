@@ -1,6 +1,10 @@
+import { Trash2 } from 'lucide-react';
+
 import { Badge } from '../../../shared/ui/badge.component';
 import { Box } from '../../../shared/ui/box.component';
+import { Button } from '../../../shared/ui/button.component';
 import { Checkbox } from '../../../shared/ui/checkbox.component';
+import { Icon } from '../../../shared/ui/icon.component';
 import { Text } from '../../../shared/ui/text.component';
 import { cn } from '../../../shared/utils/class-names.util';
 import type { Task } from '../schemas/task.schema';
@@ -14,6 +18,8 @@ interface TaskCardProps {
   isUpdating?: boolean | undefined;
   // La casilla toma el foco al montarse: la tarea acaba de cambiar de lista al completarla o desmarcarla
   keepFocus?: boolean | undefined;
+  // Con onDelete la tarea se puede eliminar: hoy y días futuros (RF-13, RF-23)
+  onDelete?: (() => void) | undefined;
 }
 
 // Ref de callback estable: React la llama al montar la casilla (y con null al desmontarla)
@@ -42,7 +48,13 @@ function TaskTitle({ task, as }: Readonly<TaskTitleProps>) {
 // Tarjeta de DESIGN.md (Task Card): superficie con borde, radius-md, space-4 y sin sombra en reposo.
 // Si se puede completar, el título es la etiqueta de la casilla: toda la línea es pulsable y la casilla se llama
 // como la tarea; la casilla mide 44×44 px en móvil (VII.4)
-export function TaskCard({ task, onToggleCompleted, isUpdating = false, keepFocus = false }: Readonly<TaskCardProps>) {
+export function TaskCard({
+  task,
+  onToggleCompleted,
+  isUpdating = false,
+  keepFocus = false,
+  onDelete,
+}: Readonly<TaskCardProps>) {
   return (
     <Box as="li" className="flex flex-col gap-3 rounded-md border border-border bg-surface p-4">
       {onToggleCompleted === undefined ? (
@@ -65,11 +77,22 @@ export function TaskCard({ task, onToggleCompleted, isUpdating = false, keepFocu
         </Text>
       )}
       {/* Estado con las variantes de DESIGN.md (Status → Badge Mapping) */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {task.completed ? (
           <Badge variant="success">{TASKS_TEXTS.status.completed}</Badge>
         ) : (
           <Badge>{TASKS_TEXTS.status.pending}</Badge>
+        )}
+        {onDelete !== undefined && (
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-label={TASKS_TEXTS.delete.action(task.title)}
+            className="ml-auto text-foreground-muted"
+            onClick={onDelete}
+          >
+            <Icon icon={Trash2} />
+          </Button>
         )}
       </div>
     </Box>

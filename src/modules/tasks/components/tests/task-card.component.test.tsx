@@ -114,3 +114,28 @@ describe('TaskCard (completar)', () => {
     expect(checkbox).toBeEnabled();
   });
 });
+
+describe('TaskCard (eliminar)', () => {
+  it('RF-13: sin onDelete no ofrece eliminar', () => {
+    render(
+      <ul>
+        <TaskCard task={TASK} />
+      </ul>,
+    );
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('RF-23: el botón de eliminar se llama con el título de la tarea y avisa al pulsarlo', async () => {
+    const user = userEvent.setup();
+    const onDelete = jest.fn();
+    render(
+      <ul>
+        <TaskCard task={TASK} onDelete={onDelete} />
+      </ul>,
+    );
+    const button = screen.getByRole('button', { name: 'Eliminar «Comprar pan»' });
+    expect(button.className).toContain('min-h-touch');
+    await user.click(button);
+    expect(onDelete).toHaveBeenCalledTimes(1);
+  });
+});

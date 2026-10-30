@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import { toApiError, type ApiErrorCode } from '../../../shared/api/api-error.util';
 import { baseApi } from '../../../shared/api/base.api';
 import { validatedResult, type ApiResult, type BoundBaseQuery } from '../../../shared/api/validated-result.util';
@@ -21,8 +23,13 @@ export interface UpdateTaskArgs {
 // Errores que significan que el tablero muestra algo que ya no es real: se vuelve a pedir (RF-42, RF-45)
 const STALE_BOARD_CODES: readonly ApiErrorCode[] = ['DAY_CLOSED', 'DAY_NOT_STARTED', 'TASK_NOT_FOUND'];
 
+// Tras un rechazo, la semana solo se vuelve a pedir si lo que muestra ya no es real
+function staleBoardTags(error: unknown): 'Task'[] {
+  return STALE_BOARD_CODES.includes(toApiError(error).code) ? ['Task'] : [];
+}
+
 function updateTaskTags(error: unknown, changes: TaskChanges): ('Task' | 'Streak')[] {
-  if (error !== undefined) return STALE_BOARD_CODES.includes(toApiError(error).code) ? ['Task'] : [];
+  if (error !== undefined) return staleBoardTags(error);
   // Completar o desmarcar ya está en la caché (optimista); cambia la racha (D-7)
   return changes.completed === undefined ? ['Task'] : ['Streak'];
 }
@@ -102,7 +109,13 @@ export const tasksApi = baseApi.injectEndpoints({
       },
       invalidatesTags: (_result, error, { changes }) => updateTaskTags(error, changes),
     }),
+    // Eliminar espera a la API (D-7): al acertar, la tarea sale del tablero y la racha se recalcula (RF-24)
+    deleteTask: build.mutation<null, string>({
+      queryFn: async (id, _api, _extra, baseQuery) =>
+        validatedResult(await baseQuery({ url: `/tasks/${id}`, method: 'DELETE' }), z.null()),
+      invalidatesTags: (_result, error) => (error === undefined ? ['Task', 'Streak'] : staleBoardTags(error)),
+    }),
   }),
 });
 
-export const { useGetWeekTasksQuery, useCreateTaskMutation, useUpdateTaskMutation } = tasksApi;
+export const { useGetWeekTasksQuery, useCreateTaskMutation, useUpdateTaskMutation, useDeleteTaskMutation } = tasksApi;

@@ -359,16 +359,20 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
 ## Fase H5 — Eliminar una tarea (HU-05, P1)
 
 ### Tests (deben fallar)
-- [ ] T076 [P] [H5] Tests de `DeleteTaskDialog` y de la acción de eliminar en `use-task-actions`: confirmación con el título, cancelar no cambia nada, invalida `Task` y `Streak` (RF-23, RF-24) — `tasks/components/tests/delete-task-dialog.component.test.tsx`, `tasks/hooks/tests/use-task-actions.hook.test.ts`
+- [x] T076 [P] [H5] Tests de `DeleteTaskDialog` y de la acción de eliminar en `use-task-actions`: confirmación con el título, cancelar no cambia nada, invalida `Task` y `Streak` (RF-23, RF-24) — `tasks/components/tests/delete-task-dialog.component.test.tsx`, `tasks/hooks/tests/use-task-actions.hook.test.ts`
   - Verifica: `dce pnpm test src/modules/tasks/components/tests/delete-task-dialog` **falla**.
-- [ ] T077 [P] [H5] E2E `delete-task.e2e.ts` en 6 proyectos: eliminar con confirmación, cancelar, desaparece del tablero (RF-23, RF-24) — `e2e/specs/delete-task.e2e.ts`
+  - Hecho (2026-10-30): 5 casos de `DeleteTaskDialog`, 5 de eliminar en `useTaskActions` y 3 de `deleteTask` en `tasks.api.test.ts`. También 2 de `TaskCard`, 4 de `DayColumn` (papelera hoy y en días futuros, nunca en pasados) y 2 de la página: confirmar hace desaparecer la tarea y cancelar la deja igual.
+- [x] T077 [P] [H5] E2E `delete-task.e2e.ts` en 6 proyectos: eliminar con confirmación, cancelar, desaparece del tablero (RF-23, RF-24) — `e2e/specs/delete-task.e2e.ts`
   - Verifica: `dre pnpm test:e2e e2e/specs/delete-task --project=chromium-desktop` **falla**.
+  - Hecho (2026-10-30): 3 tests × 6 proyectos: eliminar con confirmación (y recargar para comprobar que se borró en la API), cancelar y solo con teclado (Escape devuelve el foco a la papelera).
 
 ### Implementación
-- [ ] T078 [H5] Mutación `deleteTask` y acción de eliminar en `useTaskActions` — `tasks/api/tasks.api.ts`, `tasks/hooks/use-task-actions.hook.ts`
+- [x] T078 [H5] Mutación `deleteTask` y acción de eliminar en `useTaskActions` — `tasks/api/tasks.api.ts`, `tasks/hooks/use-task-actions.hook.ts`
   - Verifica: `dce pnpm test src/modules/tasks` pasa.
-- [ ] T079 [H5] `DeleteTaskDialog` sobre `Dialog` y acceso desde `TaskCard` — `tasks/components/delete-task-dialog.component.tsx`, `task-card.component.tsx`
+  - Hecho (2026-10-30): `deleteTask` espera a la API (D-7) e invalida `Task` y `Streak`; ante un rechazo, solo vuelve a pedir la semana con `DAY_CLOSED`, `DAY_NOT_STARTED` o `TASK_NOT_FOUND`. `useTaskActions` guarda la tarea pendiente de confirmar, elimina una sola vez aunque se confirme dos y ofrece «Reintentar» (sin volver a preguntar) solo sin conexión o ante un fallo inesperado.
+- [x] T079 [H5] `DeleteTaskDialog` sobre `Dialog` y acceso desde `TaskCard` — `tasks/components/delete-task-dialog.component.tsx`, `task-card.component.tsx`
   - Verifica: `dre pnpm test:e2e e2e/specs/delete-task --project=chromium-desktop` pasa.
+  - Hecho (2026-10-30): `DeleteTaskDialog` controlado sobre `Dialog`, con el foco inicial en «Cancelar». Papelera (`Trash2`) en cada tarjeta de hoy o futura, con nombre accesible «Eliminar «título»». `DayColumn` recibe `actions` (`TaskCardActions`) y decide por día qué ofrece. Lint, typecheck, 506 tests (99,8 % de líneas), build, 282 E2E en los 6 proyectos y quality gate en verde.
 
 ---
 
@@ -593,4 +597,5 @@ Los criterios de éxito se comprueban en:
   - `DESIGN.md`: «Añadir tarea» con icono y texto.
   - Las E2E necesitan 12 GB en Docker.
 - **2026-10-30** — Fase H4 terminada: T071–T075.
+- **2026-10-30** — Fase H5 terminada: T076–T079.
 - **2026-10-30** — Nueva paleta (decisión del usuario): neutros cálidos (papel y tinta en claro, carbón `#191816` en oscuro), acento Tide (`#0F6E66` / `#5CC8B8`) y estados en tonos de tierra (arcilla, hoja y miel), partiendo de la estructura de WattVision. Cambian `DESIGN.md`, `design-tokens.css` (botones y badges con valor claro y oscuro, `on-primary` / `on-destructive`) y el test de contraste, que comprueba también 3:1 en bordes de campos y foco. `EmptyState` pasa a borde discontinuo sin relleno.

@@ -36,14 +36,14 @@ function DrawerTrigger(props: Readonly<ButtonProps>) {
 }
 
 // Panel lateral izquierdo con el ancho del Sidebar de DESIGN.md y la superficie del shell (Layout Patterns);
-// nunca más ancho que la pantalla (CONSTITUTION.md VII.6)
+// nunca más ancho que la pantalla (CONSTITUTION.md VII.6). Entra desde su borde (anim-drawer)
 function DrawerContent({ children }: Readonly<DrawerPartProps>) {
   const drawer = usePart('Content');
   return (
     <ModalPanel
       state={drawer}
       layerClassName=""
-      className="absolute inset-y-0 right-auto left-0 h-full max-h-full w-sidebar max-w-full gap-6 border-r border-border bg-page p-4"
+      className="absolute inset-y-0 right-auto left-0 h-full max-h-full w-sidebar max-w-full animate-slide-in-left gap-6 border-r border-border bg-page p-4"
     >
       {children}
     </ModalPanel>

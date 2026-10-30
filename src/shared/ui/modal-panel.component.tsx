@@ -20,8 +20,13 @@ export function ModalPanel({ state, layerClassName, className, children }: Reado
   if (!state.open) return null;
   return createPortal(
     <div className={cn('fixed inset-0 z-50', layerClassName)}>
-      {/* Fondo: el clic cierra; con teclado se cierra con Escape */}
-      <div aria-hidden="true" data-testid="modal-overlay" className="absolute inset-0 bg-overlay" onClick={close} />
+      {/* Fondo: entra con un fundido de 150 ms (anim-overlay); el clic cierra y con teclado, Escape */}
+      <div
+        aria-hidden="true"
+        data-testid="modal-overlay"
+        className="absolute inset-0 animate-fade-in bg-overlay"
+        onClick={close}
+      />
       <Box
         as="dialog"
         open

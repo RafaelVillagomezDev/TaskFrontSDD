@@ -48,6 +48,8 @@ describe('VI.2: Drawer compound', () => {
     expect(drawer).toHaveAttribute('aria-modal', 'true');
     expect(drawer.className).toContain('w-sidebar');
     expect(drawer.className).toContain('max-w-full');
+    // anim-drawer: entra desde su borde izquierdo
+    expect(drawer.className).toContain('animate-slide-in-left');
     expect(screen.getByRole('button', { name: 'Cerrar menú' })).toHaveFocus();
   });
 

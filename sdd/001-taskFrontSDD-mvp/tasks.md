@@ -554,12 +554,12 @@ Los avisos los genera la API a las 22:00 y no se pueden crear desde la UI. Por e
 - [x] T109 [P] [Rob] E2E `responsive.e2e.ts` en 6 proyectos: en cada pantalla, `scrollWidth <= innerWidth`, cada elemento interactivo `toBeInViewport()` y, en móvil, al menos 44×44px; el tablero solo desplaza su zona (RNF-03, CE-07, VII.5) — `e2e/specs/responsive.e2e.ts`, `e2e/fixtures/responsive.fixture.ts`
   - Verifica: `dre pnpm test:e2e e2e/specs/responsive` pasa.
   - Hecho (2026-10-30): `responsive.e2e.ts` recorre inicio de sesión, registro, tablero, crear y editar tarea, confirmar eliminación, historial, avisos y cuenta con su diálogo. 48 pruebas en los 6 proyectos.
-- [ ] T110 [Rob] Revisión con las skills: `break-ui` (contenido largo, emojis y texto no latino en tarjetas y columnas, caso límite de la spec), `mobile-native` y `review-animations`. Corregir lo que encuentren, sin salir de `DESIGN.md`.
+- [x] T110 [Rob] Revisión con las skills: `break-ui` (contenido largo, emojis y texto no latino en tarjetas y columnas, caso límite de la spec), `mobile-native` y `review-animations`. Corregir lo que encuentren, sin salir de `DESIGN.md`.
   - Verifica: las correcciones tienen test y `dce pnpm test` pasa.
-  - En curso (2026-10-30):
+  - Hecho (2026-10-30):
     - `break-ui` con datos reales del peor caso: el historial muestra título y descripción completos (`TaskCard` con `variant="list"`); en el tablero el título recortado lleva `title`; `dir="auto"` en títulos, descripciones y tareas de un aviso; `title` en el nombre recortado de la navegación.
     - `mobile-native`: `theme-color` por tema, sin destello al tocar, `touch-action: manipulation` y `user-select: none` en controles, `overscroll-x-contain` en el tablero y `overscroll-contain` en los modales.
-    - Falta `review-animations`, que solo puede lanzar el usuario (`/review-animations`).
+    - `review-animations` (lanzada por el usuario): los modales entran en 200 ms con un ease-out fuerte y sin rebote, en lugar de 400 ms con rebote; el fondo entra con un fundido de 150 ms; el Drawer entra desde su borde en 250 ms; `anim-fast` usa `cubic-bezier(0.23, 1, 0.32, 1)`. `DESIGN.md` (Motion & Animation) actualizado a petición del usuario. Tests en `motion-tokens.test.ts`, `dialog` y `drawer`.
 - [x] T111 [Rob] Suite completa en Chromium y Firefox, en los 6 proyectos (IV.6).
   - Verifica: `dre pnpm test:e2e` pasa.
   - Hecho (2026-10-30): 672 E2E en los 6 proyectos en verde.
@@ -569,8 +569,9 @@ Los avisos los genera la API a las 22:00 y no se pueden crear desde la UI. Por e
 - [x] T113 [Rob] Trazabilidad: cada uno de los 54 RF aparece en el nombre de al menos un test (II.5).
   - Verifica: `grep -rhoE "RF-[0-9]{2}" src e2e --include="*.test.ts" --include="*.test.tsx" --include="*.e2e.ts" | sort -u | wc -l` devuelve `54`.
   - Hecho (2026-10-30): devuelve 54.
-- [ ] T114 [Rob] `README.md` al día (estado, comandos que ya funcionan) y spec → `Implementada`, con entrada en su *Registro de cambios* (II.2, Gobierno 3) — `README.md`, `sdd/001-taskFrontSDD-mvp/spec.md`
+- [x] T114 [Rob] `README.md` al día (estado, comandos que ya funcionan) y spec → `Implementada`, con entrada en su *Registro de cambios* (II.2, Gobierno 3) — `README.md`, `sdd/001-taskFrontSDD-mvp/spec.md`
   - Verifica: T111, T112 y T113 terminados.
+  - Hecho (2026-10-30): README con el estado, las funcionalidades y la estructura reales, y sin el aviso de proyecto sin inicializar; spec → *Implementada* con su entrada en el registro de cambios.
 
 ---
 
@@ -643,3 +644,4 @@ Los criterios de éxito se comprueban en:
 - **2026-10-30** — Fase H10 terminada: T100–T102.
 - **2026-10-30** — Fase H11 terminada: T103–T106. Todas las historias de la spec implementadas; queda la fase R.
 - **2026-10-30** — Fase R: T107–T109 y T111–T113 hechas; T110 a falta de `review-animations` (la lanza el usuario); T114 espera a T110.
+- **2026-10-30** — T110 terminada con `review-animations` y T114 hecha: las 114 tareas completas, spec *Implementada*.

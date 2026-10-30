@@ -4,23 +4,25 @@
 
 ## Estado del proyecto
 
-**Sin inicializar.** Por ahora solo existen la documentación de gobierno, el sistema de diseño y los tokens de Tailwind. Todavía no hay `package.json`, Dockerfiles, hooks, scripts ni código de la aplicación. Tampoco hay especificaciones en `sdd/`.
+**MVP implementado.** La primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) está terminada: sus 114 tareas hechas y su spec en estado *Implementada*. Cada RF tiene al menos un test con su nombre, y la suite completa pasa en Chromium y Firefox, en móvil, tablet y escritorio.
 
 | Elemento | Estado |
 | :--- | :--- |
 | `CONSTITUTION.md`, `AGENTS.md`, `DESIGN.md` | Listos |
 | Tokens de diseño (`src/styles/design-tokens.css`) | Paleta cálida (papel, tinta y carbón con acento Tide) en claro y oscuro; el contraste de cada pareja se comprueba con un test |
 | Referencia de diseño del tablero (`docs/design/`) | Lista |
-| Proyecto Vite + React, Docker, SonarQube, hooks de git | Pendiente |
-| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | `spec.md` aprobada, `plan.md` aprobado y `tasks.md` creado (114 tareas + 1 externa); implementación en curso: 112 de 114 (fase 0 «Base», fases H1 a H11 —todas las historias— y casi toda la fase R: errores comunes, navegación y responsive en E2E, revisión con `break-ui` y `mobile-native`, suite completa, cobertura, quality gate y trazabilidad; faltan la revisión con `review-animations` y el cierre de la spec) |
+| Proyecto Vite + React, Docker, SonarQube, hooks de git | Listos |
+| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | Spec *Implementada*: 114 de 114 tareas. Cobertura del 99,9 % de líneas, quality gate en verde y E2E en los 6 proyectos de Playwright |
 | Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Hecho (spec 003 de la API): la sesión sigue tras recargar |
 
-## Funcionalidades previstas
+## Funcionalidades
 
-- Registro, inicio y cierre de sesión contra TaskApiSDD.
-- Crear, listar, editar, completar y eliminar tareas diarias.
-- Dashboard de rachas y métricas de productividad.
-- Navegación entre varias páginas con React Router.
+- **Cuenta y sesión:** registro, inicio y cierre de sesión con cookies y token CSRF, renovación automática de la sesión y vuelta a la pantalla pedida.
+- **Tablero semanal** (`/`): 7 días desde hoy, navegación de semana en semana, crear, editar, completar y eliminar tareas, y días pasados de solo lectura.
+- **Racha y progreso de hoy:** racha actual y mejor racha de la API, «X de Y tareas completadas» y aviso cuando la racha está en juego.
+- **Historial** (`/history`): todas las tareas con filtros de estado y de fechas en la URL, paginadas.
+- **Avisos** (`/alerts`): los avisos de las 22:00, paginados, y el de hoy destacado en el tablero.
+- **Cuenta** (`/account`): perfil con el nombre editable, cambio de contraseña y borrado de la cuenta.
 
 ## Stack
 
@@ -39,7 +41,7 @@
 | Contenedores | Docker + Docker Compose (Nginx en producción) |
 | Calidad | SonarQube (quality gate en cada push) |
 
-## Estructura prevista
+## Estructura
 
 ```text
 ./
@@ -71,8 +73,6 @@
 ```
 
 ## Guía operativa
-
-> Nada de esto funciona todavía: el proyecto no está inicializado.
 
 El proyecto **siempre** se ejecuta dentro de Docker: nada se instala ni se lanza en la máquina host (graphify es la única excepción).
 

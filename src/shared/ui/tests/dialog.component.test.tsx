@@ -60,6 +60,9 @@ describe('VI.2: Dialog compound', () => {
     expect(dialog.className).toContain('rounded-lg');
     expect(dialog.className).toContain('shadow-xl');
     expect(dialog.className).toContain('max-w-dialog');
+    // anim-modal: entra desde scale(0.95) y transparente en 200 ms, centrado; el fondo, con un fundido
+    expect(dialog.className).toContain('animate-scale-in');
+    expect(screen.getByTestId('modal-overlay').className).toContain('animate-fade-in');
     expect(dialog.className).toContain('w-full');
     expect(document.querySelector('.bg-overlay')).not.toBeNull();
   });

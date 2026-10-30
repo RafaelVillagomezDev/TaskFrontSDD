@@ -188,11 +188,14 @@ Tinted background and text in the same hue, per theme: a soft tint with deep tex
 
 | Token | Duration | Easing | Usage |
 |-------|----------|--------|-------|
-| `anim-fast` | 100ms | ease-out | Hover states |
+| `anim-fast` | 100ms | cubic-bezier(0.23,1,0.32,1) | Hover states and press feedback |
 | `anim-base` | 200ms | ease-in-out | Transitions |
-| `anim-slow` | 350ms | ease-in-out | Modals, drawers |
-| `anim-spring` | 400ms | cubic-bezier(0.34,1.56,0.64,1) | Scale-in effects |
+| `anim-modal` | 200ms | cubic-bezier(0.23,1,0.32,1) | Modal entrance: from scale(0.95) and transparent, centered |
+| `anim-overlay` | 150ms | cubic-bezier(0.23,1,0.32,1) | Backdrop fade-in behind modals and drawers |
+| `anim-drawer` | 250ms | cubic-bezier(0.32,0.72,0,1) | Drawer entrance, sliding in from its edge |
 | `anim-spin` | 800ms | linear, infinite | Loading indicator (360° rotation); stops with reduced motion |
+
+UI motion stays under 300ms and never bounces: the board is a daily tool, so it should feel crisp. Exits are instant. With reduced motion, every entrance and transition is skipped.
 
 ---
 

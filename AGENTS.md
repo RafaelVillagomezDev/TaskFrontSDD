@@ -5,14 +5,14 @@ SPA que consume la API REST **TaskApiSDD** (otro repositorio) para gestionar tar
 
 - **Stack:** TypeScript strict · React · Vite · React Router · Redux Toolkit + RTK Query · React Hook Form + Zod · Tailwind CSS v4 · Lucide · Jest + React Testing Library · Playwright · pnpm · Docker Compose (Nginx en producción) · SonarQube.
 - **Ley suprema:** **`CONSTITUTION.md`**. Prevalece sobre este fichero. El diseño visual está en **`DESIGN.md`**.
-- **Estado:** proyecto sin inicializar. Los comandos describen la configuración prevista. La guía operativa completa (variables, producción, SonarQube, graphify) está en `README.md`.
+- **Estado:** MVP implementado (`sdd/001-taskFrontSDD-mvp/`, spec *Implementada*). Todos los comandos de §3 funcionan. La guía operativa completa (variables, producción, SonarQube, graphify) está en `README.md`.
 
 ## 2. Estructura
 ```text
 src/
 ├── styles/design-tokens.css    # Tokens de Tailwind (únicos valores de diseño permitidos)
 ├── shared/                     # ui/ (componentes base), layout/ (estructura reutilizable), store/, api/ (API base de RTK Query), router/, utils/
-└── modules/[modulo]/           # auth, tasks, streaks
+└── modules/[modulo]/           # auth, tasks, streaks, alerts, account
     ├── index.ts                # API pública del módulo: lo único que otros módulos pueden importar
     └── pages/ components/ hooks/ api/ store/ schemas/ types/ texts/
 e2e/                            # Playwright: specs/, pages/ (page objects), fixtures/

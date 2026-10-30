@@ -34,7 +34,8 @@ function DialogTrigger(props: Readonly<ButtonProps>) {
   );
 }
 
-// Modal centrado según DESIGN.md: radius-lg, shadow-xl, space-6 y ancho máximo container-dialog.
+// Modal centrado según DESIGN.md: radius-lg, shadow-xl, space-6 y ancho máximo container-dialog. Entra desde
+// scale(0.95) y transparente en 200 ms (anim-modal), centrado como corresponde a un modal.
 // En móvil ocupa el ancho disponible (CONSTITUTION.md VII.6)
 function DialogContent({ children }: Readonly<DialogPartProps>) {
   const dialog = usePart('Content');

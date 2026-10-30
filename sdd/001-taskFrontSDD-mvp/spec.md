@@ -1,5 +1,5 @@
 # Feature: TaskFrontSDD MVP — cuenta, tablero semanal de tareas, rachas y avisos
-Rama: 001-taskFrontSDD-mvp · Estado: Aprobada · Fecha: 2026-10-29
+Rama: 001-taskFrontSDD-mvp · Estado: Implementada · Fecha: 2026-10-29
 
 Depende de TaskApiSDD: `../TaskApiSDD/sdd/001-taskApiSDD-mvp/spec.md` (tareas, rachas y avisos) y `../TaskApiSDD/sdd/002-user-accounts/spec.md` (cuentas y sesiones). Las reglas de negocio de la API no se repiten aquí: se citan como «API-001 RF-xx» o «API-002 RF-xx».
 
@@ -334,3 +334,4 @@ Como usuario, quiero cambiar mi contraseña y poder borrar mi cuenta, para contr
   - RF-06 reescrito con el patrón complejo «Mientras…, cuando…».
 - **2026-10-29** — Spec aprobada por el usuario, con los supuestos S-01 a S-12, CE-01 (menos de 2 minutos) y el ancho mínimo de 360px de RNF-03. Estado → *Aprobada*.
 - **2026-10-29** — Detectado al planificar: el token CSRF de la sesión solo llega al iniciar sesión y se perdería al recargar. Decisión del usuario: cambiar la API para que `GET /me` lo devuelva. Añadido como requisito previo; RNF-06 no cambia.
+- **2026-10-30** — Todas las tareas de `tasks.md` hechas (T001–T114) y cada RF con su test, en Chromium y Firefox, en móvil, tablet y escritorio. Estado → *Implementada*. Los requisitos no cambian.

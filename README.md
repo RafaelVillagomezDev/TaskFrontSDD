@@ -12,7 +12,7 @@
 | Tokens de diseño (`src/styles/design-tokens.css`) | Paleta cálida (papel, tinta y carbón con acento Tide) en claro y oscuro; el contraste de cada pareja se comprueba con un test |
 | Referencia de diseño del tablero (`docs/design/`) | Lista |
 | Proyecto Vite + React, Docker, SonarQube, hooks de git | Pendiente |
-| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | `spec.md` aprobada, `plan.md` aprobado y `tasks.md` creado (114 tareas + 1 externa); implementación en curso: 99 de 114 (fase 0 «Base» y fases H1 a H9 completas: todas las historias P1 —cuenta, tablero semanal, crear, completar y eliminar tareas, y racha con el progreso de hoy—, editar tareas, historial con filtros y avisos) |
+| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | `spec.md` aprobada, `plan.md` aprobado y `tasks.md` creado (114 tareas + 1 externa); implementación en curso: 102 de 114 (fase 0 «Base» y fases H1 a H10 completas: todas las historias P1 —cuenta, tablero semanal, crear, completar y eliminar tareas, y racha con el progreso de hoy— y las P2: editar tareas, historial con filtros, avisos y perfil) |
 | Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Hecho (spec 003 de la API): la sesión sigue tras recargar |
 
 ## Funcionalidades previstas
@@ -53,7 +53,7 @@
 ├── src/
 │   ├── styles/                # Tokens de diseño de Tailwind
 │   ├── shared/                # UI base, layout reutilizable, store, API base, router y utilidades
-│   └── modules/               # auth, tasks, streaks, alerts (un módulo vertical por funcionalidad)
+│   └── modules/               # auth, tasks, streaks, alerts, account (un módulo vertical por funcionalidad)
 ├── Dockerfile.dev             # Vite dev server en :5173 con hot reload
 ├── Dockerfile.prod            # Multi-stage: build con Vite → Nginx sin root con fallback SPA
 ├── nginx/                     # Plantilla de Nginx (fallback SPA, caché) y cabeceras de seguridad (CSP)

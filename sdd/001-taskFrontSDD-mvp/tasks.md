@@ -491,17 +491,20 @@ Los avisos los genera la API a las 22:00 y no se pueden crear desde la UI. Por e
 ## Fase H10 — Ver y editar mi perfil (HU-10, P2)
 
 ### Tests (deben fallar)
-- [ ] T100 [P] [H10] Tests de `profile.schema` (nombre opcional, 100/101 recortado) y de `use-profile-form`: guardar actualiza el usuario del slice y la barra superior (RF-38, RF-46, RF-53) — `account/schemas/tests/profile.schema.test.ts`, `account/hooks/tests/use-profile-form.hook.test.ts`
+- [x] T100 [P] [H10] Tests de `profile.schema` (nombre opcional, 100/101 recortado) y de `use-profile-form`: guardar actualiza el usuario del slice y la barra superior (RF-38, RF-46, RF-53) — `account/schemas/tests/profile.schema.test.ts`, `account/hooks/tests/use-profile-form.hook.test.ts`
   - Verifica: `dce pnpm test src/modules/account` **falla**.
-- [ ] T101 [P] [H10] E2E en 6 proyectos (RF-38, RF-46, RF-53):
+  - Hecho (2026-10-30): además, tests de `account.api` (`PATCH /me`, nombre vacío como `null`, el slice solo cambia al acertar), de `ProfileForm` y de la página `/account`.
+- [x] T101 [P] [H10] E2E en 6 proyectos (RF-38, RF-46, RF-53):
   - `account.e2e.ts`, parte de perfil: ver email, nombre y fecha de alta; cambiar el nombre.
   - `fields-account.e2e.ts`: campo nombre.
   — `e2e/specs/`, `e2e/pages/account.po.ts`
   - Verifica: `dre pnpm test:e2e e2e/specs/account e2e/specs/fields-account --project=chromium-desktop` **falla**.
+  - Hecho (2026-10-30): también borrar el nombre (vuelve el email a la navegación), solo espacios y uso solo con teclado. `AppShell.displayName` busca el nombre en el Sidebar o en el menú.
 
 ### Implementación
-- [ ] T102 [H10] `account.api` (`updateProfile`, invalida `Me`), esquema, hook, `ProfileForm` y página `/account` — `account/api/account.api.ts`, `account/schemas/profile.schema.ts`, `account/hooks/use-profile-form.hook.ts`, `account/components/profile-form.component.tsx`, `account/pages/account.page.tsx`, `account/index.ts`
+- [x] T102 [H10] `account.api` (`updateProfile`, invalida `Me`), esquema, hook, `ProfileForm` y página `/account` — `account/api/account.api.ts`, `account/schemas/profile.schema.ts`, `account/hooks/use-profile-form.hook.ts`, `account/components/profile-form.component.tsx`, `account/pages/account.page.tsx`, `account/index.ts`
   - Verifica: `dce pnpm test src/modules/account` y `dre pnpm test:e2e e2e/specs/account e2e/specs/fields-account --project=chromium-desktop` pasan.
+  - Hecho (2026-10-30): `updateProfile` despacha `userUpdated` e invalida `Me`; el formulario muestra el nombre tal como quedó guardado. `/account` deja de usar `PlaceholderPage`, que se elimina por quedar sin uso. 643 tests y 468 E2E en los 6 proyectos en verde.
 
 ---
 
@@ -623,3 +626,4 @@ Los criterios de éxito se comprueban en:
 - **2026-10-30** — Fase H7 terminada: T086–T088.
 - **2026-10-30** — Fase H8 terminada: T089–T094.
 - **2026-10-30** — Fase H9 terminada: T095–T099.
+- **2026-10-30** — Fase H10 terminada: T100–T102.

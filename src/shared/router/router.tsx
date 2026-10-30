@@ -1,15 +1,14 @@
 import { Navigate, type RouteObject } from 'react-router';
 
+import { AccountPage } from '../../modules/account';
 import { AlertsPage } from '../../modules/alerts';
 import { LoginPage, RegisterPage } from '../../modules/auth';
 import { BoardPage, HistoryPage } from '../../modules/tasks';
-import { NAVIGATION_TEXTS } from '../texts/navigation.texts';
-import { PlaceholderPage } from './placeholder.page';
 import { PrivateLayout } from './private.layout';
 import { ProtectedRoute } from './protected-route.component';
 import { ROUTES } from './routes.constants';
 
-// Rutas de la aplicación (plan §6.1). Las páginas son provisionales hasta que cada historia añade la suya
+// Rutas de la aplicación (plan §6.1)
 export const APP_ROUTES: RouteObject[] = [
   {
     element: <ProtectedRoute access="guest" />,
@@ -27,7 +26,7 @@ export const APP_ROUTES: RouteObject[] = [
           { path: ROUTES.board, element: <BoardPage /> },
           { path: ROUTES.history, element: <HistoryPage /> },
           { path: ROUTES.alerts, element: <AlertsPage /> },
-          { path: ROUTES.account, element: <PlaceholderPage>{NAVIGATION_TEXTS.account}</PlaceholderPage> },
+          { path: ROUTES.account, element: <AccountPage /> },
         ],
       },
     ],

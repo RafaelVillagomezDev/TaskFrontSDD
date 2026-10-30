@@ -197,7 +197,7 @@ Tipos inferidos de esquemas Zod (`z.infer`), nunca escritos a mano ni con aserci
 ### 5.5 Racha y progreso (RF-25 a RF-28)
 - `use-week-board` calcula `todayProgress = { done, total }` con la columna de hoy de la consulta de la semana, sin pedir nada más. Si la semana visible no incluye hoy, consulta solo `?date=hoy` (`getDayTasks`, a la que también se aplica el cambio optimista de completar).
 - `use-streak-panel(todayProgress)` lo combina con `GET /streak`:
-  - `atRisk = done === 0 && current > 0`.
+  - `atRisk = done === 0 && current > 0`, solo con la racha ya recalculada: mientras `GET /streak` se vuelve a pedir tras un cambio, no hay aviso (clarificación de RF-27 del 2026-10-30, T115).
   - `total === 0` → «Sin tareas hoy».
 - Así `streaks` no depende de `tasks`: el tablero le pasa el progreso y la acción de crear una tarea para hoy.
 
@@ -378,3 +378,4 @@ Todas con versión exacta publicada hace al menos dos semanas. Se instalan dentr
 - **2026-10-30** — §3 y §5.9: los errores de campo de la API se muestran con un mensaje propio del cliente («Revisa este campo.») en lugar del texto de `details`, que llega en español pero a veces es técnico (RF-41). `fieldErrors` pasa a `invalidFields` y se añade `showApiError` (decisión del usuario).
 - **2026-10-30** — §6.3: añadido `Checkbox` (`shared/ui`), necesario para completar tareas con el objetivo táctil de VII.4.
 - **2026-10-30** — §5.5: el progreso de hoy lo calcula `use-week-board` y se pasa a `use-streak-panel`, para que `streaks` no importe de `tasks` (evita una dependencia circular entre módulos). Se añade `getDayTasks`.
+- **2026-10-30** — §5.5: el aviso de racha en juego espera a la racha recalculada (clarificación de RF-27 por un bug de parpadeo; T115).

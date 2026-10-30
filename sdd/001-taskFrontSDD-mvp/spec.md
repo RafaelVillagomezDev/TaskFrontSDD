@@ -1,5 +1,5 @@
 # Feature: TaskFrontSDD MVP — cuenta, tablero semanal de tareas, rachas y avisos
-Rama: 001-taskFrontSDD-mvp · Estado: Implementada · Fecha: 2026-10-29
+Rama: 001-taskFrontSDD-mvp · Estado: Aprobada · Fecha: 2026-10-29
 
 Depende de TaskApiSDD: `../TaskApiSDD/sdd/001-taskApiSDD-mvp/spec.md` (tareas, rachas y avisos) y `../TaskApiSDD/sdd/002-user-accounts/spec.md` (cuentas y sesiones). Las reglas de negocio de la API no se repiten aquí: se citan como «API-001 RF-xx» o «API-002 RF-xx».
 
@@ -313,6 +313,7 @@ Como usuario, quiero cambiar mi contraseña y poder borrar mi cuenta, para contr
 - **2026-10-29** — ¿Dashboard de rachas? → Racha actual, mejor racha y progreso de hoy («X de Y»), con aviso cuando la racha está en juego.
 - **2026-10-29** — ¿Columnas del tablero? → 7 columnas fijas, de hoy a dentro de 6 días, con navegación de semana en semana; las semanas pasadas en solo lectura.
 - **2026-10-29** — ¿Nombre visible de la aplicación? → Kompitu, como sus dominios.
+- **2026-10-30** — Bug reportado por el usuario: crea 2 tareas hoy, las completa (racha 1) y las quita; al quitarlas, el panel parpadea «Tu racha está en juego». Causa: mientras la API recalcula la racha, el panel combina el progreso de hoy ya actualizado (0 completadas) con la racha anterior (1). ¿Qué es «la racha actual» de RF-27? → La que devuelve la API tras el último cambio de las tareas de hoy. Mientras se recalcula, el panel no avisa de que la racha está en juego; avisa cuando llega y sigue cumpliéndose la condición. Pasa al completar, desmarcar o eliminar. Se corrige en T115.
 
 ## Registro de cambios
 
@@ -335,3 +336,4 @@ Como usuario, quiero cambiar mi contraseña y poder borrar mi cuenta, para contr
 - **2026-10-29** — Spec aprobada por el usuario, con los supuestos S-01 a S-12, CE-01 (menos de 2 minutos) y el ancho mínimo de 360px de RNF-03. Estado → *Aprobada*.
 - **2026-10-29** — Detectado al planificar: el token CSRF de la sesión solo llega al iniciar sesión y se perdería al recargar. Decisión del usuario: cambiar la API para que `GET /me` lo devuelva. Añadido como requisito previo; RNF-06 no cambia.
 - **2026-10-30** — Todas las tareas de `tasks.md` hechas (T001–T114) y cada RF con su test, en Chromium y Firefox, en móvil, tablet y escritorio. Estado → *Implementada*. Los requisitos no cambian.
+- **2026-10-30** — Clarificación de RF-27 por un bug (aviso de racha en juego que parpadea al quitar las tareas completadas de hoy): el aviso usa la racha recalculada tras el último cambio. El texto de RF-27 no cambia. Estado → *Aprobada* hasta terminar T115; después vuelve a *Implementada*.

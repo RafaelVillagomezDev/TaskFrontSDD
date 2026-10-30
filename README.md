@@ -4,7 +4,7 @@
 
 ## Estado del proyecto
 
-**MVP implementado.** La primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) está terminada: sus 114 tareas hechas y su spec en estado *Implementada*. Cada RF tiene al menos un test con su nombre, y la suite completa pasa en Chromium y Firefox, en móvil, tablet y escritorio.
+**MVP implementado, con una corrección abierta.** La primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) tiene sus 114 tareas de implementación hechas; la spec vuelve a *Aprobada* hasta corregir T115 (el aviso de racha en juego parpadea al quitar las tareas completadas de hoy). Cada RF tiene al menos un test con su nombre.
 
 | Elemento | Estado |
 | :--- | :--- |
@@ -12,7 +12,7 @@
 | Tokens de diseño (`src/styles/design-tokens.css`) | Paleta cálida (papel, tinta y carbón con acento Tide) en claro y oscuro; el contraste de cada pareja se comprueba con un test |
 | Referencia de diseño del tablero (`docs/design/`) | Lista |
 | Proyecto Vite + React, Docker, SonarQube, hooks de git | Listos |
-| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | Spec *Implementada*: 114 de 114 tareas. Cobertura del 99,9 % de líneas, quality gate en verde y E2E en los 6 proyectos de Playwright |
+| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | 114 de 115 tareas. Abierta T115 (fase B, corrección): sus tests ya la reproducen y están en rojo. La spec vuelve a *Implementada* al cerrarla |
 | Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Hecho (spec 003 de la API): la sesión sigue tras recargar |
 
 ## Funcionalidades

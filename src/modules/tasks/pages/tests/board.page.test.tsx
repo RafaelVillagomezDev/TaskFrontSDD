@@ -269,6 +269,108 @@ describe('BoardPage', () => {
     expect(within(panel).queryByText('Tu racha está en juego')).not.toBeInTheDocument();
   });
 
+  // Bug reportado el 2026-10-30: dos tareas de hoy completadas (racha 1) y después quitadas. Mientras la API
+  // recalcula la racha, el panel combinaba «0 completadas hoy» con la racha anterior y parpadeaba «en juego»
+  describe('RF-27: no avisa de la racha en juego con la racha anterior mientras se recalcula', () => {
+    const DONE = [
+      { ...TASK, id: 't1', title: 'Comprar pan', date: '2026-10-29', completed: true },
+      { ...TASK, id: 't2', title: 'Llamar al banco', date: '2026-10-29', completed: true },
+    ];
+
+    // La primera racha llega al momento (1 día); cada petición siguiente espera a que el test la responda,
+    // como una API lenta
+    function controlledStreak() {
+      const pending: ((streak: { current: number; best: number }) => void)[] = [];
+      let calls = 0;
+      const handler = () => {
+        calls += 1;
+        if (calls === 1) return apiOk({ current: 1, best: 1 });
+        return new Promise<Response>((resolve) => {
+          pending.push((streak) => {
+            resolve(apiOk(streak));
+          });
+        });
+      };
+      // Responde la petición pendiente más antigua en cuanto llegue
+      const respond = async (streak: { current: number; best: number }) => {
+        await waitFor(() => {
+          expect(pending.length).toBeGreaterThan(0);
+        });
+        pending.shift()?.(streak);
+      };
+      return { handler, respond, pending: () => pending.length };
+    }
+
+    it('RF-27: al eliminar las dos tareas completadas de hoy', async () => {
+      const user = userEvent.setup({ advanceTimers: advance });
+      let items: unknown[] = DONE;
+      const streak = controlledStreak();
+      mockBoardApi({
+        'GET /streak': streak.handler,
+        'GET /tasks': () => weekWith(items)(),
+        'DELETE /tasks/t1': () => {
+          items = items.filter((item) => item !== DONE[0]);
+          return apiOk(null);
+        },
+        'DELETE /tasks/t2': () => {
+          items = [];
+          return apiOk(null);
+        },
+      });
+      renderBoard();
+      const panel = screen.getByRole('region', { name: 'Racha y progreso de hoy' });
+      expect(await within(panel).findByText('2 de 2 tareas completadas')).toBeInTheDocument();
+      expect(panel).toHaveTextContent(/Racha actual\s*1 día/);
+
+      // Primera: queda una completada, la racha sigue en 1
+      await user.click(await screen.findByRole('button', { name: 'Eliminar «Comprar pan»' }));
+      await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Eliminar' }));
+      await streak.respond({ current: 1, best: 1 });
+      expect(await within(panel).findByText('1 de 1 tareas completadas')).toBeInTheDocument();
+
+      // Segunda: hoy queda sin tareas y la API aún recalcula la racha (pasará a 0)
+      await user.click(await screen.findByRole('button', { name: 'Eliminar «Llamar al banco»' }));
+      await user.click(within(screen.getByRole('dialog')).getByRole('button', { name: 'Eliminar' }));
+      expect(await within(panel).findByText('Sin tareas hoy')).toBeInTheDocument();
+      expect(streak.pending()).toBe(1);
+      expect(within(panel).queryByText('Tu racha está en juego')).not.toBeInTheDocument();
+
+      await streak.respond({ current: 0, best: 1 });
+      await waitFor(() => {
+        expect(panel).toHaveTextContent(/Racha actual\s*0 días/);
+      });
+      expect(within(panel).queryByText('Tu racha está en juego')).not.toBeInTheDocument();
+    });
+
+    it('RF-27: al desmarcar las dos tareas completadas de hoy', async () => {
+      const user = userEvent.setup({ advanceTimers: advance });
+      const streak = controlledStreak();
+      mockBoardApi({
+        'GET /streak': streak.handler,
+        'GET /tasks': weekWith(DONE),
+        'PATCH /tasks/t1': () => apiOk({ ...DONE[0], completed: false }),
+        'PATCH /tasks/t2': () => apiOk({ ...DONE[1], completed: false }),
+      });
+      renderBoard();
+      const panel = screen.getByRole('region', { name: 'Racha y progreso de hoy' });
+      expect(await within(panel).findByText('2 de 2 tareas completadas')).toBeInTheDocument();
+
+      // Primera: queda una completada, la racha sigue en 1
+      await user.click(await screen.findByRole('checkbox', { name: 'Comprar pan' }));
+      await streak.respond({ current: 1, best: 1 });
+      // Segunda: ninguna completada hoy y la API aún recalcula la racha (pasará a 0)
+      await user.click(await screen.findByRole('checkbox', { name: 'Llamar al banco' }));
+      expect(await within(panel).findByText('0 de 2 tareas completadas')).toBeInTheDocument();
+      expect(within(panel).queryByText('Tu racha está en juego')).not.toBeInTheDocument();
+
+      await streak.respond({ current: 0, best: 1 });
+      await waitFor(() => {
+        expect(panel).toHaveTextContent(/Racha actual\s*0 días/);
+      });
+      expect(within(panel).queryByText('Tu racha está en juego')).not.toBeInTheDocument();
+    });
+  });
+
   it('RF-28: sin tareas hoy, «Crear una tarea» del panel abre el formulario con la fecha de hoy', async () => {
     const user = userEvent.setup({ advanceTimers: advance });
     mockBoardApi({ 'GET /tasks': weekWith([]) });

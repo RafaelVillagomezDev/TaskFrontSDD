@@ -575,6 +575,14 @@ Los avisos los genera la API a las 22:00 y no se pueden crear desde la UI. Por e
 
 ---
 
+## Fase B — Correcciones
+
+- [ ] T115 [B] El aviso de racha en juego parpadea al quitar las tareas completadas de hoy (bug del 2026-10-30, clarificación de RF-27 en la spec). Mientras `GET /streak` se recalcula tras completar, desmarcar o eliminar, el panel combina «0 completadas hoy» con la racha anterior y muestra «Tu racha está en juego». Corregir en `use-streak-panel` para que el aviso solo use la racha recalculada (RF-27) — `streaks/hooks/use-streak-panel.hook.ts`, sus tests
+  - Tests que lo reproducen, ya escritos y en rojo:
+    - `tasks/pages/tests/board.page.test.tsx`: «RF-27: al eliminar las dos tareas completadas de hoy» y «RF-27: al desmarcar las dos tareas completadas de hoy».
+    - `e2e/specs/delete-task.e2e.ts`: «RF-27: eliminar las dos tareas completadas de hoy no hace parpadear «racha en juego»» (respuesta de `/streak` retrasada 800 ms; falla en Chromium y Firefox).
+  - Verifica: `dce pnpm test src/modules/tasks/pages src/modules/streaks` y `dre pnpm test:e2e e2e/specs/delete-task` pasan; después, spec → *Implementada*.
+
 ## Cobertura RF → tareas
 
 | RF | Tareas |
@@ -591,7 +599,7 @@ Los avisos los genera la API a las 22:00 y no se pueden crear desde la UI. Por e
 | RF-20, RF-21 | T071, T073, T074, T075 |
 | RF-22 | T072, T073, T075 |
 | RF-23, RF-24 | T076, T077, T078, T079 |
-| RF-25 a RF-28 | T080, T081, T082, T083, T084 |
+| RF-25 a RF-28 | T080, T081, T082, T083, T084, T115 |
 | RF-29, RF-30 | T086, T087, T088 |
 | RF-31 a RF-34 | T036, T089, T090, T091, T092, T093, T094 |
 | RF-35 a RF-37 | T095, T096, T097, T098, T099 |
@@ -645,3 +653,4 @@ Los criterios de éxito se comprueban en:
 - **2026-10-30** — Fase H11 terminada: T103–T106. Todas las historias de la spec implementadas; queda la fase R.
 - **2026-10-30** — Fase R: T107–T109 y T111–T113 hechas; T110 a falta de `review-animations` (la lanza el usuario); T114 espera a T110.
 - **2026-10-30** — T110 terminada con `review-animations` y T114 hecha: las 114 tareas completas, spec *Implementada*.
+- **2026-10-30** — Nueva fase B (correcciones) con T115: bug del aviso de racha en juego que parpadea, reproducido con tests unitarios y E2E en rojo.

@@ -511,21 +511,25 @@ Los avisos los genera la API a las 22:00 y no se pueden crear desde la UI. Por e
 ## Fase H11 — Cambiar mi contraseña y borrar mi cuenta (HU-11, P3)
 
 ### Tests (deben fallar)
-- [ ] T103 [P] [H11] Tests de `password.schema` y `delete-account.schema` (actual obligatoria; nueva de 12 a 128 sin recortar; borrado con contraseña obligatoria) (RF-46) — `account/schemas/tests/`
+- [x] T103 [P] [H11] Tests de `password.schema` y `delete-account.schema` (actual obligatoria; nueva de 12 a 128 sin recortar; borrado con contraseña obligatoria) (RF-46) — `account/schemas/tests/`
   - Verifica: `dce pnpm test src/modules/account/schemas` **falla**.
-- [ ] T104 [P] [H11] Tests de `use-password-form` y `use-delete-account` (RF-39, RF-05):
+  - Hecho (2026-10-30): cada campo da un único error (pipe: obligatoria → longitud).
+- [x] T104 [P] [H11] Tests de `use-password-form` y `use-delete-account` (RF-39, RF-05):
   - Éxito con el mensaje de sesiones cerradas.
   - `WRONG_PASSWORD` en su campo (RF-48).
   - `TOO_MANY_ATTEMPTS`.
   - Borrado → sesión y caché vacías y `/login` (RF-49).
   — `account/hooks/tests/`
   - Verifica: `dce pnpm test src/modules/account/hooks` **falla**.
-- [ ] T105 [P] [H11] Tests de `PasswordForm` y `DeleteAccountDialog` (aviso de lo que se borra; no confirma sin contraseña), y E2E con **un usuario desechable**, nunca el de prueba compartido, en 6 proyectos (RF-39, RF-46, RF-48, RF-49) — `account/components/tests/`, `e2e/specs/account.e2e.ts`, `fields-account.e2e.ts`
+  - Hecho (2026-10-30): `WRONG_PASSWORD` va al campo de la contraseña con `showPasswordFormError` (`account/hooks/account-form-error.util.ts`), compartido por los dos formularios. También: la API rechaza la nueva, campos no válidos y el diálogo empieza vacío al reabrirlo.
+- [x] T105 [P] [H11] Tests de `PasswordForm` y `DeleteAccountDialog` (aviso de lo que se borra; no confirma sin contraseña), y E2E con **un usuario desechable**, nunca el de prueba compartido, en 6 proyectos (RF-39, RF-46, RF-48, RF-49) — `account/components/tests/`, `e2e/specs/account.e2e.ts`, `fields-account.e2e.ts`
   - Verifica: `dce pnpm test src/modules/account/components` **falla**.
+  - Hecho (2026-10-30): las E2E usan `freshAccount`; al cambiar la contraseña, el test actualiza la contraseña de la fixture para que el borrado final funcione. Arreglo de paso: `expectResponsive` redondea las medidas a centésimas, porque Firefox da 43,99997 px en una página desplazada.
 
 ### Implementación
-- [ ] T106 [H11] Mutaciones `changePassword` y `deleteAccount`, esquemas, hooks, `PasswordForm` y `DeleteAccountDialog` en `/account` — `account/`
+- [x] T106 [H11] Mutaciones `changePassword` y `deleteAccount`, esquemas, hooks, `PasswordForm` y `DeleteAccountDialog` en `/account` — `account/`
   - Verifica: `dce pnpm test src/modules/account` y `dre pnpm test:e2e e2e/specs/account e2e/specs/fields-account --project=chromium-desktop` pasan.
+  - Hecho (2026-10-30): `PasswordForm` y la zona «Borrar cuenta» con `DeleteAccountDialog` (con `Dialog.Trigger`) en `/account`; al borrar, `sessionEnded`, `resetApiState` y `/login` con `replace`. 671 tests y 540 E2E en los 6 proyectos en verde.
 
 ---
 
@@ -627,3 +631,4 @@ Los criterios de éxito se comprueban en:
 - **2026-10-30** — Fase H8 terminada: T089–T094.
 - **2026-10-30** — Fase H9 terminada: T095–T099.
 - **2026-10-30** — Fase H10 terminada: T100–T102.
+- **2026-10-30** — Fase H11 terminada: T103–T106. Todas las historias de la spec implementadas; queda la fase R.

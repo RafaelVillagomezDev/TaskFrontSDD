@@ -12,7 +12,7 @@
 | Tokens de diseño (`src/styles/design-tokens.css`) | Paleta cálida (papel, tinta y carbón con acento Tide) en claro y oscuro; el contraste de cada pareja se comprueba con un test |
 | Referencia de diseño del tablero (`docs/design/`) | Lista |
 | Proyecto Vite + React, Docker, SonarQube, hooks de git | Pendiente |
-| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | `spec.md` aprobada, `plan.md` aprobado y `tasks.md` creado (114 tareas + 1 externa); implementación en curso: 102 de 114 (fase 0 «Base» y fases H1 a H10 completas: todas las historias P1 —cuenta, tablero semanal, crear, completar y eliminar tareas, y racha con el progreso de hoy— y las P2: editar tareas, historial con filtros, avisos y perfil) |
+| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | `spec.md` aprobada, `plan.md` aprobado y `tasks.md` creado (114 tareas + 1 externa); implementación en curso: 106 de 114 (fase 0 «Base» y fases H1 a H11 completas, es decir, todas las historias: cuenta, tablero semanal, crear, completar, editar y eliminar tareas, racha y progreso de hoy, historial con filtros, avisos, perfil, contraseña y borrado de cuenta; falta la fase R de robustez y cierre) |
 | Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Hecho (spec 003 de la API): la sesión sigue tras recargar |
 
 ## Funcionalidades previstas

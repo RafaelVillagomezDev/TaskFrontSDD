@@ -47,3 +47,30 @@ describe('D-5: accountApi.updateProfile', () => {
     expect(selectCurrentUser(store.getState())).toEqual(USER);
   });
 });
+
+describe('D-5: accountApi.changePassword y deleteAccount', () => {
+  it('RF-39: envía PATCH /me/password con la actual y la nueva y el token CSRF', async () => {
+    const api = mockApi({ 'PATCH /me/password': () => apiOk(null) });
+    const values = { currentPassword: 'actual', newPassword: 'n'.repeat(12) };
+    const result = await store.dispatch(accountApi.endpoints.changePassword.initiate(values));
+    expect(result.data).toBeNull();
+    expect(await api.bodyOf('PATCH /me/password')).toEqual(values);
+    expect(api.requests[0]?.headers.get('X-CSRF-Token')).toBe('sesion-1');
+  });
+
+  it('RF-48: una contraseña incorrecta llega como WRONG_PASSWORD', async () => {
+    mockApi({ 'PATCH /me/password': () => apiFail(403, 'WRONG_PASSWORD') });
+    const result = await store.dispatch(
+      accountApi.endpoints.changePassword.initiate({ currentPassword: 'mal', newPassword: 'n'.repeat(12) }),
+    );
+    expect(toApiError(result.error).code).toBe('WRONG_PASSWORD');
+  });
+
+  it('RF-49: envía DELETE /me con la contraseña y el token CSRF', async () => {
+    const api = mockApi({ 'DELETE /me': () => apiOk(null) });
+    const result = await store.dispatch(accountApi.endpoints.deleteAccount.initiate({ password: 'actual' }));
+    expect(result.data).toBeNull();
+    expect(await api.bodyOf('DELETE /me')).toEqual({ password: 'actual' });
+    expect(api.requests[0]?.headers.get('X-CSRF-Token')).toBe('sesion-1');
+  });
+});

@@ -2,6 +2,14 @@ import { expect, type Locator, type Page, type TestInfo } from '@playwright/test
 
 const TOUCH_TARGET_PX = 44;
 
+// Firefox da las cajas con error de coma flotante en una página desplazada (43,99997 px para un min-height de
+// 44 px): se comparan redondeadas a centésimas de píxel
+const MEASURE_PRECISION = 100;
+
+function measured(size: number | undefined): number | undefined {
+  return size === undefined ? undefined : Math.round(size * MEASURE_PRECISION) / MEASURE_PRECISION;
+}
+
 // Roles de los elementos interactivos que se comprueban en cada pantalla
 const INTERACTIVE_ROLES = ['button', 'link', 'textbox', 'combobox', 'checkbox'] as const;
 
@@ -23,7 +31,7 @@ export async function expectResponsive(page: Page, testInfo: TestInfo, extra: Lo
     await expect(element).toBeInViewport();
     if (!isMobile(testInfo)) continue;
     const box = await element.boundingBox();
-    expect(box?.width, 'ancho táctil mínimo en móvil').toBeGreaterThanOrEqual(TOUCH_TARGET_PX);
-    expect(box?.height, 'alto táctil mínimo en móvil').toBeGreaterThanOrEqual(TOUCH_TARGET_PX);
+    expect(measured(box?.width), 'ancho táctil mínimo en móvil').toBeGreaterThanOrEqual(TOUCH_TARGET_PX);
+    expect(measured(box?.height), 'alto táctil mínimo en móvil').toBeGreaterThanOrEqual(TOUCH_TARGET_PX);
   }
 }

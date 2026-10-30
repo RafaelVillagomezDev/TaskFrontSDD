@@ -41,7 +41,7 @@ export function AlertItem({ alert }: Readonly<AlertItemProps>) {
             key={task.id}
             className="flex flex-wrap items-baseline justify-between gap-x-3 border-t border-border pt-2"
           >
-            <Text as="span" variant="body-sm" className="min-w-0 font-medium break-words">
+            <Text as="span" variant="body-sm" dir="auto" className="min-w-0 font-medium break-words">
               {task.title}
             </Text>
             <Text as="span" variant="caption" tone="muted" className="tabular-nums">

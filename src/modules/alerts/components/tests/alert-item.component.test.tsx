@@ -56,4 +56,9 @@ describe('AlertItem', () => {
     expect(item).toHaveTextContent('Mensual');
     expect(item).toHaveTextContent('1 tarea');
   });
+
+  it('el título de una tarea en árabe se alinea en su propio sentido', () => {
+    const item = renderItem({ ...WEEKLY, tasks: [{ id: 't1', title: 'مراجعة التقرير', date: '2026-10-24' }] });
+    expect(within(item).getByText('مراجعة التقرير')).toHaveAttribute('dir', 'auto');
+  });
 });

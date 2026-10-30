@@ -70,6 +70,8 @@ describe('BoardPage', () => {
     renderBoard();
     const board = await screen.findByRole('region', { name: 'Tareas de la semana' });
     expect(board.className).toContain('overflow-x-auto');
+    // Llegar al final de las columnas con el dedo no navega «atrás» ni arrastra la página
+    expect(board.className).toContain('overscroll-x-contain');
   });
 
   it('RF-40: mientras carga muestra un indicador en la zona del tablero', () => {

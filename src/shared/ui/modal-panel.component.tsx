@@ -29,7 +29,10 @@ export function ModalPanel({ state, layerClassName, className, children }: Reado
         aria-modal="true"
         aria-labelledby={state.titleId}
         tabIndex={-1}
-        className={cn('m-0 flex flex-col overflow-y-auto text-foreground shadow-xl focus:outline-none', className)}
+        className={cn(
+          'm-0 flex flex-col overflow-y-auto overscroll-contain text-foreground shadow-xl focus:outline-none',
+          className,
+        )}
       >
         {children}
       </Box>

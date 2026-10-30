@@ -29,6 +29,8 @@ describe('ModalPanel', () => {
     expect(container).not.toContainElement(dialog);
     expect(dialog.className).toContain('bg-surface');
     expect(dialog.className).toContain('shadow-xl');
+    // Su scroll no se encadena a la página de detrás
+    expect(dialog.className).toContain('overscroll-contain');
     expect(dialog.parentElement?.className).toContain('items-center');
   });
 

@@ -11,8 +11,13 @@ import { cn } from '../../../shared/utils/class-names.util';
 import type { Task } from '../schemas/task.schema';
 import { TASKS_TEXTS } from '../texts/tasks.texts';
 
+// board: tarjeta de columna, con título y descripción de 2 líneas como mucho (DESIGN.md Task Card); list: en el
+// historial, donde no hay otra forma de leerlos, completos
+export type TaskCardVariant = 'board' | 'list';
+
 interface TaskCardProps {
   task: Task;
+  variant?: TaskCardVariant | undefined;
   // Datos extra antes del estado, por ejemplo la fecha en el historial (RF-31)
   children?: ReactNode;
   // Con onToggleCompleted la tarea se puede completar y desmarcar: solo las de hoy (RF-13, RF-20 a RF-22)
@@ -35,15 +40,24 @@ function focusOnMount(element: HTMLInputElement | null): void {
 interface TaskTitleProps {
   task: Task;
   as: 'p' | 'span';
+  variant: TaskCardVariant;
 }
 
-// Título de como mucho 2 líneas que parte las palabras largas para no desbordar la columna (RNF-03)
-function TaskTitle({ task, as }: Readonly<TaskTitleProps>) {
+// Título que parte las palabras largas para no desbordar (RNF-03). En el tablero, de 2 líneas como mucho y con el
+// texto completo al pasar el ratón. dir="auto": un título en árabe o hebreo se alinea en su sentido
+function TaskTitle({ task, as, variant }: Readonly<TaskTitleProps>) {
+  const isClamped = variant === 'board';
   return (
     <Text
       as={as}
       variant="body-sm"
-      className={cn('line-clamp-2 font-medium break-words', task.completed && 'text-foreground-muted line-through')}
+      dir="auto"
+      title={isClamped ? task.title : undefined}
+      className={cn(
+        'font-medium break-words',
+        isClamped && 'line-clamp-2',
+        task.completed && 'text-foreground-muted line-through',
+      )}
     >
       {task.title}
     </Text>
@@ -55,6 +69,7 @@ function TaskTitle({ task, as }: Readonly<TaskTitleProps>) {
 // como la tarea; la casilla mide 44×44 px en móvil (VII.4)
 export function TaskCard({
   task,
+  variant = 'board',
   children,
   onToggleCompleted,
   isUpdating = false,
@@ -65,7 +80,7 @@ export function TaskCard({
   return (
     <Box as="li" className="flex flex-col gap-3 rounded-md border border-border bg-surface p-4">
       {onToggleCompleted === undefined ? (
-        <TaskTitle task={task} as="p" />
+        <TaskTitle task={task} as="p" variant={variant} />
       ) : (
         <label className="flex cursor-pointer items-center gap-2">
           {/* aria-disabled y no disabled: un control deshabilitado pierde el foco a mitad de uso con teclado */}
@@ -75,11 +90,16 @@ export function TaskCard({
             aria-disabled={isUpdating}
             onChange={onToggleCompleted}
           />
-          <TaskTitle task={task} as="span" />
+          <TaskTitle task={task} as="span" variant={variant} />
         </label>
       )}
       {task.description !== null && (
-        <Text variant="caption" tone="muted" className="line-clamp-2 break-words">
+        <Text
+          variant="caption"
+          tone="muted"
+          dir="auto"
+          className={cn('break-words whitespace-pre-line', variant === 'board' && 'line-clamp-2')}
+        >
           {task.description}
         </Text>
       )}

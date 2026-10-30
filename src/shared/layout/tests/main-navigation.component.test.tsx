@@ -40,9 +40,11 @@ describe('RF-50: MainNavigation', () => {
     expect(screen.getByRole('button', { name: 'Cerrar sesión' })).toBeInTheDocument();
   });
 
-  it('sin nombre muestra el email', () => {
+  it('sin nombre muestra el email; si no cabe se recorta y se lee entero al pasar el ratón', () => {
     renderNavigation('/', null);
-    expect(screen.getByText('ana@example.com')).toBeInTheDocument();
+    const email = screen.getByText('ana@example.com');
+    expect(email.className).toContain('truncate');
+    expect(email).toHaveAttribute('title', 'ana@example.com');
   });
 });
 

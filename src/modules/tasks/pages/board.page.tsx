@@ -36,8 +36,12 @@ function BoardContent({ board, onAddTask, actions }: Readonly<BoardContentProps>
   }
   return (
     // Las columnas de 264 px se desplazan solo dentro del tablero (CONSTITUTION.md VII.5, excepción).
-    // Chrome y Firefox (RNF-04) hacen enfocable con teclado una zona desplazable sin controles (RNF-02)
-    <section aria-label={TASKS_TEXTS.board.region} className="focus-ring flex gap-6 overflow-x-auto rounded-md pb-4">
+    // Chrome y Firefox (RNF-04) hacen enfocable con teclado una zona desplazable sin controles (RNF-02).
+    // overscroll-x-contain: llegar al final de las columnas con el dedo no navega «atrás» ni mueve la página
+    <section
+      aria-label={TASKS_TEXTS.board.region}
+      className="focus-ring flex gap-6 overflow-x-auto overscroll-x-contain rounded-md pb-4"
+    >
       {board.columns.map((column) => (
         <DayColumn key={column.day} column={column} actions={actions}>
           <AddTaskButton day={column.day} onAdd={onAddTask} />

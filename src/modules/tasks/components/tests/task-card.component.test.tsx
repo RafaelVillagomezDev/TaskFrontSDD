@@ -55,6 +55,33 @@ describe('TaskCard (lectura)', () => {
     const title = screen.getByText('a'.repeat(200));
     expect(title.className).toContain('break-words');
     expect(title.className).toContain('line-clamp-2');
+    // Recortado a 2 líneas: el texto completo se ve al pasar el ratón
+    expect(title).toHaveAttribute('title', 'a'.repeat(200));
+  });
+
+  it('RNF-03: en el historial (variant list) el título y la descripción se leen enteros', () => {
+    const description = 'Primera línea.\nSegunda línea con más detalle.';
+    render(
+      <ul>
+        <TaskCard task={{ ...TASK, title: 'b'.repeat(200), description }} variant="list" />
+      </ul>,
+    );
+    const title = screen.getByText('b'.repeat(200));
+    expect(title.className).not.toContain('line-clamp');
+    expect(title).not.toHaveAttribute('title');
+    const text = screen.getByText(/Primera línea/);
+    expect(text.className).not.toContain('line-clamp');
+    expect(text.className).toContain('whitespace-pre-line');
+  });
+
+  it('un título o una descripción en árabe se alinean en su propio sentido (dir="auto")', () => {
+    render(
+      <ul>
+        <TaskCard task={{ ...TASK, title: 'مراجعة التقرير', description: 'مع الفريق' }} />
+      </ul>,
+    );
+    expect(screen.getByText('مراجعة التقرير')).toHaveAttribute('dir', 'auto');
+    expect(screen.getByText('مع الفريق')).toHaveAttribute('dir', 'auto');
   });
 });
 

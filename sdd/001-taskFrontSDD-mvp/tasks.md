@@ -535,30 +535,40 @@ Los avisos los genera la API a las 22:00 y no se pueden crear desde la UI. Por e
 
 ## Fase R — Robustez y cierre
 
-- [ ] T107 [P] [Rob] Tests de errores comunes en cada pantalla:
+- [x] T107 [P] [Rob] Tests de errores comunes en cada pantalla:
   - Cargando sin bloquear el resto (RF-40).
   - Mensaje propio por código, sin código técnico (RF-41).
   - Error de hora o zona (RF-43); en E2E, reloj del navegador desviado 6 minutos con `page.clock`.
   - Fallo de red con «Reintentar» (RF-44).
   — `src/shared/ui/tests/`, `e2e/specs/errors.e2e.ts`
   - Verifica: `dce pnpm test` y `dre pnpm test:e2e e2e/specs/errors --project=chromium-desktop` pasan.
-- [ ] T108 [P] [Rob] E2E `navigation.e2e.ts` en 6 proyectos (RF-08, RF-12, RF-47, RF-50, RF-54):
+  - Hecho (2026-10-30): los tests unitarios ya cubrían RF-40, RF-41 (un mensaje por código, sin el código) y RF-44. `errors.e2e.ts`: sin conexión en tablero, historial y avisos con «Reintentar», carga del tablero sin bloquear la cabecera, error inesperado sin el código ni el texto de la API, formulario que conserva lo escrito y reloj desviado 6 minutos con `page.clock` (RF-43). 42 pruebas en los 6 proyectos.
+- [x] T108 [P] [Rob] E2E `navigation.e2e.ts` en 6 proyectos (RF-08, RF-12, RF-47, RF-50, RF-54):
   - Sin sesión, toda ruta privada lleva a `/login`.
   - Navegación con usuario y pantalla activa.
   - Menú en `Drawer` en móvil y tablet.
   - Semana anterior y siguiente, y «Hoy».
   — `e2e/specs/navigation.e2e.ts`
   - Verifica: `dre pnpm test:e2e e2e/specs/navigation` pasa.
-- [ ] T109 [P] [Rob] E2E `responsive.e2e.ts` en 6 proyectos: en cada pantalla, `scrollWidth <= innerWidth`, cada elemento interactivo `toBeInViewport()` y, en móvil, al menos 44×44px; el tablero solo desplaza su zona (RNF-03, CE-07, VII.5) — `e2e/specs/responsive.e2e.ts`, `e2e/fixtures/responsive.fixture.ts`
+  - Hecho (2026-10-30): `navigation.e2e.ts`, 42 pruebas en los 6 proyectos.
+- [x] T109 [P] [Rob] E2E `responsive.e2e.ts` en 6 proyectos: en cada pantalla, `scrollWidth <= innerWidth`, cada elemento interactivo `toBeInViewport()` y, en móvil, al menos 44×44px; el tablero solo desplaza su zona (RNF-03, CE-07, VII.5) — `e2e/specs/responsive.e2e.ts`, `e2e/fixtures/responsive.fixture.ts`
   - Verifica: `dre pnpm test:e2e e2e/specs/responsive` pasa.
+  - Hecho (2026-10-30): `responsive.e2e.ts` recorre inicio de sesión, registro, tablero, crear y editar tarea, confirmar eliminación, historial, avisos y cuenta con su diálogo. 48 pruebas en los 6 proyectos.
 - [ ] T110 [Rob] Revisión con las skills: `break-ui` (contenido largo, emojis y texto no latino en tarjetas y columnas, caso límite de la spec), `mobile-native` y `review-animations`. Corregir lo que encuentren, sin salir de `DESIGN.md`.
   - Verifica: las correcciones tienen test y `dce pnpm test` pasa.
-- [ ] T111 [Rob] Suite completa en Chromium y Firefox, en los 6 proyectos (IV.6).
+  - En curso (2026-10-30):
+    - `break-ui` con datos reales del peor caso: el historial muestra título y descripción completos (`TaskCard` con `variant="list"`); en el tablero el título recortado lleva `title`; `dir="auto"` en títulos, descripciones y tareas de un aviso; `title` en el nombre recortado de la navegación.
+    - `mobile-native`: `theme-color` por tema, sin destello al tocar, `touch-action: manipulation` y `user-select: none` en controles, `overscroll-x-contain` en el tablero y `overscroll-contain` en los modales.
+    - Falta `review-animations`, que solo puede lanzar el usuario (`/review-animations`).
+- [x] T111 [Rob] Suite completa en Chromium y Firefox, en los 6 proyectos (IV.6).
   - Verifica: `dre pnpm test:e2e` pasa.
-- [ ] T112 [Rob] Cobertura y quality gate.
+  - Hecho (2026-10-30): 672 E2E en los 6 proyectos en verde.
+- [x] T112 [Rob] Cobertura y quality gate.
   - Verifica: `dce pnpm test:coverage` (≥ 80 %) y `./scripts/sonar-scan.sh` en verde.
-- [ ] T113 [Rob] Trazabilidad: cada uno de los 54 RF aparece en el nombre de al menos un test (II.5).
+  - Hecho (2026-10-30): 677 tests, 99,88 % de líneas; quality gate PASSED.
+- [x] T113 [Rob] Trazabilidad: cada uno de los 54 RF aparece en el nombre de al menos un test (II.5).
   - Verifica: `grep -rhoE "RF-[0-9]{2}" src e2e --include="*.test.ts" --include="*.test.tsx" --include="*.e2e.ts" | sort -u | wc -l` devuelve `54`.
+  - Hecho (2026-10-30): devuelve 54.
 - [ ] T114 [Rob] `README.md` al día (estado, comandos que ya funcionan) y spec → `Implementada`, con entrada en su *Registro de cambios* (II.2, Gobierno 3) — `README.md`, `sdd/001-taskFrontSDD-mvp/spec.md`
   - Verifica: T111, T112 y T113 terminados.
 
@@ -632,3 +642,4 @@ Los criterios de éxito se comprueban en:
 - **2026-10-30** — Fase H9 terminada: T095–T099.
 - **2026-10-30** — Fase H10 terminada: T100–T102.
 - **2026-10-30** — Fase H11 terminada: T103–T106. Todas las historias de la spec implementadas; queda la fase R.
+- **2026-10-30** — Fase R: T107–T109 y T111–T113 hechas; T110 a falta de `review-animations` (la lanza el usuario); T114 espera a T110.

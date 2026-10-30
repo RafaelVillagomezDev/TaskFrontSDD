@@ -34,7 +34,7 @@ export function HistoryList({ history }: Readonly<HistoryListProps>) {
     <div className="flex flex-col gap-6">
       <ul aria-label={texts.list} className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {history.tasks.map((task) => (
-          <TaskCard key={task.id} task={task}>
+          <TaskCard key={task.id} task={task} variant="list">
             <Text as="p" variant="caption" tone="muted" className="w-full first-letter:uppercase">
               <time dateTime={task.date}>{formatDayLong(task.date)}</time>
             </Text>

@@ -4,3 +4,25 @@
 
 @import 'tailwindcss';
 @import './styles/design-tokens.css';
+
+/* Comportamiento táctil nativo (skill mobile-native): sin el destello gris al tocar, sin inflar el texto en
+   horizontal, sin el retardo de doble toque en los controles y sin seleccionar su texto al mantener pulsado.
+   El texto de contenido sigue siendo seleccionable. La respuesta al pulsar la dan los :active de cada control */
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  button,
+  a,
+  label:has(> input[type='checkbox']) {
+    touch-action: manipulation;
+  }
+
+  button {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+}

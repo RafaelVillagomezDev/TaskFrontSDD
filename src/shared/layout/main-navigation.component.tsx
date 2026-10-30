@@ -19,7 +19,8 @@ export function MainNavigation({ children }: Readonly<MainNavigationProps>) {
   return (
     <div className="flex flex-1 flex-col gap-6">
       {displayName !== null && (
-        <Text variant="body-sm" className="truncate px-4 font-semibold">
+        // Un email largo se recorta: el texto completo, al pasar el ratón
+        <Text variant="body-sm" title={displayName} className="truncate px-4 font-semibold">
           {displayName}
         </Text>
       )}

@@ -465,21 +465,26 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
 Los avisos los genera la API a las 22:00 y no se pueden crear desde la UI. Por eso las E2E prueban el estado vacío y la estructura de la pantalla, y los tests de componentes y hooks prueban el contenido con datos fijos.
 
 ### Tests (deben fallar)
-- [ ] T095 [P] [H9] Tests de `alert.schema` y de las consultas `getAlerts` y `getLatestAlert` (`pageSize=1`) — `alerts/schemas/tests/alert.schema.test.ts`, `alerts/api/tests/alerts.api.test.ts`
+- [x] T095 [P] [H9] Tests de `alert.schema` y de las consultas `getAlerts` y `getLatestAlert` (`pageSize=1`) — `alerts/schemas/tests/alert.schema.test.ts`, `alerts/api/tests/alerts.api.test.ts`
   - Verifica: `dce pnpm test src/modules/alerts/schemas src/modules/alerts/api` **falla**.
-- [ ] T096 [P] [H9] Tests de hooks:
+  - Hecho (2026-10-30): `getLatestAlert` devuelve `null` sin avisos.
+- [x] T096 [P] [H9] Tests de hooks:
   - `use-alerts-page`: paginación (RF-35).
   - `use-todays-alert`: destaca solo si `createdAt` es hoy en la fecha local, y no muestra nada si no (RF-37, S-05).
   — `alerts/hooks/tests/`
   - Verifica: `dce pnpm test src/modules/alerts/hooks` **falla**.
-- [ ] T097 [P] [H9] Tests de `AlertItem` (tipo, periodo, tareas, nota de RF-36) y `TodaysAlertBanner` (tipo, número de tareas, acceso al detalle), y E2E `alerts.e2e.ts` (estado vacío, navegación) en 6 proyectos — `alerts/components/tests/`, `e2e/specs/alerts.e2e.ts`
+  - Hecho (2026-10-30): `use-todays-alert` también deja de destacar el aviso a medianoche y no destaca nada si la consulta falla. La página en la URL pasa a un hook compartido, `shared/router/use-url-page.hook.ts` (`useUrlPage` y `useClampUrlPage`), que usan el historial y los avisos, con sus propios tests.
+- [x] T097 [P] [H9] Tests de `AlertItem` (tipo, periodo, tareas, nota de RF-36) y `TodaysAlertBanner` (tipo, número de tareas, acceso al detalle), y E2E `alerts.e2e.ts` (estado vacío, navegación) en 6 proyectos — `alerts/components/tests/`, `e2e/specs/alerts.e2e.ts`
   - Verifica: `dce pnpm test src/modules/alerts/components` **falla**.
+  - Hecho (2026-10-30): además, `alerts.page.test.tsx` (lista, vacío, carga y error) y una prueba del aviso destacado en `board.page.test.tsx`. Revisado con capturas con respuestas simuladas, en claro y oscuro.
 
 ### Implementación
-- [ ] T098 [H9] Esquema, consultas, hooks y textos de avisos — `alerts/schemas/alert.schema.ts`, `alerts/api/alerts.api.ts`, `alerts/hooks/`, `alerts/texts/alerts.texts.ts`
+- [x] T098 [H9] Esquema, consultas, hooks y textos de avisos — `alerts/schemas/alert.schema.ts`, `alerts/api/alerts.api.ts`, `alerts/hooks/`, `alerts/texts/alerts.texts.ts`
   - Verifica: `dce pnpm test src/modules/alerts/schemas src/modules/alerts/api src/modules/alerts/hooks` pasa.
-- [ ] T099 [H9] `AlertItem`, página `/alerts` y `TodaysAlertBanner` en el tablero — `alerts/components/`, `alerts/pages/alerts.page.tsx`, `alerts/index.ts`, `tasks/pages/board.page.tsx`
+  - Hecho (2026-10-30): las consultas de avisos usan `refetchOnFocus`; `main.tsx` llama a `setupListeners` (plan §4, «Al volver a la pestaña»). `formatTime` en `date-format.util`.
+- [x] T099 [H9] `AlertItem`, página `/alerts` y `TodaysAlertBanner` en el tablero — `alerts/components/`, `alerts/pages/alerts.page.tsx`, `alerts/index.ts`, `tasks/pages/board.page.tsx`
   - Verifica: `dce pnpm test src/modules/alerts` y `dre pnpm test:e2e e2e/specs/alerts --project=chromium-desktop` pasan.
+  - Hecho (2026-10-30): `AlertItem` con badge Warning del tipo, periodo, hora de generación, tareas con su fecha y la nota de RF-36; `TodaysAlertBanner` con el tinte Warning y «Ver aviso» hacia `/alerts`. 628 tests y 426 E2E en los 6 proyectos en verde.
 
 ---
 
@@ -617,3 +622,4 @@ Los criterios de éxito se comprueban en:
 - **2026-10-30** — Fase H6 terminada: T080–T085, con el progreso de hoy calculado en `useWeekBoard` (plan §5.5). Historias P1 completas.
 - **2026-10-30** — Fase H7 terminada: T086–T088.
 - **2026-10-30** — Fase H8 terminada: T089–T094.
+- **2026-10-30** — Fase H9 terminada: T095–T099.

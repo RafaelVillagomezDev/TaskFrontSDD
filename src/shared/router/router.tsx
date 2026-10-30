@@ -1,5 +1,6 @@
 import { Navigate, type RouteObject } from 'react-router';
 
+import { AlertsPage } from '../../modules/alerts';
 import { LoginPage, RegisterPage } from '../../modules/auth';
 import { BoardPage, HistoryPage } from '../../modules/tasks';
 import { NAVIGATION_TEXTS } from '../texts/navigation.texts';
@@ -25,7 +26,7 @@ export const APP_ROUTES: RouteObject[] = [
         children: [
           { path: ROUTES.board, element: <BoardPage /> },
           { path: ROUTES.history, element: <HistoryPage /> },
-          { path: ROUTES.alerts, element: <PlaceholderPage>{NAVIGATION_TEXTS.alerts}</PlaceholderPage> },
+          { path: ROUTES.alerts, element: <AlertsPage /> },
           { path: ROUTES.account, element: <PlaceholderPage>{NAVIGATION_TEXTS.account}</PlaceholderPage> },
         ],
       },

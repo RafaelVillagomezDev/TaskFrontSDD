@@ -24,9 +24,13 @@ function weekWith(items: unknown[]) {
   return () => apiOk({ items, page: 1, pageSize: 100, totalItems: items.length, totalPages: 1 });
 }
 
-// El tablero también pide la racha del panel (S-10): racha 0, sin aviso de racha en juego
+// El tablero también pide la racha del panel (S-10) y el último aviso (RF-37): racha 0 y sin avisos
 function mockBoardApi(handlers: Parameters<typeof mockApi>[0]): MockedApi {
-  return mockApi({ 'GET /streak': () => apiOk({ current: 0, best: 0 }), ...handlers });
+  return mockApi({
+    'GET /streak': () => apiOk({ current: 0, best: 0 }),
+    'GET /alerts': () => apiOk({ items: [], page: 1, pageSize: 1, totalItems: 0, totalPages: 0 }),
+    ...handlers,
+  });
 }
 
 function renderBoard() {
@@ -297,5 +301,34 @@ describe('BoardPage', () => {
     expect(await within(sunday).findByText('Comprar pan integral')).toBeInTheDocument();
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(await api.bodyOf('PATCH /tasks/t1')).toEqual({ title: 'Comprar pan integral', description: null });
+  });
+  it('RF-37: destaca el aviso generado hoy con su tipo, sus tareas y el acceso a los avisos', async () => {
+    const user = userEvent.setup({ advanceTimers: advance });
+    mockBoardApi({
+      'GET /tasks': weekWith([]),
+      'GET /alerts': () =>
+        apiOk({
+          items: [
+            {
+              id: 'al1',
+              type: 'daily',
+              periodStart: '2026-10-29',
+              periodEnd: '2026-10-29',
+              tasks: [{ id: 't1', title: 'Llamar al banco', date: '2026-10-29' }],
+              createdAt: new Date(2026, 9, 29, 22, 0).toISOString(),
+            },
+          ],
+          page: 1,
+          pageSize: 1,
+          totalItems: 1,
+          totalPages: 1,
+        }),
+    });
+    renderBoard();
+    const banner = await screen.findByRole('region', { name: 'Aviso de hoy' });
+    expect(banner).toHaveTextContent('Aviso diario de hoy');
+    expect(banner).toHaveTextContent('1 tarea pendiente');
+    await user.click(within(banner).getByRole('link', { name: 'Ver aviso' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Avisos' })).toBeInTheDocument();
   });
 });

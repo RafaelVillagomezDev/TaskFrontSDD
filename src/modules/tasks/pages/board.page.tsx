@@ -7,6 +7,7 @@ import { ErrorMessage } from '../../../shared/ui/error-message.component';
 import { Icon } from '../../../shared/ui/icon.component';
 import { Notice } from '../../../shared/ui/notice.component';
 import { Spinner } from '../../../shared/ui/spinner.component';
+import { TodaysAlertBanner, useTodaysAlert } from '../../alerts';
 import { StreakPanel, useStreakPanel } from '../../streaks';
 import { AddTaskButton } from '../components/add-task-button.component';
 import { DayColumn } from '../components/day-column.component';
@@ -46,12 +47,13 @@ function BoardContent({ board, onAddTask, actions }: Readonly<BoardContentProps>
   );
 }
 
-// Tablero semanal en / con el panel de racha y progreso de hoy (RF-09 a RF-30, RF-47, RF-51, RF-52; plan §6.2)
+// Tablero semanal en / con el panel de racha y progreso de hoy y el aviso de hoy (RF-09 a RF-30, RF-37, RF-47, RF-51, RF-52; plan §6.2)
 export function BoardPage() {
   const board = useWeekBoard();
   const taskForm = useTaskForm({ today: board.today, weekStart: board.weekStart, weekEnd: board.weekEnd });
   const actions = useTaskActions(taskForm.openEdit);
   const streakPanel = useStreakPanel(board.todayProgress);
+  const todaysAlert = useTodaysAlert();
   const createTodayTask = () => {
     taskForm.openFor(board.today);
   };
@@ -76,6 +78,8 @@ export function BoardPage() {
       </PageHeader>
       {/* Debajo de la cabecera (S-10, plan §6.2); «Crear una tarea» propone hoy, como «Nueva tarea» (RF-28) */}
       <StreakPanel panel={streakPanel} onCreateTask={createTodayTask} />
+      {/* El aviso generado hoy, si lo hay (RF-37) */}
+      {todaysAlert !== undefined && <TodaysAlertBanner alert={todaysAlert} />}
       {taskForm.notice !== undefined && <Notice onDismiss={taskForm.dismissNotice}>{taskForm.notice}</Notice>}
       {actions.error !== undefined && (
         <ErrorMessage message={actions.error} onRetry={actions.retry} onDismiss={actions.dismissError} />

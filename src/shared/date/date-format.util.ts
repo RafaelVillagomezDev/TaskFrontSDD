@@ -3,6 +3,8 @@ import { parseDayKey } from './day.util';
 // Formatos en español (spec S-03)
 const LOCALE = 'es-ES';
 
+const timeFormat = new Intl.DateTimeFormat(LOCALE, { hour: '2-digit', minute: '2-digit' });
+
 const weekdayFormat = new Intl.DateTimeFormat(LOCALE, { weekday: 'long' });
 const shortDateFormat = new Intl.DateTimeFormat(LOCALE, { day: '2-digit', month: '2-digit', year: 'numeric' });
 const longDateFormat = new Intl.DateTimeFormat(LOCALE, {
@@ -22,4 +24,9 @@ export function formatShortDate(day: string): string {
 
 export function formatDayLong(day: string): string {
   return longDateFormat.format(parseDayKey(day));
+}
+
+// Hora local HH:mm de un instante (la de generación de un aviso)
+export function formatTime(instant: Date): string {
+  return timeFormat.format(instant);
 }

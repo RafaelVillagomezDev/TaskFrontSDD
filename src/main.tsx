@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { setupListeners } from '@reduxjs/toolkit/query';
 import { Provider } from 'react-redux';
 import { createBrowserRouter } from 'react-router';
 
@@ -16,6 +17,9 @@ if (rootElement === null) {
 }
 
 const router = createBrowserRouter(APP_ROUTES);
+
+// Activa refetchOnFocus en las consultas que lo piden (avisos, plan §4): la app vive lo que vive la pestaña
+setupListeners(store.dispatch);
 
 createRoot(rootElement).render(
   <StrictMode>

@@ -1,10 +1,10 @@
 import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { useSearchParams, type SetURLSearchParams } from 'react-router';
-import { z } from 'zod';
+import { useSearchParams } from 'react-router';
 
 import { errorMessage, toApiError } from '../../../shared/api/api-error.util';
+import { useClampUrlPage, useUrlPage } from '../../../shared/router/use-url-page.hook';
 import { useSingleSubmit } from '../../../shared/ui/use-single-submit.hook';
 import { useGetTasksQuery } from '../api/tasks.api';
 import { historyFiltersSchema, NO_HISTORY_FILTERS, type HistoryFilters } from '../schemas/history-filters.schema';
@@ -15,8 +15,6 @@ export type HistoryStatusView = 'loading' | 'error' | 'ready';
 
 const NO_TASKS: Task[] = [];
 
-const pageParamSchema = z.coerce.number().int().positive();
-
 // Filtros de la URL (D-8): unos filtros no válidos (URL editada a mano) se ignoran en bloque
 function filtersFromUrl(params: URLSearchParams): HistoryFilters {
   const parsed = historyFiltersSchema.safeParse({
@@ -25,11 +23,6 @@ function filtersFromUrl(params: URLSearchParams): HistoryFilters {
     to: params.get('to') ?? '',
   });
   return parsed.success ? parsed.data : NO_HISTORY_FILTERS;
-}
-
-function pageFromUrl(params: URLSearchParams): number {
-  const parsed = pageParamSchema.safeParse(params.get('page'));
-  return parsed.success ? parsed.data : FIRST_PAGE;
 }
 
 // URL corta: solo los filtros que cambian algo y la página si no es la primera
@@ -50,26 +43,13 @@ function isFiltered(filters: HistoryFilters): boolean {
   );
 }
 
-// Una página fuera de rango (URL antigua o tareas eliminadas) se sustituye por la última (plan §5.6)
-function useClampPage(
-  totalPages: number | undefined,
-  page: number,
-  filters: HistoryFilters,
-  setUrl: SetURLSearchParams,
-) {
-  const { status, from, to } = filters;
-  useEffect(() => {
-    if (totalPages === undefined || totalPages === 0 || page <= totalPages) return;
-    setUrl(urlFor({ status, from, to }, totalPages), { replace: true });
-  }, [totalPages, page, status, from, to, setUrl]);
-}
-
 // Historial con filtros y páginas (plan §5.6, RF-31 a RF-34). Los filtros y la página viven en la URL (D-8) para
 // recargar y compartir; el formulario solo los cambia cuando son válidos (RF-33)
 export function useHistory() {
   const [searchParams, setSearchParams] = useSearchParams();
   const filters = filtersFromUrl(searchParams);
-  const page = pageFromUrl(searchParams);
+  const urlPage = useUrlPage();
+  const { page } = urlPage;
   const form = useForm<HistoryFilters>({ resolver: zodResolver(historyFiltersSchema), defaultValues: filters });
 
   // Al cambiar la URL (atrás, adelante, quitar filtros) el formulario muestra los filtros aplicados
@@ -79,7 +59,7 @@ export function useHistory() {
   }, [form, urlStatus, urlFrom, urlTo]);
 
   const { currentData, error, isError, refetch } = useGetTasksQuery({ ...filters, page });
-  useClampPage(currentData?.totalPages, page, filters, setSearchParams);
+  useClampUrlPage(urlPage, currentData?.totalPages);
 
   let status: HistoryStatusView = 'loading';
   if (currentData !== undefined) status = 'ready';
@@ -105,7 +85,7 @@ export function useHistory() {
     totalPages: currentData?.totalPages ?? 0,
     totalItems: currentData?.totalItems ?? 0,
     goToPage: (next: number) => {
-      setSearchParams(urlFor(filters, next));
+      urlPage.goToPage(next);
     },
     errorMessage: status === 'error' ? errorMessage(toApiError(error).code) : undefined,
     // El resultado del reintento llega por la propia consulta

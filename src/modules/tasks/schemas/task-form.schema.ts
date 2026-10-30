@@ -21,3 +21,9 @@ export function createTaskFormSchema(today: string) {
 }
 
 export type TaskFormValues = z.infer<ReturnType<typeof createTaskFormSchema>>;
+
+// Formulario de editar (RF-29): mismas reglas para título y descripción; la fecha no se puede cambiar
+// (API-001 RF-37), así que viaja sin validar y nunca se envía
+export function editTaskFormSchema(today: string) {
+  return createTaskFormSchema(today).extend({ date: z.string() });
+}

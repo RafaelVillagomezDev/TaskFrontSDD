@@ -30,7 +30,14 @@ export const TASKS_TEXTS = {
     counter: (length: number, max: number): string => `${String(length)}/${String(max)} caracteres`,
     create: 'Crear tarea',
     creating: 'Creando…',
+    editTitle: 'Editar tarea',
+    save: 'Guardar cambios',
+    saving: 'Guardando…',
     createdOutsideWeek: (dayLong: string): string => `Tarea creada para el ${dayLong}.`,
+  },
+  edit: {
+    // Nombre accesible del botón de cada tarjeta: distingue las tareas entre sí
+    action: (title: string): string => `Editar «${title}»`,
   },
   delete: {
     // Nombre accesible del botón de cada tarjeta: distingue las tareas entre sí

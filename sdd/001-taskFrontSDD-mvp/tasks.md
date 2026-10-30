@@ -413,14 +413,17 @@ Spec: `sdd/001-taskFrontSDD-mvp/spec.md` (Aprobada) · Plan: `sdd/001-taskFrontS
 ## Fase H7 — Editar una tarea (HU-07, P2)
 
 ### Tests (deben fallar)
-- [ ] T086 [P] [H7] Tests de `use-task-form` y de `TaskFormDialog` en modo editar: solo título y descripción, sin campo fecha, mismas reglas (RF-29, RF-30) — `tasks/hooks/tests/use-task-form.hook.test.ts`, `tasks/components/tests/task-form-dialog.component.test.tsx`
+- [x] T086 [P] [H7] Tests de `use-task-form` y de `TaskFormDialog` en modo editar: solo título y descripción, sin campo fecha, mismas reglas (RF-29, RF-30) — `tasks/hooks/tests/use-task-form.hook.test.ts`, `tasks/components/tests/task-form-dialog.component.test.tsx`
   - Verifica: `dce pnpm test src/modules/tasks/hooks/tests/use-task-form src/modules/tasks/components/tests/task-form-dialog` **falla**.
-- [ ] T087 [P] [H7] E2E `edit-task.e2e.ts` y ampliar `fields-task.e2e.ts` con los campos del formulario de edición, en 6 proyectos (RF-29, RF-30, RF-46) — `e2e/specs/edit-task.e2e.ts`, `fields-task.e2e.ts`
+  - Hecho (2026-10-30): además, tests de editar en `TaskCard`, `DayColumn` y `board.page` (el título nuevo aparece en el tablero).
+- [x] T087 [P] [H7] E2E `edit-task.e2e.ts` y ampliar `fields-task.e2e.ts` con los campos del formulario de edición, en 6 proyectos (RF-29, RF-30, RF-46) — `e2e/specs/edit-task.e2e.ts`, `fields-task.e2e.ts`
   - Verifica: `dre pnpm test:e2e e2e/specs/edit-task --project=chromium-desktop` **falla**.
+  - Hecho (2026-10-30): `edit-task.e2e.ts` (título de hoy, descripción futura, sin editar en días pasados, cancelar) y `fields-task.e2e.ts` con los campos de editar. `createTasks` admite descripción y `TaskFormDialog` (page object) recibe el nombre del diálogo.
 
 ### Implementación
-- [ ] T088 [H7] Modo editar en `useTaskForm` y `TaskFormDialog`, con acceso desde `TaskCard` y sin acceso en días pasados — `tasks/hooks/use-task-form.hook.ts`, `tasks/components/task-form-dialog.component.tsx`, `task-card.component.tsx`
+- [x] T088 [H7] Modo editar en `useTaskForm` y `TaskFormDialog`, con acceso desde `TaskCard` y sin acceso en días pasados — `tasks/hooks/use-task-form.hook.ts`, `tasks/components/task-form-dialog.component.tsx`, `task-card.component.tsx`
   - Verifica: `dre pnpm test:e2e e2e/specs/edit-task e2e/specs/fields-task --project=chromium-desktop` pasa.
+  - Hecho (2026-10-30): `useTaskForm` con `openEdit(task)` y `mode`; al editar, el esquema no valida la fecha (`editTaskFormSchema`) y se envía `PATCH` solo con título y descripción. Botón de lápiz en `TaskCard` (hoy y futuro), que llega como `requestEdit` de `useTaskActions`. 557 tests y 354 E2E en los 6 proyectos en verde.
 
 ---
 
@@ -606,3 +609,4 @@ Los criterios de éxito se comprueban en:
 - **2026-10-30** — Fase H5 terminada: T076–T079.
 - **2026-10-30** — Nueva paleta (decisión del usuario): neutros cálidos (papel y tinta en claro, carbón `#191816` en oscuro), acento Tide (`#0F6E66` / `#5CC8B8`) y estados en tonos de tierra (arcilla, hoja y miel), partiendo de la estructura de WattVision. Cambian `DESIGN.md`, `design-tokens.css` (botones y badges con valor claro y oscuro, `on-primary` / `on-destructive`) y el test de contraste, que comprueba también 3:1 en bordes de campos y foco. `EmptyState` pasa a borde discontinuo sin relleno.
 - **2026-10-30** — Fase H6 terminada: T080–T085, con el progreso de hoy calculado en `useWeekBoard` (plan §5.5). Historias P1 completas.
+- **2026-10-30** — Fase H7 terminada: T086–T088.

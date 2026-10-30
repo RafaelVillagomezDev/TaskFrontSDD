@@ -16,6 +16,7 @@ export interface Account {
 
 export interface NewTask {
   title: string;
+  description?: string;
   // Día AAAA-MM-DD del dispositivo
   date: string;
   completed?: boolean;
@@ -74,7 +75,10 @@ export async function createTasks(account: Account, tasks: NewTask[]): Promise<v
     const session = await loginByApi(api, account);
     for (const task of tasks) {
       const headers = { 'X-CSRF-Token': session, ...buildClientTimeHeaders() };
-      const created = await api.post('/tasks', { headers, data: { title: task.title, date: task.date } });
+      const created = await api.post('/tasks', {
+        headers,
+        data: { title: task.title, description: task.description ?? null, date: task.date },
+      });
       expectStatus(created, HTTP_CREATED, `crear la tarea «${task.title}»`);
       if (task.completed !== true) continue;
       const { id } = taskResponseSchema.parse(await created.json()).data;

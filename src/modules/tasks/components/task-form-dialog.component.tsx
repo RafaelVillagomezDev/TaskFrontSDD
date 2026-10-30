@@ -21,15 +21,20 @@ function counterTone(length: number, max: number): HelperTone {
   return length > max ? 'danger' : 'muted';
 }
 
-// Diálogo de crear tarea sobre Dialog (plan §5.4): título y descripción con contador (RF-17), fecha desde hoy
-// (RF-16) y botón deshabilitado mientras se envía (RF-19)
+function submitLabel(taskForm: TaskForm): string {
+  if (taskForm.mode === 'edit') return taskForm.isSubmitting ? texts.saving : texts.save;
+  return taskForm.isSubmitting ? texts.creating : texts.create;
+}
+
+// Diálogo único de crear y editar tarea sobre Dialog (plan §5.4): título y descripción con contador (RF-17),
+// fecha desde hoy solo al crear (RF-16, RF-29) y botón deshabilitado mientras se envía (RF-19)
 export function TaskFormDialog({ taskForm }: Readonly<TaskFormDialogProps>) {
-  const { form, counters, isSubmitting, formError } = taskForm;
+  const { form, counters, isSubmitting, formError, mode } = taskForm;
   const { errors } = form.formState;
   return (
     <Dialog open={taskForm.isOpen} onOpenChange={taskForm.onOpenChange}>
       <Dialog.Content>
-        <Dialog.Title>{texts.createTitle}</Dialog.Title>
+        <Dialog.Title>{mode === 'edit' ? texts.editTitle : texts.createTitle}</Dialog.Title>
         <form noValidate onSubmit={taskForm.onSubmit} className="flex flex-col gap-4">
           <Input
             {...form.register('title')}
@@ -46,17 +51,20 @@ export function TaskFormDialog({ taskForm }: Readonly<TaskFormDialogProps>) {
             helperTone={counterTone(counters.description, DESCRIPTION_MAX_LENGTH)}
             errorText={errors.description?.message}
           />
-          <DateInput
-            {...form.register('date')}
-            label={texts.date}
-            min={taskForm.minDate}
-            errorText={errors.date?.message}
-          />
+          {/* La fecha de una tarea no se puede cambiar (RF-29, API-001 RF-37) */}
+          {mode === 'create' && (
+            <DateInput
+              {...form.register('date')}
+              label={texts.date}
+              min={taskForm.minDate}
+              errorText={errors.date?.message}
+            />
+          )}
           {formError !== undefined && <ErrorMessage message={formError} />}
           <Dialog.Actions>
             <Dialog.Close variant="secondary">{COMMON_TEXTS.cancel}</Dialog.Close>
             <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? texts.creating : texts.create}
+              {submitLabel(taskForm)}
             </Button>
           </Dialog.Actions>
         </form>

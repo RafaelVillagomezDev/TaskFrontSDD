@@ -274,4 +274,28 @@ describe('BoardPage', () => {
       '2026-10-29',
     );
   });
+  it('RF-29 y RF-30: editar el título lo muestra actualizado en el tablero, sin ofrecer cambiar la fecha', async () => {
+    const user = userEvent.setup({ advanceTimers: advance });
+    let items: unknown[] = [TASK];
+    const api = mockBoardApi({
+      'GET /tasks': () => weekWith(items)(),
+      'PATCH /tasks/t1': () => {
+        const updated = { ...TASK, title: 'Comprar pan integral' };
+        items = [updated];
+        return apiOk(updated);
+      },
+    });
+    renderBoard();
+    await user.click(await screen.findByRole('button', { name: 'Editar «Comprar pan»' }));
+    const dialog = screen.getByRole('dialog', { name: 'Editar tarea' });
+    expect(within(dialog).queryByLabelText('Fecha')).not.toBeInTheDocument();
+    const title = within(dialog).getByLabelText('Título');
+    await user.clear(title);
+    await user.type(title, 'Comprar pan integral');
+    await user.click(within(dialog).getByRole('button', { name: 'Guardar cambios' }));
+    const sunday = screen.getByRole('region', { name: 'domingo, 1 de noviembre de 2026' });
+    expect(await within(sunday).findByText('Comprar pan integral')).toBeInTheDocument();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(await api.bodyOf('PATCH /tasks/t1')).toEqual({ title: 'Comprar pan integral', description: null });
+  });
 });

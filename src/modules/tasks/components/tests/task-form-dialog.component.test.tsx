@@ -11,6 +11,16 @@ import { TaskFormDialog } from '../task-form-dialog.component';
 
 const USER = { id: 'u1', email: 'ana@example.com', name: 'Ana', createdAt: '2026-10-29T10:00:00.000Z' };
 
+const TASK = {
+  id: 't1',
+  title: 'Comprar pan',
+  description: 'Integral',
+  date: '2026-10-30',
+  completed: false,
+  createdAt: '2026-10-29T09:15:00Z',
+  updatedAt: '2026-10-29T09:15:00Z',
+};
+
 function Harness() {
   const taskForm = useTaskForm({ today: '2026-10-29', weekStart: '2026-10-29', weekEnd: '2026-11-04' });
   return (
@@ -23,12 +33,20 @@ function Harness() {
       >
         Abrir
       </button>
+      <button
+        type="button"
+        onClick={() => {
+          taskForm.openEdit(TASK);
+        }}
+      >
+        Editar
+      </button>
       <TaskFormDialog taskForm={taskForm} />
     </>
   );
 }
 
-async function openDialog() {
+async function openDialog(trigger = 'Abrir', name = 'Nueva tarea') {
   const user = userEvent.setup();
   const store = freshStore();
   store.dispatch(sessionStarted({ user: USER, csrfToken: 'sesion-1' }));
@@ -37,8 +55,8 @@ async function openDialog() {
       <Harness />
     </Provider>,
   );
-  await user.click(screen.getByRole('button', { name: 'Abrir' }));
-  return { user, dialog: screen.getByRole('dialog', { name: 'Nueva tarea' }) };
+  await user.click(screen.getByRole('button', { name: trigger }));
+  return { user, dialog: screen.getByRole('dialog', { name }) };
 }
 
 afterEach(() => {
@@ -138,5 +156,43 @@ describe('TaskFormDialog (crear)', () => {
     await user.click(within(dialog).getByRole('button', { name: 'Cancelar' }));
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Abrir' })).toHaveFocus();
+  });
+});
+
+describe('TaskFormDialog (editar)', () => {
+  it('RF-29: «Editar tarea» con título y descripción de la tarea, sin campo fecha', async () => {
+    const { dialog } = await openDialog('Editar', 'Editar tarea');
+    expect(within(dialog).getByLabelText('Título')).toHaveValue('Comprar pan');
+    expect(within(dialog).getByLabelText('Descripción (opcional)')).toHaveValue('Integral');
+    expect(within(dialog).queryByLabelText('Fecha')).not.toBeInTheDocument();
+    expect(within(dialog).getByText('11/200 caracteres')).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: 'Guardar cambios' })).toBeInTheDocument();
+  });
+
+  it('RF-19 y RF-30: «Guardando…» deshabilitado mientras guarda y se cierra al terminar', async () => {
+    let release: (response: Response) => void = () => undefined;
+    mockApi({
+      'PATCH /tasks/t1': () =>
+        new Promise<Response>((resolve) => {
+          release = resolve;
+        }),
+    });
+    const { user, dialog } = await openDialog('Editar', 'Editar tarea');
+    await user.type(within(dialog).getByLabelText('Título'), ' integral');
+    await user.click(within(dialog).getByRole('button', { name: 'Guardar cambios' }));
+    expect(await within(dialog).findByRole('button', { name: 'Guardando…' })).toBeDisabled();
+    release(apiOk({ ...TASK, title: 'Comprar pan integral' }));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+  });
+
+  it('al pasar de editar a crear vuelve el título «Nueva tarea» y el campo fecha', async () => {
+    const { user } = await openDialog('Editar', 'Editar tarea');
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: 'Abrir' }));
+    const dialog = screen.getByRole('dialog', { name: 'Nueva tarea' });
+    expect(within(dialog).getByLabelText('Título')).toHaveValue('');
+    expect(within(dialog).getByLabelText('Fecha')).toHaveValue('2026-10-30');
   });
 });

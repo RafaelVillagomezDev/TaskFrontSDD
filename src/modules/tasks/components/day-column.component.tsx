@@ -15,7 +15,8 @@ interface DayColumnProps {
   column: DayColumnModel;
   // Acciones del día (crear una tarea): solo se muestran si el día no está cerrado (RF-11, RF-13)
   children?: ReactNode;
-  // Acciones sobre las tareas: completar solo hoy (RF-20 a RF-22) y eliminar hoy y días futuros (RF-23);
+  // Acciones sobre las tareas: completar solo hoy (RF-20 a RF-22), y editar y eliminar hoy y días futuros
+  // (RF-23, RF-29);
   // un día cerrado no ofrece ninguna (RF-13)
   actions?: TaskCardActions | undefined;
 }
@@ -30,7 +31,8 @@ interface TaskListProps {
 function TaskList({ label, tasks, kind, actions }: Readonly<TaskListProps>) {
   if (tasks.length === 0) return null;
   const canComplete = actions !== undefined && kind === 'today';
-  const canDelete = actions !== undefined && kind !== 'past';
+  // Editar y eliminar: hoy y días futuros (RF-13, RF-23, RF-29)
+  const canChange = actions !== undefined && kind !== 'past';
   return (
     <BoardColumn.List aria-label={label}>
       {tasks.map((task) => (
@@ -46,8 +48,15 @@ function TaskList({ label, tasks, kind, actions }: Readonly<TaskListProps>) {
           }
           isUpdating={actions?.isUpdating(task.id)}
           keepFocus={actions?.keepsFocus(task.id)}
+          onEdit={
+            canChange
+              ? () => {
+                  actions.requestEdit(task);
+                }
+              : undefined
+          }
           onDelete={
-            canDelete
+            canChange
               ? () => {
                   actions.requestDelete(task);
                 }

@@ -4,6 +4,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
 import { appWrapper, freshStore } from '../../../../../jest/render-app';
 import { sessionStarted } from '../../../auth';
+import type { Task } from '../../schemas/task.schema';
 import { useTaskForm } from '../use-task-form.hook';
 
 const USER = { id: 'u1', email: 'ana@example.com', name: 'Ana', createdAt: '2026-10-29T10:00:00.000Z' };
@@ -213,6 +214,150 @@ describe('useTaskForm (crear)', () => {
       result.current.onOpenChange(false);
     });
     expect(result.current.isOpen).toBe(false);
+    expect(api.requests).toHaveLength(0);
+  });
+});
+
+describe('useTaskForm (editar)', () => {
+  const TASK: Task = {
+    id: 't1',
+    title: 'Comprar pan',
+    description: 'Integral',
+    date: '2026-10-30',
+    completed: false,
+    createdAt: '2026-10-29T09:15:00Z',
+    updatedAt: '2026-10-29T09:15:00Z',
+  };
+
+  function openEdit(result: View, task = TASK) {
+    act(() => {
+      result.current.openEdit(task);
+    });
+  }
+
+  it('RF-29: se abre en modo editar con el título y la descripción de la tarea', () => {
+    const { result } = setup();
+    openEdit(result);
+    expect(result.current.isOpen).toBe(true);
+    expect(result.current.mode).toBe('edit');
+    expect(result.current.form.getValues()).toEqual({
+      title: 'Comprar pan',
+      description: 'Integral',
+      date: '2026-10-30',
+    });
+    expect(result.current.counters).toEqual({ title: 11, description: 8 });
+  });
+
+  it('RF-29: sin descripción, el campo empieza vacío', () => {
+    const { result } = setup();
+    openEdit(result, { ...TASK, description: null });
+    expect(result.current.form.getValues('description')).toBe('');
+  });
+
+  it('RF-29 y RF-30: guarda solo título y descripción con PATCH, sin fecha, y cierra', async () => {
+    const api = mockApi({ 'PATCH /tasks/t1': () => apiOk({ ...TASK, title: 'Comprar pan integral' }) });
+    const { result } = setup();
+    openEdit(result);
+    act(() => {
+      result.current.form.setValue('title', '  Comprar pan integral ');
+      result.current.form.setValue('description', '');
+    });
+    await submit(result);
+    await waitFor(() => {
+      expect(result.current.isOpen).toBe(false);
+    });
+    expect(await api.bodyOf('PATCH /tasks/t1')).toEqual({ title: 'Comprar pan integral', description: null });
+    expect(api.requests[0]?.headers.get('X-CSRF-Token')).toBe('sesion-1');
+    expect(result.current.notice).toBeUndefined();
+  });
+
+  it('RF-29 y RF-46: mismas reglas que al crear, sin enviar nada', async () => {
+    const api = mockApi({});
+    const { result } = setup();
+    openEdit(result);
+    act(() => {
+      result.current.form.setValue('title', '   ');
+      result.current.form.setValue('description', 'd'.repeat(1001));
+    });
+    await submit(result);
+    await waitFor(() => {
+      expect(result.current.form.formState.errors.title?.message).toBe('Escribe un título.');
+    });
+    expect(result.current.form.formState.errors.description?.message).toBe(
+      'La descripción no puede tener más de 1000 caracteres.',
+    );
+    expect(api.requests).toHaveLength(0);
+  });
+
+  it('RF-29: la fecha no se valida al editar, porque no se puede cambiar', async () => {
+    mockApi({ 'PATCH /tasks/t1': () => apiOk(TASK) });
+    const { result } = setup();
+    // La tarea quedó en un día ya pasado mientras el formulario seguía abierto
+    openEdit(result, { ...TASK, date: '2026-10-28' });
+    await submit(result);
+    await waitFor(() => {
+      expect(result.current.isOpen).toBe(false);
+    });
+  });
+
+  it('RF-19: mientras guarda no se puede enviar otra vez', async () => {
+    let release: (response: Response) => void = () => undefined;
+    const api = mockApi({
+      'PATCH /tasks/t1': () =>
+        new Promise<Response>((resolve) => {
+          release = resolve;
+        }),
+    });
+    const { result } = setup();
+    openEdit(result);
+    await submit(result);
+    await waitFor(() => {
+      expect(result.current.isSubmitting).toBe(true);
+    });
+    await submit(result);
+    await act(async () => {
+      release(apiOk(TASK));
+      await Promise.resolve();
+    });
+    await waitFor(() => {
+      expect(result.current.isOpen).toBe(false);
+    });
+    expect(api.requests.filter((request) => request.method === 'PATCH')).toHaveLength(1);
+  });
+
+  it('RF-45: si la tarea ya no existe lo explica bajo el formulario', async () => {
+    mockApi({ 'PATCH /tasks/t1': () => apiFail(404, 'TASK_NOT_FOUND') });
+    const { result } = setup();
+    openEdit(result);
+    await submit(result);
+    await waitFor(() => {
+      expect(result.current.formError).toBe('Esta tarea ya no existe. Puede que se eliminara desde otra pestaña.');
+    });
+    expect(result.current.isOpen).toBe(true);
+  });
+
+  it('RF-41: un campo que rechaza la API muestra el mensaje del cliente', async () => {
+    mockApi({
+      'PATCH /tasks/t1': () => apiFail(400, 'VALIDATION_ERROR', [{ field: 'description', message: 'x' }]),
+    });
+    const { result } = setup();
+    openEdit(result);
+    await submit(result);
+    await waitFor(() => {
+      expect(result.current.form.formState.errors.description?.message).toBe('Revisa este campo.');
+    });
+  });
+
+  it('RF-16: al volver a crear, la fecha vuelve a validarse', async () => {
+    const api = mockApi({});
+    const { result } = setup();
+    openEdit(result);
+    openAndFill(result, { title: 'Otra', date: '2026-10-28' });
+    expect(result.current.mode).toBe('create');
+    await submit(result);
+    await waitFor(() => {
+      expect(result.current.form.formState.errors.date?.message).toBe('Elige hoy o un día posterior.');
+    });
     expect(api.requests).toHaveLength(0);
   });
 });

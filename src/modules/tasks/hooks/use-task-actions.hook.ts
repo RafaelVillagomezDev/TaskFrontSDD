@@ -12,6 +12,8 @@ export interface TaskCardActions {
   keepsFocus: (id: string) => boolean;
   // Pide confirmar la eliminación (RF-23)
   requestDelete: (task: Task) => void;
+  // Abre el formulario de editar con la tarea (RF-29)
+  requestEdit: (task: Task) => void;
 }
 
 // Lo que necesita el diálogo de confirmar la eliminación
@@ -37,8 +39,8 @@ function failureOf(error: unknown, retry: () => void): ActionFailure {
 
 // Acciones sobre las tareas del tablero (plan §5.4). Completar y desmarcar son optimistas en la API (D-7);
 // eliminar pide confirmación y espera a la API. Aquí se evita repetir una acción mientras se guarda y se explica
-// cualquier rechazo (RF-41 a RF-45)
-export function useTaskActions() {
+// cualquier rechazo (RF-41 a RF-45). Editar lo resuelve el formulario de tareas: llega como onEdit (RF-29)
+export function useTaskActions(onEdit: (task: Task) => void) {
   const [updateTask] = useUpdateTaskMutation();
   const [deleteTask] = useDeleteTaskMutation();
   const [updatingIds, setUpdatingIds] = useState<ReadonlySet<string>>(new Set());
@@ -104,6 +106,7 @@ export function useTaskActions() {
     requestDelete: (task: Task) => {
       setPendingDelete(task);
     },
+    requestEdit: onEdit,
     pendingDelete,
     isDeleting,
     confirmDelete: () => {

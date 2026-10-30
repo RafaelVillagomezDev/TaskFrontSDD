@@ -1,4 +1,4 @@
-import { Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 
 import { Badge } from '../../../shared/ui/badge.component';
 import { Box } from '../../../shared/ui/box.component';
@@ -18,6 +18,8 @@ interface TaskCardProps {
   isUpdating?: boolean | undefined;
   // La casilla toma el foco al montarse: la tarea acaba de cambiar de lista al completarla o desmarcarla
   keepFocus?: boolean | undefined;
+  // Con onEdit la tarea se puede editar: hoy y días futuros (RF-13, RF-29)
+  onEdit?: (() => void) | undefined;
   // Con onDelete la tarea se puede eliminar: hoy y días futuros (RF-13, RF-23)
   onDelete?: (() => void) | undefined;
 }
@@ -53,6 +55,7 @@ export function TaskCard({
   onToggleCompleted,
   isUpdating = false,
   keepFocus = false,
+  onEdit,
   onDelete,
 }: Readonly<TaskCardProps>) {
   return (
@@ -83,17 +86,30 @@ export function TaskCard({
         ) : (
           <Badge>{TASKS_TEXTS.status.pending}</Badge>
         )}
-        {onDelete !== undefined && (
-          <Button
-            variant="ghost"
-            size="sm"
-            aria-label={TASKS_TEXTS.delete.action(task.title)}
-            className="ml-auto text-foreground-muted"
-            onClick={onDelete}
-          >
-            <Icon icon={Trash2} />
-          </Button>
-        )}
+        <div className="ml-auto flex items-center">
+          {onEdit !== undefined && (
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-label={TASKS_TEXTS.edit.action(task.title)}
+              className="text-foreground-muted"
+              onClick={onEdit}
+            >
+              <Icon icon={Pencil} />
+            </Button>
+          )}
+          {onDelete !== undefined && (
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-label={TASKS_TEXTS.delete.action(task.title)}
+              className="text-foreground-muted"
+              onClick={onDelete}
+            >
+              <Icon icon={Trash2} />
+            </Button>
+          )}
+        </div>
       </div>
     </Box>
   );

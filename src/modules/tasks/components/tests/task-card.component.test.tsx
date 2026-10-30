@@ -139,3 +139,28 @@ describe('TaskCard (eliminar)', () => {
     expect(onDelete).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('TaskCard (editar)', () => {
+  it('RF-13: sin onEdit no ofrece editar', () => {
+    render(
+      <ul>
+        <TaskCard task={TASK} onDelete={jest.fn()} />
+      </ul>,
+    );
+    expect(screen.queryByRole('button', { name: 'Editar «Comprar pan»' })).not.toBeInTheDocument();
+  });
+
+  it('RF-29: el botón de editar se llama con el título de la tarea y avisa al pulsarlo', async () => {
+    const user = userEvent.setup();
+    const onEdit = jest.fn();
+    render(
+      <ul>
+        <TaskCard task={TASK} onEdit={onEdit} onDelete={jest.fn()} />
+      </ul>,
+    );
+    const button = screen.getByRole('button', { name: 'Editar «Comprar pan»' });
+    expect(button.className).toContain('min-h-touch');
+    await user.click(button);
+    expect(onEdit).toHaveBeenCalledTimes(1);
+  });
+});

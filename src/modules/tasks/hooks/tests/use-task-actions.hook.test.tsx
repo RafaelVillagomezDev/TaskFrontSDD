@@ -24,7 +24,7 @@ function task(id: string, completed = false): Task {
 function setup() {
   const store = freshStore();
   store.dispatch(sessionStarted({ user: USER, csrfToken: 'sesion-1' }));
-  return renderHook(() => useTaskActions(), { wrapper: appWrapper(store, '/') });
+  return renderHook(() => useTaskActions(jest.fn()), { wrapper: appWrapper(store, '/') });
 }
 
 afterEach(() => {

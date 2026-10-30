@@ -46,11 +46,11 @@ function BoardContent({ board, onAddTask, actions }: Readonly<BoardContentProps>
   );
 }
 
-// Tablero semanal en / con el panel de racha y progreso de hoy (RF-09 a RF-28, RF-47, RF-51, RF-52; plan §6.2)
+// Tablero semanal en / con el panel de racha y progreso de hoy (RF-09 a RF-30, RF-47, RF-51, RF-52; plan §6.2)
 export function BoardPage() {
   const board = useWeekBoard();
   const taskForm = useTaskForm({ today: board.today, weekStart: board.weekStart, weekEnd: board.weekEnd });
-  const actions = useTaskActions();
+  const actions = useTaskActions(taskForm.openEdit);
   const streakPanel = useStreakPanel(board.todayProgress);
   const createTodayTask = () => {
     taskForm.openFor(board.today);

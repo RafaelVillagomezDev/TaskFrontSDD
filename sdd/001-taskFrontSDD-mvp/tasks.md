@@ -589,6 +589,11 @@ Los avisos los genera la API a las 22:00 y no se pueden crear desde la UI. Por e
     - Arreglo: `useTaskActions` expone `isSavingCompletion` y `useStreakPanel(progress, isSavingProgress)` no avisa mientras hay un completar o desmarcar sin guardar.
     - Tests nuevos, en rojo antes del arreglo: `board.page.test.tsx` con el `PATCH` retenido y `complete-task.e2e.ts` con su respuesta retrasada 800 ms (fallaba en Chromium y Firefox). Las E2E de desmarcar y eliminar pasan 3 veces seguidas en los 6 proyectos. 689 tests en verde. Spec → *Implementada*.
 
+- [x] T116 [B] El historial no muestra lo completado o desmarcado en el tablero hasta recargar (bug del 2026-10-31). `updateTask` con `completed` solo invalidaba `Streak`, porque el cambio optimista ya está en las semanas y días en caché, pero `getTasks` (historial) no recibe ese cambio y seguía mostrando su página en caché durante los 60 s que RTK Query la conserva. Corregir con una etiqueta propia del historial que se invalide al completar o desmarcar (RF-31, RF-32) — `tasks/api/tasks.api.ts`, sus tests, `e2e/specs/history.e2e.ts`
+  - Verifica: `dce pnpm test src/modules/tasks/api` y `dre pnpm test:e2e e2e/specs/history` pasan.
+  - Hecho (2026-10-31): `getTasks` da la etiqueta `{ type: 'Task', id: 'HISTORY' }` y completar o desmarcar invalida `['Streak', HISTORY_TAG]`; las semanas y días no se vuelven a pedir (ya tienen el cambio optimista) y crear, editar y eliminar siguen invalidando todo con la etiqueta general `Task`. No se aplica el cambio optimista al historial: con un filtro de estado la tarea tendría que salir o entrar en la lista.
+  - Tests, en rojo antes del arreglo: `tasks.api.test.ts` (historial visible, historial en caché sin suscriptores, completar y desmarcar) y `history.e2e.ts` «RF-31: completar y desmarcar en el tablero se ve en el historial sin recargar» (fallaba en Chromium y Firefox). Además, tests de que editar y eliminar siguen refrescando el historial y de que la semana no se vuelve a pedir. 695 tests y 690 E2E en verde (un fallo intermitente de registro en Firefox escritorio, ajeno al cambio, pasó 5 veces seguidas al repetirlo).
+
 ## Cobertura RF → tareas
 
 | RF | Tareas |
@@ -607,7 +612,7 @@ Los avisos los genera la API a las 22:00 y no se pueden crear desde la UI. Por e
 | RF-23, RF-24 | T076, T077, T078, T079 |
 | RF-25 a RF-28 | T080, T081, T082, T083, T084, T115 |
 | RF-29, RF-30 | T086, T087, T088 |
-| RF-31 a RF-34 | T036, T089, T090, T091, T092, T093, T094 |
+| RF-31 a RF-34 | T036, T089, T090, T091, T092, T093, T094, T116 |
 | RF-35 a RF-37 | T095, T096, T097, T098, T099 |
 | RF-38, RF-53 | T100, T101, T102 |
 | RF-39, RF-48, RF-49 | T103, T104, T105, T106 |
@@ -661,3 +666,4 @@ Los criterios de éxito se comprueban en:
 - **2026-10-30** — T110 terminada con `review-animations` y T114 hecha: las 114 tareas completas, spec *Implementada*.
 - **2026-10-30** — Nueva fase B (correcciones) con T115: bug del aviso de racha en juego que parpadea, reproducido con tests unitarios y E2E en rojo.
 - **2026-10-30** — T115 corregida: el aviso de racha en juego espera a que se guarde el cambio y a la racha recalculada. Fase B terminada.
+- **2026-10-31** — T116 (fase B): el historial se vuelve a pedir al completar o desmarcar, con una etiqueta de RTK Query propia.

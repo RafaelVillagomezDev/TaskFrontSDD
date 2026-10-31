@@ -309,6 +309,94 @@ describe('D-7: tasksApi.updateTask (completar y desmarcar)', () => {
     day.unsubscribe();
   });
 
+  // Bug del 2026-10-31 (T116): tras completar o desmarcar, el historial en caché seguía mostrando el estado anterior
+  describe('RF-31 (T116): el historial en caché se vuelve a pedir al completar o desmarcar', () => {
+    const HISTORY = { status: 'all', from: '', to: '', page: 1 } as const;
+
+    function historyRequests(api: { requests: Request[] }): Request[] {
+      return api.requests.filter(
+        (request) => request.method === 'GET' && new URL(request.url).searchParams.get('pageSize') === '50',
+      );
+    }
+
+    it.each([true, false])(
+      'RF-31: con completed: %s, el historial que se está viendo se refresca',
+      async (completed) => {
+        const api = mockApi({
+          'GET /tasks': () =>
+            apiOk({ items: [task('t1', WEEK, !completed)], page: 1, pageSize: 50, totalItems: 1, totalPages: 1 }),
+          'PATCH /tasks/t1': () => apiOk(task('t1', WEEK, completed)),
+        });
+        const history = store.dispatch(tasksApi.endpoints.getTasks.initiate(HISTORY));
+        await history;
+        await store.dispatch(tasksApi.endpoints.updateTask.initiate({ id: 't1', changes: { completed } }));
+        await settle();
+        expect(historyRequests(api)).toHaveLength(2);
+        history.unsubscribe();
+      },
+    );
+
+    it('RF-31: un historial en caché que ya no se ve se vuelve a pedir al volver a él', async () => {
+      let completed = false;
+      const api = mockApi({
+        'GET /tasks': () =>
+          apiOk({ items: [task('t1', WEEK, completed)], page: 1, pageSize: 50, totalItems: 1, totalPages: 1 }),
+        'PATCH /tasks/t1': () => {
+          completed = true;
+          return apiOk(task('t1', WEEK, true));
+        },
+      });
+      // Se visita el historial y se sale de él: su caché queda guardada sin suscriptores
+      const visit = store.dispatch(tasksApi.endpoints.getTasks.initiate(HISTORY));
+      await visit;
+      visit.unsubscribe();
+      await store.dispatch(tasksApi.endpoints.updateTask.initiate({ id: 't1', changes: { completed: true } }));
+      await settle();
+      // Se vuelve al historial
+      const back = store.dispatch(tasksApi.endpoints.getTasks.initiate(HISTORY));
+      const result = await back;
+      expect(result.data?.items[0]?.completed).toBe(true);
+      expect(historyRequests(api)).toHaveLength(2);
+      back.unsubscribe();
+    });
+
+    it.each([
+      ['editar', 'PATCH', { title: 'Otro título' }],
+      ['eliminar', 'DELETE', undefined],
+    ])(
+      'RF-31: %s también refresca el historial (invalida la etiqueta general Task)',
+      async (_case, method, changes) => {
+        const api = mockApi({
+          'GET /tasks': () => apiOk({ items: [task('t1', WEEK)], page: 1, pageSize: 50, totalItems: 1, totalPages: 1 }),
+          'PATCH /tasks/t1': () => apiOk({ ...task('t1', WEEK), title: 'Otro título' }),
+          'DELETE /tasks/t1': () => apiOk(null),
+        });
+        const history = store.dispatch(tasksApi.endpoints.getTasks.initiate(HISTORY));
+        await history;
+        if (method === 'PATCH' && changes !== undefined) {
+          await store.dispatch(tasksApi.endpoints.updateTask.initiate({ id: 't1', changes }));
+        } else {
+          await store.dispatch(tasksApi.endpoints.deleteTask.initiate('t1'));
+        }
+        await settle();
+        expect(historyRequests(api)).toHaveLength(2);
+        history.unsubscribe();
+      },
+    );
+
+    it('D-7: la semana en caché no se vuelve a pedir: ya tiene el cambio optimista', async () => {
+      const api = mockApi({
+        'GET /tasks': () => page([task('t1', WEEK)], 1, 1),
+        'PATCH /tasks/t1': () => apiOk(task('t1', WEEK, true)),
+      });
+      const week = await loadWeek();
+      await store.dispatch(tasksApi.endpoints.updateTask.initiate({ id: 't1', changes: { completed: true } }));
+      await settle();
+      expect(api.requests.filter((request) => request.method === 'GET')).toHaveLength(1);
+      week.unsubscribe();
+    });
+  });
+
   it('D-7: si la API rechaza, deshace el cambio optimista', async () => {
     mockApi({
       'GET /tasks': () => page([task('t1', WEEK)], 1, 1),

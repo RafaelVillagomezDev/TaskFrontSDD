@@ -143,8 +143,8 @@ Tipos inferidos de esquemas Zod (`z.infer`), nunca escritos a mano ni con aserci
 
 | Consulta | Etiquetas | Invalidada por |
 | :--- | :--- | :--- |
-| Tareas de una semana | `Task` | Crear, editar, completar, desmarcar o eliminar |
-| Historial | `Task` | Igual |
+| Tareas de una semana | `Task` | Crear, editar o eliminar; completar y desmarcar ya están en la caché (optimista, D-7) |
+| Historial | `{ type: 'Task', id: 'HISTORY' }` | Crear, editar, completar, desmarcar o eliminar: no recibe el cambio optimista (T116) |
 | Racha | `Streak` | Completar, desmarcar o eliminar |
 | Avisos | `Alert` | Al volver a la pestaña (`refetchOnFocus`) |
 | `GET /me` | `Me` | Cambiar nombre |
@@ -379,3 +379,4 @@ Todas con versión exacta publicada hace al menos dos semanas. Se instalan dentr
 - **2026-10-30** — §6.3: añadido `Checkbox` (`shared/ui`), necesario para completar tareas con el objetivo táctil de VII.4.
 - **2026-10-30** — §5.5: el progreso de hoy lo calcula `use-week-board` y se pasa a `use-streak-panel`, para que `streaks` no importe de `tasks` (evita una dependencia circular entre módulos). Se añade `getDayTasks`.
 - **2026-10-30** — §5.5: el aviso de racha en juego espera a la racha recalculada (clarificación de RF-27 por un bug de parpadeo; T115).
+- **2026-10-31** — §4: el historial da la etiqueta `{ type: 'Task', id: 'HISTORY' }`; completar o desmarcar la invalida junto a `Streak`, porque el historial no recibe el cambio optimista (T116).

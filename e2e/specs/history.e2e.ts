@@ -131,4 +131,36 @@ test.describe('HU-08: consultar mi historial con filtros', () => {
     await history.goto();
     await expect(page.getByText('Todavía no tienes tareas.')).toBeVisible();
   });
+
+  // Bug del 2026-10-31 (T116): tras completar o desmarcar en el tablero, el historial ya visitado seguía con el
+  // estado anterior hasta recargar la página
+  test('RF-31: completar y desmarcar en el tablero se ve en el historial sin recargar', async ({
+    page,
+    freshAccount,
+  }) => {
+    await createTasks(freshAccount, [{ title: 'Llamar al banco', date: todayKey() }]);
+    await login(page, freshAccount);
+    const shell = new AppShell(page);
+    const history = new HistoryPage(page);
+    // Se visita el historial antes del cambio: su página queda en la caché
+    await shell.navigateTo('Historial');
+    await expect(history.items).toContainText('Pendiente');
+
+    await shell.navigateTo('Tablero');
+    const board = new BoardPage(page);
+    const checkbox = board.column(todayKey()).getByRole('checkbox', { name: 'Llamar al banco' });
+    await checkbox.click();
+    await expect(checkbox).toHaveAttribute('aria-disabled', 'false');
+    await shell.navigateTo('Historial');
+    await expect(history.items).toContainText('Completada');
+
+    await shell.navigateTo('Tablero');
+    await board.column(todayKey()).getByRole('checkbox', { name: 'Llamar al banco' }).click();
+    await expect(board.column(todayKey()).getByRole('checkbox', { name: 'Llamar al banco' })).toHaveAttribute(
+      'aria-disabled',
+      'false',
+    );
+    await shell.navigateTo('Historial');
+    await expect(history.items).toContainText('Pendiente');
+  });
 });

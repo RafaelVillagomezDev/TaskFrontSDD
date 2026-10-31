@@ -49,10 +49,17 @@ function staleBoardTags(error: unknown): 'Task'[] {
   return STALE_BOARD_CODES.includes(toApiError(error).code) ? ['Task'] : [];
 }
 
-function updateTaskTags(error: unknown, changes: TaskChanges): ('Task' | 'Streak')[] {
+// Etiqueta propia del historial, además de la general 'Task' (que lo invalida junto al resto). El historial no recibe
+// el cambio optimista de completar: con un filtro de estado la tarea tendría que salir o entrar en la lista
+const HISTORY_TAG: { type: 'Task'; id: string } = { type: 'Task', id: 'HISTORY' };
+
+type TaskTag = 'Task' | 'Streak' | typeof HISTORY_TAG;
+
+function updateTaskTags(error: unknown, changes: TaskChanges): TaskTag[] {
   if (error !== undefined) return staleBoardTags(error);
-  // Completar o desmarcar ya está en la caché (optimista); cambia la racha (D-7)
-  return changes.completed === undefined ? ['Task'] : ['Streak'];
+  // Completar o desmarcar ya está en las semanas y días en caché (optimista): cambian la racha y el historial,
+  // que se vuelven a pedir (D-7, T116)
+  return changes.completed === undefined ? ['Task'] : ['Streak', HISTORY_TAG];
 }
 
 // Cambio optimista sobre una lista de tareas en caché (D-7)
@@ -113,7 +120,7 @@ export const tasksApi = baseApi.injectEndpoints({
     getTasks: build.query<Page<Task>, HistoryQuery>({
       queryFn: async (query, _api, _extra, baseQuery) =>
         validatedResult(await baseQuery({ url: '/tasks', params: historyParams(query) }), taskPageSchema),
-      providesTags: ['Task'],
+      providesTags: [HISTORY_TAG],
     }),
     // Crear espera a la API e invalida la semana y la racha (plan D-7); la descripción vacía se guarda como null
     createTask: build.mutation<Task, TaskFormValues>({

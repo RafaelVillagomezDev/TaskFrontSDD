@@ -65,11 +65,14 @@ describe('useTaskActions', () => {
         }),
     });
     const { result } = setup();
+    expect(result.current.isSavingCompletion).toBe(false);
     act(() => {
       result.current.toggleCompleted(task('t1'));
     });
     expect(result.current.isUpdating('t1')).toBe(true);
     expect(result.current.isUpdating('t2')).toBe(false);
+    // T115: el panel de racha sabe que el progreso de hoy aún es optimista
+    expect(result.current.isSavingCompletion).toBe(true);
     expect(result.current.keepsFocus('t1')).toBe(true);
     act(() => {
       result.current.toggleCompleted(task('t1', true));
@@ -84,6 +87,7 @@ describe('useTaskActions', () => {
     await waitFor(() => {
       expect(result.current.isUpdating('t1')).toBe(false);
     });
+    expect(result.current.isSavingCompletion).toBe(false);
     expect(result.current.keepsFocus('t1')).toBe(false);
     expect(api.requests).toHaveLength(1);
   });

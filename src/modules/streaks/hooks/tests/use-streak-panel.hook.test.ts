@@ -3,14 +3,15 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
 import { appWrapper, freshStore } from '../../../../../jest/render-app';
+import { baseApi } from '../../../../shared/api/base.api';
 import type { TodayProgress } from '../../types/streak.types';
 import { useStreakPanel } from '../use-streak-panel.hook';
 
-function setup(progress: TodayProgress | undefined) {
-  return renderHook(({ value }) => useStreakPanel(value), {
-    wrapper: appWrapper(freshStore(), '/'),
-    initialProps: { value: progress },
-  });
+function setup(progress: TodayProgress | undefined, store = freshStore()) {
+  return renderHook(
+    ({ value, saving }: { value: TodayProgress | undefined; saving: boolean }) => useStreakPanel(value, saving),
+    { wrapper: appWrapper(store, '/'), initialProps: { value: progress, saving: false } },
+  );
 }
 
 async function readyPanel(streak: { current: number; best: number }, progress: TodayProgress | undefined) {
@@ -65,7 +66,7 @@ describe('useStreakPanel', () => {
     await waitFor(() => {
       expect(result.current.atRisk).toBe(true);
     });
-    rerender({ value: { done: 1, total: 1 } });
+    rerender({ value: { done: 1, total: 1 }, saving: false });
     expect(result.current.atRisk).toBe(false);
     expect(api.requests).toHaveLength(1);
   });
@@ -88,5 +89,50 @@ describe('useStreakPanel', () => {
       expect(result.current.streak).toEqual({ current: 1, best: 3 });
     });
     expect(result.current.errorMessage).toBeUndefined();
+  });
+
+  it('RF-27 (T115): mientras la racha se recalcula tras un cambio no avisa; avisa si al llegar sigue en juego', async () => {
+    let release: (response: Response) => void = () => undefined;
+    let calls = 0;
+    mockApi({
+      'GET /streak': () => {
+        calls += 1;
+        if (calls === 1) return apiOk({ current: 3, best: 3 });
+        return new Promise<Response>((resolve) => {
+          release = resolve;
+        });
+      },
+    });
+    const store = freshStore();
+    const { result, rerender } = setup({ done: 1, total: 1 }, store);
+    await waitFor(() => {
+      expect(result.current.status).toBe('ready');
+    });
+    // Se desmarca la única tarea de hoy: el progreso cambia al momento y la racha se vuelve a pedir
+    act(() => {
+      store.dispatch(baseApi.util.invalidateTags(['Streak']));
+    });
+    rerender({ value: { done: 0, total: 1 }, saving: false });
+    await waitFor(() => {
+      expect(calls).toBe(2);
+    });
+    expect(result.current.atRisk).toBe(false);
+    // La racha de días anteriores sigue en 2: ahora sí está en juego
+    await act(async () => {
+      release(apiOk({ current: 2, best: 3 }));
+      await Promise.resolve();
+    });
+    await waitFor(() => {
+      expect(result.current.atRisk).toBe(true);
+    });
+  });
+
+  it('RF-27 (T115): mientras el tablero guarda un completar o desmarcar no avisa; al guardarse, sí', async () => {
+    const { result, rerender } = await readyPanel({ current: 2, best: 2 }, { done: 0, total: 1 });
+    expect(result.current.atRisk).toBe(true);
+    rerender({ value: { done: 0, total: 1 }, saving: true });
+    expect(result.current.atRisk).toBe(false);
+    rerender({ value: { done: 0, total: 1 }, saving: false });
+    expect(result.current.atRisk).toBe(true);
   });
 });

@@ -577,11 +577,17 @@ Los avisos los genera la API a las 22:00 y no se pueden crear desde la UI. Por e
 
 ## Fase B — Correcciones
 
-- [ ] T115 [B] El aviso de racha en juego parpadea al quitar las tareas completadas de hoy (bug del 2026-10-30, clarificación de RF-27 en la spec). Mientras `GET /streak` se recalcula tras completar, desmarcar o eliminar, el panel combina «0 completadas hoy» con la racha anterior y muestra «Tu racha está en juego». Corregir en `use-streak-panel` para que el aviso solo use la racha recalculada (RF-27) — `streaks/hooks/use-streak-panel.hook.ts`, sus tests
+- [x] T115 [B] El aviso de racha en juego parpadea al quitar las tareas completadas de hoy (bug del 2026-10-30, clarificación de RF-27 en la spec). Mientras `GET /streak` se recalcula tras completar, desmarcar o eliminar, el panel combina «0 completadas hoy» con la racha anterior y muestra «Tu racha está en juego». Corregir en `use-streak-panel` para que el aviso solo use la racha recalculada (RF-27) — `streaks/hooks/use-streak-panel.hook.ts`, sus tests
   - Tests que lo reproducen, ya escritos y en rojo:
     - `tasks/pages/tests/board.page.test.tsx`: «RF-27: al eliminar las dos tareas completadas de hoy» y «RF-27: al desmarcar las dos tareas completadas de hoy».
     - `e2e/specs/delete-task.e2e.ts`: «RF-27: eliminar las dos tareas completadas de hoy no hace parpadear «racha en juego»» (respuesta de `/streak` retrasada 800 ms; falla en Chromium y Firefox).
+    - `e2e/specs/complete-task.e2e.ts`: «RF-27: desmarcar las dos tareas completadas de hoy no hace parpadear «racha en juego»» (respuesta del `PATCH` retrasada 800 ms).
   - Verifica: `dce pnpm test src/modules/tasks/pages src/modules/streaks` y `dre pnpm test:e2e e2e/specs/delete-task` pasan; después, spec → *Implementada*.
+  - Hecho (2026-10-30), en dos pasos:
+    - Primero: `atRisk` exige `!isFetching` de `GET /streak`. Cubría eliminar, pero no desmarcar.
+    - El usuario lo vio aún al desmarcar: la casilla cambia al momento (D-7) y la racha no se vuelve a pedir hasta que la API guarda el `PATCH`, así que el aviso salía con la racha anterior. El test unitario no lo veía porque la API simulada respondía al instante.
+    - Arreglo: `useTaskActions` expone `isSavingCompletion` y `useStreakPanel(progress, isSavingProgress)` no avisa mientras hay un completar o desmarcar sin guardar.
+    - Tests nuevos, en rojo antes del arreglo: `board.page.test.tsx` con el `PATCH` retenido y `complete-task.e2e.ts` con su respuesta retrasada 800 ms (fallaba en Chromium y Firefox). Las E2E de desmarcar y eliminar pasan 3 veces seguidas en los 6 proyectos. 689 tests en verde. Spec → *Implementada*.
 
 ## Cobertura RF → tareas
 
@@ -654,3 +660,4 @@ Los criterios de éxito se comprueban en:
 - **2026-10-30** — Fase R: T107–T109 y T111–T113 hechas; T110 a falta de `review-animations` (la lanza el usuario); T114 espera a T110.
 - **2026-10-30** — T110 terminada con `review-animations` y T114 hecha: las 114 tareas completas, spec *Implementada*.
 - **2026-10-30** — Nueva fase B (correcciones) con T115: bug del aviso de racha en juego que parpadea, reproducido con tests unitarios y E2E en rojo.
+- **2026-10-30** — T115 corregida: el aviso de racha en juego espera a que se guarde el cambio y a la racha recalculada. Fase B terminada.

@@ -1,5 +1,5 @@
 import { jest } from '@jest/globals';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
 import { apiFail, apiOk, mockApi, type MockedApi } from '../../../../../jest/mock-api';
@@ -369,6 +369,39 @@ describe('BoardPage', () => {
       });
       expect(within(panel).queryByText('Tu racha está en juego')).not.toBeInTheDocument();
     });
+  });
+
+  it('RF-27 (T115): mientras la API guarda el desmarcado de la única completada no avisa con la racha anterior', async () => {
+    const user = userEvent.setup({ advanceTimers: advance });
+    const done = { ...TASK, date: '2026-10-29', completed: true };
+    let current = 1;
+    let releasePatch: () => void = () => undefined;
+    mockBoardApi({
+      'GET /streak': () => apiOk({ current, best: 1 }),
+      'GET /tasks': weekWith([done]),
+      'PATCH /tasks/t1': () =>
+        new Promise<Response>((resolve) => {
+          releasePatch = () => {
+            current = 0;
+            resolve(apiOk({ ...done, completed: false }));
+          };
+        }),
+    });
+    renderBoard();
+    const panel = screen.getByRole('region', { name: 'Racha y progreso de hoy' });
+    expect(await within(panel).findByText('1 de 1 tareas completadas')).toBeInTheDocument();
+    await user.click(await screen.findByRole('checkbox', { name: 'Comprar pan' }));
+    // Cambio optimista: el progreso ya dice 0, pero la API aún no ha guardado nada ni recalculado la racha
+    expect(within(panel).getByText('0 de 1 tareas completadas')).toBeInTheDocument();
+    expect(within(panel).queryByText('Tu racha está en juego')).not.toBeInTheDocument();
+
+    act(() => {
+      releasePatch();
+    });
+    await waitFor(() => {
+      expect(panel).toHaveTextContent(/Racha actual\s*0 días/);
+    });
+    expect(within(panel).queryByText('Tu racha está en juego')).not.toBeInTheDocument();
   });
 
   it('RF-28: sin tareas hoy, «Crear una tarea» del panel abre el formulario con la fecha de hoy', async () => {

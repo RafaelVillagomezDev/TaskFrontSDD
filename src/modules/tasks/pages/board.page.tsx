@@ -56,7 +56,7 @@ export function BoardPage() {
   const board = useWeekBoard();
   const taskForm = useTaskForm({ today: board.today, weekStart: board.weekStart, weekEnd: board.weekEnd });
   const actions = useTaskActions(taskForm.openEdit);
-  const streakPanel = useStreakPanel(board.todayProgress);
+  const streakPanel = useStreakPanel(board.todayProgress, actions.isSavingCompletion);
   const todaysAlert = useTodaysAlert();
   const createTodayTask = () => {
     taskForm.openFor(board.today);

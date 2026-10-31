@@ -1,3 +1,5 @@
+import type { Page } from '@playwright/test';
+
 import { addDays, todayKey } from '../../src/shared/date/day.util';
 import { createTasks } from '../fixtures/api-client';
 import { expect, test } from '../fixtures/auth.fixture';
@@ -73,5 +75,65 @@ test.describe('HU-04: completar y desmarcar tareas', () => {
     await expect(checkbox).toBeFocused();
     await page.keyboard.press('Space');
     await expect(checkbox).not.toBeChecked();
+  });
+});
+
+const PATCH_DELAY_MS = 800;
+const AT_RISK = 'Tu racha está en juego';
+
+// Registra si el aviso de racha en juego aparece en algún momento, aunque sea un instante (un parpadeo)
+async function watchAtRisk(page: Page): Promise<() => Promise<boolean>> {
+  await page.evaluate((text) => {
+    const seen = { value: false };
+    Object.assign(window, { atRiskSeen: seen });
+    new MutationObserver(() => {
+      if (document.body.textContent.includes(text)) seen.value = true;
+    }).observe(document.body, { childList: true, subtree: true, characterData: true });
+  }, AT_RISK);
+  return () =>
+    page.evaluate(() => {
+      const seen: unknown = Reflect.get(window, 'atRiskSeen');
+      return typeof seen === 'object' && seen !== null && Reflect.get(seen, 'value') === true;
+    });
+}
+
+// Bug del 2026-10-30 (T115): al desmarcar, la casilla cambia al momento, pero la racha no se recalcula hasta
+// que la API guarda el cambio; en ese tiempo el panel avisaba con la racha anterior
+test.describe('RF-27: racha al desmarcar las tareas completadas de hoy', () => {
+  test('RF-27: desmarcar las dos tareas completadas de hoy no hace parpadear «racha en juego»', async ({
+    page,
+    freshAccount,
+  }) => {
+    await createTasks(freshAccount, [
+      { title: 'Comprar pan', date: todayKey(), completed: true },
+      { title: 'Llamar al banco', date: todayKey(), completed: true },
+    ]);
+    const login = new LoginPage(page);
+    await login.goto();
+    await login.login(freshAccount);
+    const board = new BoardPage(page);
+    await expect(board.streakPanel).toContainText(/Racha actual\s*1 día/);
+
+    // Guardar en la API tarda, como en una red lenta
+    await page.route(
+      (url) => url.port === '3000' && url.pathname.startsWith('/tasks/'),
+      async (route) => {
+        const response = await route.fetch();
+        await new Promise((resolve) => setTimeout(resolve, PATCH_DELAY_MS));
+        await route.fulfill({ response });
+      },
+    );
+    const sawAtRisk = await watchAtRisk(page);
+
+    const today = board.column(todayKey());
+    for (const title of ['Comprar pan', 'Llamar al banco']) {
+      const checkbox = today.getByRole('checkbox', { name: title });
+      await checkbox.click();
+      await expect(checkbox).not.toBeChecked();
+      await expect(checkbox).toHaveAttribute('aria-disabled', 'false');
+    }
+    await expect(board.streakPanel).toContainText('0 de 2 tareas completadas');
+    await expect(board.streakPanel).toContainText(/Racha actual\s*0 días/);
+    expect(await sawAtRisk()).toBe(false);
   });
 });

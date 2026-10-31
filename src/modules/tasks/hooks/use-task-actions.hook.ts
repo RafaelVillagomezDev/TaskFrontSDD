@@ -102,6 +102,8 @@ export function useTaskActions(onEdit: (task: Task) => void) {
       setCompleted(task, !task.completed);
     },
     isUpdating: (id: string) => updatingIds.has(id),
+    // Hay un completar o desmarcar sin guardar: el progreso de hoy es optimista (D-7) y la racha aún no se recalcula
+    isSavingCompletion: updatingIds.size > 0,
     keepsFocus: (id: string) => id === focusedTaskId,
     requestDelete: (task: Task) => {
       setPendingDelete(task);

@@ -1,26 +1,11 @@
 {
-  // Código de la aplicación, sus tests y las E2E (CONSTITUTION.md, principio IV.1: strict sin desactivar nada)
-  "compilerOptions": {
-    "target": "ES2022",
-    "lib": ["ES2023", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    "noImplicitOverride": true,
-    "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "erasableSyntaxOnly": true,
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "noEmit": true,
-    "types": ["vite/client", "jest", "@testing-library/jest-dom"]
-  },
-  "include": ["src", "jest"]
+  // Índice para el editor: TypeScript busca el tsconfig.json más cercano y, por estas referencias, encuentra la
+  // configuración de cada fichero. Sin él, e2e/ y los *.config.ts se comprobaban sin los tipos de Node.
+  // `pnpm typecheck` comprueba cada configuración por separado
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" },
+    { "path": "./tsconfig.e2e.json" }
+  ]
 }

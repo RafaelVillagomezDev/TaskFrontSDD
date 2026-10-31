@@ -6,7 +6,7 @@ const config: Config = {
   testEnvironment: '<rootDir>/jest/jsdom-fetch.environment.js',
   extensionsToTreatAsEsm: ['.ts', '.tsx'],
   transform: {
-    '^.+\\.tsx?$': ['ts-jest', { useESM: true, tsconfig: 'tsconfig.json' }],
+    '^.+\\.tsx?$': ['ts-jest', { useESM: true, tsconfig: 'tsconfig.app.json' }],
   },
   moduleNameMapper: {
     // Los estilos no se evalúan en los tests

@@ -67,6 +67,7 @@
 ├── .githooks/                 # pre-commit (README vivo) y pre-push (E2E de Chromium + quality gate)
 ├── jest/                      # Entorno jsdom con el fetch de Node, setup y utilidades de test (mockApi, render con store y router)
 ├── vite.config.ts · jest.config.ts · playwright.config.ts
+├── tsconfig.json              # Índice para el editor: referencia tsconfig.app.json (app y Jest), tsconfig.node.json (*.config.ts) y tsconfig.e2e.json
 ├── .env.example               # Variables sin valor (versionado)
 ├── .claude/ · .claudeignore   # Configuración de Claude Code (permisos, hooks, skills)
 └── CLAUDE.MD                  # Reglas para Claude Code (importa AGENTS.md)
@@ -137,7 +138,7 @@ docker build -f Dockerfile.prod --build-arg VITE_API_URL=https://apikompitu.yand
 - Corre en su propio compose en **:9001**, para convivir con el de TaskApiSDD (:9000). El scanner es una imagen de Docker, así que nada se añade a `package.json`.
 - SonarQube Community no distingue ramas, así que cada rama tiene su propio proyecto `taskfrontsdd-<rama>`, con el quality gate predeterminado «TaskFrontSDD».
 - `sonar-setup.sh` crea también el perfil de calidad CSS «TaskFrontSDD», en el que la regla `css:S4662` reconoce las directivas de Tailwind v4 (`@theme`, `@utility`, `@custom-variant`…).
-- El análisis usa `tsconfig.sonar.json`, una copia de `tsconfig.json` sin `erasableSyntaxOnly`, que el TypeScript integrado de SonarQube 10.7 no reconoce.
+- El análisis usa `tsconfig.sonar.json`, una copia de `tsconfig.app.json` sin `erasableSyntaxOnly`, que el TypeScript integrado de SonarQube 10.7 no reconoce.
 ```bash
 docker compose -f docker-compose.sonar.yml up -d sonarqube   # Levantar SonarQube
 ./scripts/sonar-setup.sh                                     # Primera vez: admin, quality gate y token

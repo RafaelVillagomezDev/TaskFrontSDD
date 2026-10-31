@@ -66,7 +66,7 @@ export function useHistory() {
   else if (isError) status = 'error';
 
   // Unos filtros nuevos empiezan en la primera página
-  const onSubmit = useSingleSubmit( 
+  const onSubmit = useSingleSubmit(
     form.handleSubmit((values) => {
       setSearchParams(urlFor(values, FIRST_PAGE));
     }),

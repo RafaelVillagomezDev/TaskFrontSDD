@@ -1,6 +1,6 @@
 {
   // Solo para el análisis de SonarQube: su TypeScript integrado no reconoce erasableSyntaxOnly.
-  // Mismas opciones que tsconfig.json salvo esa; el tipado real lo comprueba `pnpm typecheck`
+  // Mismas opciones que tsconfig.app.json salvo esa; el tipado real lo comprueba `pnpm typecheck`
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2023", "DOM", "DOM.Iterable"],

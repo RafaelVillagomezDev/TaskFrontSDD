@@ -13,7 +13,7 @@
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0 --port 5173",
     "lint": "eslint .",
-    "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.node.json && tsc -p tsconfig.e2e.json",
+    "typecheck": "tsc -p tsconfig.app.json && tsc -p tsconfig.node.json && tsc -p tsconfig.e2e.json",
     "test": "TZ=America/Los_Angeles NODE_OPTIONS=--experimental-vm-modules jest",
     "test:watch": "TZ=America/Los_Angeles NODE_OPTIONS=--experimental-vm-modules jest --watch",
     "test:coverage": "TZ=America/Los_Angeles NODE_OPTIONS=--experimental-vm-modules jest --coverage",

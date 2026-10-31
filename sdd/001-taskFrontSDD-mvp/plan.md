@@ -49,7 +49,7 @@ La UI se construye con componentes headless de `src/shared/ui/` y piezas de layo
 | Archivo | Qué hace |
 | :--- | :--- |
 | `package.json`, `pnpm-lock.yaml` | Dependencias con versión exacta (sección 8). Scripts: `dev`, `build`, `preview`, `lint`, `typecheck`, `test`, `test:watch`, `test:coverage`, `test:e2e`, `test:e2e:report`. |
-| `tsconfig.json`, `tsconfig.node.json` | `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `erasableSyntaxOnly`, `verbatimModuleSyntax`. |
+| `tsconfig.app.json`, `tsconfig.node.json`, `tsconfig.e2e.json` | `strict`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes`, `erasableSyntaxOnly`, `verbatimModuleSyntax`. `tsconfig.json` solo las referencia, para que el editor encuentre la de cada fichero. |
 | `vite.config.ts` | Plugins `@vitejs/plugin-react` y `@tailwindcss/vite`; servidor en `0.0.0.0:5173`. |
 | `eslint.config.js` | `typescript-eslint` estricto, `react-hooks` y las reglas de `AGENTS.md` §8 como error; desactiva `consistent-type-assertions` solo en tests. |
 | `.prettierrc` | Formato del proyecto. |
@@ -380,3 +380,4 @@ Todas con versión exacta publicada hace al menos dos semanas. Se instalan dentr
 - **2026-10-30** — §5.5: el progreso de hoy lo calcula `use-week-board` y se pasa a `use-streak-panel`, para que `streaks` no importe de `tasks` (evita una dependencia circular entre módulos). Se añade `getDayTasks`.
 - **2026-10-30** — §5.5: el aviso de racha en juego espera a la racha recalculada (clarificación de RF-27 por un bug de parpadeo; T115).
 - **2026-10-31** — §4: el historial da la etiqueta `{ type: 'Task', id: 'HISTORY' }`; completar o desmarcar la invalida junto a `Streak`, porque el historial no recibe el cambio optimista (T116).
+- **2026-10-31** — §3: `tsconfig.json` pasa a ser un índice con referencias a `tsconfig.app.json` (la app, antes `tsconfig.json`), `tsconfig.node.json` y `tsconfig.e2e.json`. El editor comprobaba `e2e/` y los `*.config.ts` sin los tipos de Node.

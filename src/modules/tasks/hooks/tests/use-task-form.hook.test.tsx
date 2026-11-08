@@ -1,9 +1,9 @@
 import { jest } from '@jest/globals';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
-import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
-import { appWrapper, freshStore } from '../../../../../jest/render-app';
-import { sessionStarted } from '../../../auth';
+import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
+import { appWrapper, freshStore } from '@test-utils/render-app';
+import { sessionStarted } from '@modules/auth';
 import type { Task } from '../../schemas/task.schema';
 import { useTaskForm } from '../use-task-form.hook';
 

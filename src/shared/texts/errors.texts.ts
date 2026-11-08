@@ -1,4 +1,4 @@
-import type { ApiErrorCode } from '../api/api-error.util';
+import type { ApiErrorCode } from '@shared/api/api-error.util';
 
 // Un mensaje por cada código de error, en español y sin el código técnico (spec RF-41, RNF-01)
 export const ERROR_MESSAGES: Record<ApiErrorCode, string> = {

@@ -1,4 +1,4 @@
-import { addDays, todayKey } from '../../src/shared/date/day.util';
+import { addDays, todayKey } from '@shared/date/day.util';
 import { createTasks } from '../fixtures/api-client';
 import { expect, test as authTest } from '../fixtures/auth.fixture';
 import { expectResponsive } from '../fixtures/responsive.fixture';

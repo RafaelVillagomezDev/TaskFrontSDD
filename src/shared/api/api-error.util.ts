@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ERROR_MESSAGES } from '../texts/errors.texts';
+import { ERROR_MESSAGES } from '@shared/texts/errors.texts';
 import { apiErrorEnvelopeSchema } from './api-envelope.schema';
 
 // Códigos de error de TaskApiSDD (API-001 y API-002) más los del propio cliente: sin red o respuesta inesperada

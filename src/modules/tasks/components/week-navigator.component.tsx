@@ -1,9 +1,9 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-import { formatShortDate } from '../../../shared/date/date-format.util';
-import { Button } from '../../../shared/ui/button.component';
-import { Icon } from '../../../shared/ui/icon.component';
-import { Text } from '../../../shared/ui/text.component';
+import { formatShortDate } from '@shared/date/date-format.util';
+import { Button } from '@shared/ui/button.component';
+import { Icon } from '@shared/ui/icon.component';
+import { Text } from '@shared/ui/text.component';
 import { TASKS_TEXTS } from '../texts/tasks.texts';
 
 interface WeekNavigatorProps {

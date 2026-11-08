@@ -1,10 +1,10 @@
-import { EmptyState } from '../../../shared/layout/empty-state.component';
-import { PageContainer } from '../../../shared/layout/page-container.layout';
-import { PageHeader } from '../../../shared/layout/page-header.component';
-import { ErrorMessage } from '../../../shared/ui/error-message.component';
-import { Pagination } from '../../../shared/ui/pagination.component';
-import { Spinner } from '../../../shared/ui/spinner.component';
-import { Text } from '../../../shared/ui/text.component';
+import { EmptyState } from '@shared/layout/empty-state.component';
+import { PageContainer } from '@shared/layout/page-container.layout';
+import { PageHeader } from '@shared/layout/page-header.component';
+import { ErrorMessage } from '@shared/ui/error-message.component';
+import { Pagination } from '@shared/ui/pagination.component';
+import { Spinner } from '@shared/ui/spinner.component';
+import { Text } from '@shared/ui/text.component';
 import { AlertItem } from '../components/alert-item.component';
 import { useAlertsPage, type AlertsPageModel } from '../hooks/use-alerts-page.hook';
 import { ALERTS_TEXTS } from '../texts/alerts.texts';

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-import { COMMON_TEXTS } from '../texts/common.texts';
+import { COMMON_TEXTS } from '@shared/texts/common.texts';
 import { Button } from './button.component';
 import { Icon } from './icon.component';
 import { Text } from './text.component';

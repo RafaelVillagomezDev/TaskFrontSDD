@@ -1,4 +1,4 @@
-import { sessionStarted } from '../../../modules/auth';
+import { sessionStarted } from '@modules/auth';
 import { createAppStore } from '../store';
 
 describe('createAppStore', () => {

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { Box } from '../ui/box.component';
+import { Box } from '@shared/ui/box.component';
 
 interface EmptyStateProps {
   children: ReactNode;

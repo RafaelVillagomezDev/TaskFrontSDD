@@ -1,11 +1,11 @@
-import { formatDayLong } from '../../../shared/date/date-format.util';
-import { toDayKey } from '../../../shared/date/day.util';
-import { Box } from '../../../shared/ui/box.component';
-import { Button } from '../../../shared/ui/button.component';
-import { ErrorMessage } from '../../../shared/ui/error-message.component';
-import { Input } from '../../../shared/ui/input.component';
-import { Notice } from '../../../shared/ui/notice.component';
-import { Text } from '../../../shared/ui/text.component';
+import { formatDayLong } from '@shared/date/date-format.util';
+import { toDayKey } from '@shared/date/day.util';
+import { Box } from '@shared/ui/box.component';
+import { Button } from '@shared/ui/button.component';
+import { ErrorMessage } from '@shared/ui/error-message.component';
+import { Input } from '@shared/ui/input.component';
+import { Notice } from '@shared/ui/notice.component';
+import { Text } from '@shared/ui/text.component';
 import type { ProfileForm as ProfileFormModel } from '../hooks/use-profile-form.hook';
 import { ACCOUNT_TEXTS } from '../texts/account.texts';
 

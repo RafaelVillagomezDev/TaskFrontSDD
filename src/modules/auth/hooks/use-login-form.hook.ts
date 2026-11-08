@@ -3,9 +3,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type UseFormReturn } from 'react-hook-form';
 import { useLocation, useSearchParams } from 'react-router';
 
-import { errorMessage, toApiError } from '../../../shared/api/api-error.util';
-import { REASON_PARAM } from '../../../shared/router/routes.constants';
-import { useSingleSubmit } from '../../../shared/ui/use-single-submit.hook';
+import { errorMessage, toApiError } from '@shared/api/api-error.util';
+import { REASON_PARAM } from '@shared/router/routes.constants';
+import { useSingleSubmit } from '@shared/ui/use-single-submit.hook';
 import { useLoginMutation } from '../api/auth.api';
 import { loginSchema, type LoginValues } from '../schemas/login.schema';
 import { loginEntry, type LoginNotice } from './login-notice.util';

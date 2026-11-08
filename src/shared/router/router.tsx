@@ -1,9 +1,9 @@
 import { Navigate, type RouteObject } from 'react-router';
 
-import { AccountPage } from '../../modules/account';
-import { AlertsPage } from '../../modules/alerts';
-import { LoginPage, RegisterPage } from '../../modules/auth';
-import { BoardPage, HistoryPage } from '../../modules/tasks';
+import { AccountPage } from '@modules/account';
+import { AlertsPage } from '@modules/alerts';
+import { LoginPage, RegisterPage } from '@modules/auth';
+import { BoardPage, HistoryPage } from '@modules/tasks';
 import { PrivateLayout } from './private.layout';
 import { ProtectedRoute } from './protected-route.component';
 import { ROUTES } from './routes.constants';

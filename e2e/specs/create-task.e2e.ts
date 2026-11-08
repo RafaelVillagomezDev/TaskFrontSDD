@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
 
-import { formatDayLong } from '../../src/shared/date/date-format.util';
-import { addDays, todayKey } from '../../src/shared/date/day.util';
+import { formatDayLong } from '@shared/date/date-format.util';
+import { addDays, todayKey } from '@shared/date/day.util';
 import { expectResponsive } from '../fixtures/responsive.fixture';
 import { expect, test } from '../fixtures/tasks.fixture';
 import { TaskFormDialog } from '../pages/task-form.po';

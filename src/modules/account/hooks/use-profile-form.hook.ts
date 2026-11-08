@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-import { showApiError } from '../../../shared/api/api-form-error.util';
-import { useAppSelector } from '../../../shared/store/hooks';
-import { useSingleSubmit } from '../../../shared/ui/use-single-submit.hook';
-import { selectCurrentUser } from '../../auth';
+import { showApiError } from '@shared/api/api-form-error.util';
+import { useAppSelector } from '@shared/store/hooks';
+import { useSingleSubmit } from '@shared/ui/use-single-submit.hook';
+import { selectCurrentUser } from '@modules/auth';
 import { useUpdateProfileMutation } from '../api/account.api';
 import { profileSchema, type ProfileValues } from '../schemas/profile.schema';
 import { ACCOUNT_TEXTS } from '../texts/account.texts';

@@ -1,9 +1,9 @@
-import { formatDayLong } from '../../../shared/date/date-format.util';
-import { EmptyState } from '../../../shared/layout/empty-state.component';
-import { ErrorMessage } from '../../../shared/ui/error-message.component';
-import { Pagination } from '../../../shared/ui/pagination.component';
-import { Spinner } from '../../../shared/ui/spinner.component';
-import { Text } from '../../../shared/ui/text.component';
+import { formatDayLong } from '@shared/date/date-format.util';
+import { EmptyState } from '@shared/layout/empty-state.component';
+import { ErrorMessage } from '@shared/ui/error-message.component';
+import { Pagination } from '@shared/ui/pagination.component';
+import { Spinner } from '@shared/ui/spinner.component';
+import { Text } from '@shared/ui/text.component';
 import type { History } from '../hooks/use-history.hook';
 import { TASKS_TEXTS } from '../texts/tasks.texts';
 import { TaskCard } from './task-card.component';

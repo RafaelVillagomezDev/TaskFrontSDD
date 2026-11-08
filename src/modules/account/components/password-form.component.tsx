@@ -1,9 +1,9 @@
-import { Box } from '../../../shared/ui/box.component';
-import { Button } from '../../../shared/ui/button.component';
-import { ErrorMessage } from '../../../shared/ui/error-message.component';
-import { Notice } from '../../../shared/ui/notice.component';
-import { PasswordInput } from '../../../shared/ui/password-input.component';
-import { Text } from '../../../shared/ui/text.component';
+import { Box } from '@shared/ui/box.component';
+import { Button } from '@shared/ui/button.component';
+import { ErrorMessage } from '@shared/ui/error-message.component';
+import { Notice } from '@shared/ui/notice.component';
+import { PasswordInput } from '@shared/ui/password-input.component';
+import { Text } from '@shared/ui/text.component';
 import type { PasswordForm as PasswordFormModel } from '../hooks/use-password-form.hook';
 import { ACCOUNT_TEXTS } from '../texts/account.texts';
 

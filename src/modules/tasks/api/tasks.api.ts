@@ -1,11 +1,11 @@
 import { z } from 'zod';
 
-import { toApiError, type ApiErrorCode } from '../../../shared/api/api-error.util';
-import { baseApi } from '../../../shared/api/base.api';
-import { validatedResult, type ApiResult, type BoundBaseQuery } from '../../../shared/api/validated-result.util';
-import { addDays } from '../../../shared/date/day.util';
+import { toApiError, type ApiErrorCode } from '@shared/api/api-error.util';
+import { baseApi } from '@shared/api/base.api';
+import { validatedResult, type ApiResult, type BoundBaseQuery } from '@shared/api/validated-result.util';
+import { addDays } from '@shared/date/day.util';
 import type { TaskFormValues } from '../schemas/task-form.schema';
-import type { Page } from '../../../shared/api/api-envelope.schema';
+import type { Page } from '@shared/api/api-envelope.schema';
 import type { HistoryStatus } from '../schemas/history-filters.schema';
 import { taskPageSchema, taskSchema, type Task } from '../schemas/task.schema';
 import { FIRST_PAGE, HISTORY_PAGE_SIZE, WEEK_LENGTH, WEEK_PAGE_SIZE } from '../schemas/tasks.constants';

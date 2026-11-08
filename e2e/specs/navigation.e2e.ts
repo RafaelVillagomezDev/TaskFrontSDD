@@ -1,5 +1,5 @@
-import { addDays, todayKey } from '../../src/shared/date/day.util';
-import { formatShortDate } from '../../src/shared/date/date-format.util';
+import { addDays, todayKey } from '@shared/date/day.util';
+import { formatShortDate } from '@shared/date/date-format.util';
 import { expect, test as authTest } from '../fixtures/auth.fixture';
 import { test } from '../fixtures/tasks.fixture';
 import { AppShell } from '../pages/app-shell.po';

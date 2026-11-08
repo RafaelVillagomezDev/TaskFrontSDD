@@ -1,7 +1,7 @@
 import { request, type APIRequestContext } from '@playwright/test';
 import { z } from 'zod';
 
-import { buildClientTimeHeaders } from '../../src/shared/api/client-time.util';
+import { buildClientTimeHeaders } from '@shared/api/client-time.util';
 
 const csrfResponseSchema = z.object({ data: z.object({ csrfToken: z.string() }) });
 

@@ -3,9 +3,9 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 
-import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
-import { freshStore } from '../../../../../jest/render-app';
-import { sessionStarted } from '../../../auth';
+import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
+import { freshStore } from '@test-utils/render-app';
+import { sessionStarted } from '@modules/auth';
 import { usePasswordForm } from '../../hooks/use-password-form.hook';
 import { PasswordForm } from '../password-form.component';
 

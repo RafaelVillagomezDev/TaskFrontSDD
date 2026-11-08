@@ -52,6 +52,22 @@ export default tseslint.config(
       'no-nested-ternary': 'error',
       'max-params': ['error', 4],
       'no-warning-comments': ['error', { terms: ['todo', 'fixme'], location: 'start' }],
+      // AGENTS.md §4: fuera de su propia carpeta se importa con alias, nunca con ../../shared o ../../modules
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['**/shared/**', '**/modules/**', '**/jest/**', '**/src/**'],
+              message: 'Usa el alias: @shared/…, @modules/<módulo> o @test-utils/… (AGENTS.md §4).',
+            },
+            {
+              group: ['@modules/*/**'],
+              message: 'Importa solo el index.ts público del módulo: @modules/<módulo> (CONSTITUTION.md).',
+            },
+          ],
+        },
+      ],
     },
   },
   {

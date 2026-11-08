@@ -1,8 +1,8 @@
 import { Plus } from 'lucide-react';
 
-import { formatDayLong } from '../../../shared/date/date-format.util';
-import { Button } from '../../../shared/ui/button.component';
-import { Icon } from '../../../shared/ui/icon.component';
+import { formatDayLong } from '@shared/date/date-format.util';
+import { Button } from '@shared/ui/button.component';
+import { Icon } from '@shared/ui/icon.component';
 import { TASKS_TEXTS } from '../texts/tasks.texts';
 
 interface AddTaskButtonProps {

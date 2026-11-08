@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router';
 
-import { Button } from '../../../shared/ui/button.component';
-import { Text } from '../../../shared/ui/text.component';
+import { Button } from '@shared/ui/button.component';
+import { Text } from '@shared/ui/text.component';
 
 interface AuthSwitchProps {
   to: string;

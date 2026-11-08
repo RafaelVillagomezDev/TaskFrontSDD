@@ -3,10 +3,10 @@
  */
 import { jest } from '@jest/globals';
 
-import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
-import { toApiError } from '../../../../shared/api/api-error.util';
-import { baseApi } from '../../../../shared/api/base.api';
-import { createAppStore, type AppStore } from '../../../../shared/store/store';
+import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
+import { toApiError } from '@shared/api/api-error.util';
+import { baseApi } from '@shared/api/base.api';
+import { createAppStore, type AppStore } from '@shared/store/store';
 import { streaksApi } from '../streaks.api';
 
 let store: AppStore;

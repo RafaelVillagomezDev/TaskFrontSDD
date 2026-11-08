@@ -1,14 +1,14 @@
 import { Plus } from 'lucide-react';
 
-import { PageContainer } from '../../../shared/layout/page-container.layout';
-import { PageHeader } from '../../../shared/layout/page-header.component';
-import { Button } from '../../../shared/ui/button.component';
-import { ErrorMessage } from '../../../shared/ui/error-message.component';
-import { Icon } from '../../../shared/ui/icon.component';
-import { Notice } from '../../../shared/ui/notice.component';
-import { Spinner } from '../../../shared/ui/spinner.component';
-import { TodaysAlertBanner, useTodaysAlert } from '../../alerts';
-import { StreakPanel, useStreakPanel } from '../../streaks';
+import { PageContainer } from '@shared/layout/page-container.layout';
+import { PageHeader } from '@shared/layout/page-header.component';
+import { Button } from '@shared/ui/button.component';
+import { ErrorMessage } from '@shared/ui/error-message.component';
+import { Icon } from '@shared/ui/icon.component';
+import { Notice } from '@shared/ui/notice.component';
+import { Spinner } from '@shared/ui/spinner.component';
+import { TodaysAlertBanner, useTodaysAlert } from '@modules/alerts';
+import { StreakPanel, useStreakPanel } from '@modules/streaks';
 import { AddTaskButton } from '../components/add-task-button.component';
 import { DayColumn } from '../components/day-column.component';
 import { DeleteTaskDialog } from '../components/delete-task-dialog.component';

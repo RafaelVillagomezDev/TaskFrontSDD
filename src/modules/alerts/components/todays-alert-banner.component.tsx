@@ -1,9 +1,9 @@
 import { Bell } from 'lucide-react';
 import { Link } from 'react-router';
 
-import { ROUTES } from '../../../shared/router/routes.constants';
-import { Button } from '../../../shared/ui/button.component';
-import { Icon } from '../../../shared/ui/icon.component';
+import { ROUTES } from '@shared/router/routes.constants';
+import { Button } from '@shared/ui/button.component';
+import { Icon } from '@shared/ui/icon.component';
 import type { Alert } from '../schemas/alert.schema';
 import { ALERTS_TEXTS } from '../texts/alerts.texts';
 

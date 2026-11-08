@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react';
 import { Bell, LayoutDashboard, ListChecks, UserRound } from 'lucide-react';
 
-import { ROUTES } from '../router/routes.constants';
-import { NAVIGATION_TEXTS } from '../texts/navigation.texts';
-import { Text } from '../ui/text.component';
+import { ROUTES } from '@shared/router/routes.constants';
+import { NAVIGATION_TEXTS } from '@shared/texts/navigation.texts';
+import { Text } from '@shared/ui/text.component';
 import { NavItem } from './nav-item.component';
 import { useMainNavigation } from './use-main-navigation.hook';
 

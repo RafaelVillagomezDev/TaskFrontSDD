@@ -1,6 +1,6 @@
-import type { Page } from '../../../shared/api/api-envelope.schema';
-import { baseApi } from '../../../shared/api/base.api';
-import { validatedResult } from '../../../shared/api/validated-result.util';
+import type { Page } from '@shared/api/api-envelope.schema';
+import { baseApi } from '@shared/api/base.api';
+import { validatedResult } from '@shared/api/validated-result.util';
 import { alertPageSchema, type Alert } from '../schemas/alert.schema';
 import { ALERTS_PAGE_SIZE, LATEST_ALERT_QUERY } from '../schemas/alerts.constants';
 

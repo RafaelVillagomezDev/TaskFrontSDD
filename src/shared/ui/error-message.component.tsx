@@ -1,6 +1,6 @@
 import { CircleAlert, X } from 'lucide-react';
 
-import { COMMON_TEXTS } from '../texts/common.texts';
+import { COMMON_TEXTS } from '@shared/texts/common.texts';
 import { Box } from './box.component';
 import { Button } from './button.component';
 import { Icon } from './icon.component';

@@ -23,6 +23,8 @@ export default defineConfig({
   testDir: './e2e/specs',
   testMatch: '**/*.e2e.ts',
   globalSetup: './e2e/global-setup.ts',
+  // Resuelve el alias @shared/* de las E2E (tsconfig.json raíz solo tiene referencias)
+  tsconfig: './tsconfig.e2e.json',
   reporter: [['list'], ['html', { open: 'never' }]],
   use: {
     // El contenedor e2e usa la red del host: misma URL que en el navegador del desarrollador (plan R-2)

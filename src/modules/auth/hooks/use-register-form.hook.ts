@@ -3,10 +3,10 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, type UseFormReturn } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
-import { errorMessage, toApiError } from '../../../shared/api/api-error.util';
-import { showApiError } from '../../../shared/api/api-form-error.util';
-import { ROUTES } from '../../../shared/router/routes.constants';
-import { useSingleSubmit } from '../../../shared/ui/use-single-submit.hook';
+import { errorMessage, toApiError } from '@shared/api/api-error.util';
+import { showApiError } from '@shared/api/api-form-error.util';
+import { ROUTES } from '@shared/router/routes.constants';
+import { useSingleSubmit } from '@shared/ui/use-single-submit.hook';
 import { useRegisterMutation } from '../api/auth.api';
 import { registerSchema, type RegisterValues } from '../schemas/register.schema';
 import type { RegisteredState } from './login-notice.util';

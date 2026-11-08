@@ -2,7 +2,7 @@ import { act, renderHook } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router';
 
-import { useRouterProbe } from '../../../../jest/render-app';
+import { useRouterProbe } from '@test-utils/render-app';
 import { useClampUrlPage, useUrlPage } from '../use-url-page.hook';
 
 function setup(url: string, totalPages?: number) {

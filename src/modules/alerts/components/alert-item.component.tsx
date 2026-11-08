@@ -1,7 +1,7 @@
-import { formatDayLong, formatShortDate, formatTime } from '../../../shared/date/date-format.util';
-import { toDayKey } from '../../../shared/date/day.util';
-import { Badge } from '../../../shared/ui/badge.component';
-import { Text } from '../../../shared/ui/text.component';
+import { formatDayLong, formatShortDate, formatTime } from '@shared/date/date-format.util';
+import { toDayKey } from '@shared/date/day.util';
+import { Badge } from '@shared/ui/badge.component';
+import { Text } from '@shared/ui/text.component';
 import type { Alert } from '../schemas/alert.schema';
 import { ALERTS_TEXTS } from '../texts/alerts.texts';
 

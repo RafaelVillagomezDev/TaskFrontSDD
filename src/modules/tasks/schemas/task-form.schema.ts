@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { compareDays, isDayKey } from '../../../shared/date/day.util';
+import { compareDays, isDayKey } from '@shared/date/day.util';
 import { TASKS_TEXTS } from '../texts/tasks.texts';
 import { DESCRIPTION_MAX_LENGTH, TITLE_MAX_LENGTH } from './tasks.constants';
 

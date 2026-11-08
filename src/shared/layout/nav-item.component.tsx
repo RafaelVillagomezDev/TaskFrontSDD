@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import { NavLink } from 'react-router';
 
-import { cn } from '../utils/class-names.util';
-import { Icon } from '../ui/icon.component';
+import { cn } from '@shared/utils/class-names.util';
+import { Icon } from '@shared/ui/icon.component';
 
 interface NavItemProps {
   to: string;

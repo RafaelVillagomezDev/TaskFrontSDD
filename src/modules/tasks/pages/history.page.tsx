@@ -1,5 +1,5 @@
-import { PageContainer } from '../../../shared/layout/page-container.layout';
-import { PageHeader } from '../../../shared/layout/page-header.component';
+import { PageContainer } from '@shared/layout/page-container.layout';
+import { PageHeader } from '@shared/layout/page-header.component';
 import { HistoryFilters } from '../components/history-filters.component';
 import { HistoryList } from '../components/history-list.component';
 import { useHistory } from '../hooks/use-history.hook';

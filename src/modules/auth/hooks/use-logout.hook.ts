@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 
-import { baseApi } from '../../../shared/api/base.api';
-import { ROUTES } from '../../../shared/router/routes.constants';
-import { useAppDispatch } from '../../../shared/store/hooks';
+import { baseApi } from '@shared/api/base.api';
+import { ROUTES } from '@shared/router/routes.constants';
+import { useAppDispatch } from '@shared/store/hooks';
 import { useLogoutMutation } from '../api/auth.api';
 import { sessionEnded } from '../store/auth.slice';
 

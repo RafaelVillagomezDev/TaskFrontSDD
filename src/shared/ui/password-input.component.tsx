@@ -1,7 +1,7 @@
 import { Eye, EyeOff } from 'lucide-react';
 
-import { COMMON_TEXTS } from '../texts/common.texts';
-import { cn } from '../utils/class-names.util';
+import { COMMON_TEXTS } from '@shared/texts/common.texts';
+import { cn } from '@shared/utils/class-names.util';
 import { Button } from './button.component';
 import { controlClassName, Field } from './field.component';
 import { Icon } from './icon.component';

@@ -1,6 +1,6 @@
 import type { ElementType } from 'react';
 
-import { cn } from '../utils/class-names.util';
+import { cn } from '@shared/utils/class-names.util';
 import type { PolymorphicProps } from './polymorphic.types';
 
 export type TextVariant = 'display' | 'h1' | 'h2' | 'h3' | 'h4' | 'body-lg' | 'body' | 'body-sm' | 'caption';

@@ -1,8 +1,8 @@
 import { jest } from '@jest/globals';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
-import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
-import { appWrapper, freshStore, useRouterProbe } from '../../../../../jest/render-app';
+import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
+import { appWrapper, freshStore, useRouterProbe } from '@test-utils/render-app';
 import { useRegisterForm } from '../use-register-form.hook';
 
 const USER = { id: 'u1', email: 'ana@example.com', name: 'Ana', createdAt: '2026-10-29T10:00:00.000Z' };

@@ -1,10 +1,10 @@
-import { COMMON_TEXTS } from '../../../shared/texts/common.texts';
-import { Box } from '../../../shared/ui/box.component';
-import { Button } from '../../../shared/ui/button.component';
-import { Dialog } from '../../../shared/ui/dialog.component';
-import { ErrorMessage } from '../../../shared/ui/error-message.component';
-import { PasswordInput } from '../../../shared/ui/password-input.component';
-import { Text } from '../../../shared/ui/text.component';
+import { COMMON_TEXTS } from '@shared/texts/common.texts';
+import { Box } from '@shared/ui/box.component';
+import { Button } from '@shared/ui/button.component';
+import { Dialog } from '@shared/ui/dialog.component';
+import { ErrorMessage } from '@shared/ui/error-message.component';
+import { PasswordInput } from '@shared/ui/password-input.component';
+import { Text } from '@shared/ui/text.component';
 import type { AccountDeletion } from '../hooks/use-delete-account.hook';
 import { ACCOUNT_TEXTS } from '../texts/account.texts';
 

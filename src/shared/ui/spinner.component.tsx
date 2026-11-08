@@ -1,6 +1,6 @@
 import { LoaderCircle } from 'lucide-react';
 
-import { COMMON_TEXTS } from '../texts/common.texts';
+import { COMMON_TEXTS } from '@shared/texts/common.texts';
 import { Icon } from './icon.component';
 
 interface SpinnerProps {

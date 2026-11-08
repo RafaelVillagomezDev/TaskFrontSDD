@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { cn } from '../utils/class-names.util';
+import { cn } from '@shared/utils/class-names.util';
 
 // Variantes de DESIGN.md (Badges / Tags); outline es la etiqueta de identificador del tablero (Layout Patterns)
 export type BadgeVariant = 'default' | 'primary' | 'success' | 'warning' | 'danger' | 'outline';

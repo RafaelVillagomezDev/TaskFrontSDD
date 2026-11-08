@@ -1,7 +1,7 @@
-import { COMMON_TEXTS } from '../../../shared/texts/common.texts';
-import { Button } from '../../../shared/ui/button.component';
-import { Dialog } from '../../../shared/ui/dialog.component';
-import { Text } from '../../../shared/ui/text.component';
+import { COMMON_TEXTS } from '@shared/texts/common.texts';
+import { Button } from '@shared/ui/button.component';
+import { Dialog } from '@shared/ui/dialog.component';
+import { Text } from '@shared/ui/text.component';
 import type { TaskDeletion } from '../hooks/use-task-actions.hook';
 import { TASKS_TEXTS } from '../texts/tasks.texts';
 

@@ -1,4 +1,4 @@
-import { toDayKey } from '../date/day.util';
+import { toDayKey } from '@shared/date/day.util';
 
 // Cabeceras de hora que exige TaskApiSDD en /tasks, /streak y /alerts (API-001 RF-31 a RF-33, plan D-3)
 export interface ClientTimeHeaders {

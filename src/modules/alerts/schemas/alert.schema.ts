@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { pageSchema } from '../../../shared/api/api-envelope.schema';
-import { isDayKey } from '../../../shared/date/day.util';
+import { pageSchema } from '@shared/api/api-envelope.schema';
+import { isDayKey } from '@shared/date/day.util';
 
 const dayKey = z.string().refine(isDayKey);
 

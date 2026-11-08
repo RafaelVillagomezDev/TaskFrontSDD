@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react';
 import { CircleCheck, Flame, Plus, Trophy, type LucideIcon } from 'lucide-react';
 
-import { cn } from '../../../shared/utils/class-names.util';
-import { Badge } from '../../../shared/ui/badge.component';
-import { Button } from '../../../shared/ui/button.component';
-import { ErrorMessage } from '../../../shared/ui/error-message.component';
-import { Icon } from '../../../shared/ui/icon.component';
-import { Spinner } from '../../../shared/ui/spinner.component';
-import { Text } from '../../../shared/ui/text.component';
+import { cn } from '@shared/utils/class-names.util';
+import { Badge } from '@shared/ui/badge.component';
+import { Button } from '@shared/ui/button.component';
+import { ErrorMessage } from '@shared/ui/error-message.component';
+import { Icon } from '@shared/ui/icon.component';
+import { Spinner } from '@shared/ui/spinner.component';
+import { Text } from '@shared/ui/text.component';
 import type { useStreakPanel } from '../hooks/use-streak-panel.hook';
 import { STREAKS_TEXTS } from '../texts/streaks.texts';
 

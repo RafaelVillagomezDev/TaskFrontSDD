@@ -1,10 +1,10 @@
 import { jest } from '@jest/globals';
 import { render, screen, within } from '@testing-library/react';
 
-import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
-import { AppUnderTest, freshStore, routerAt } from '../../../../../jest/render-app';
-import { sessionStarted } from '../../../auth';
-import { APP_ROUTES } from '../../../../shared/router/router';
+import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
+import { AppUnderTest, freshStore, routerAt } from '@test-utils/render-app';
+import { sessionStarted } from '@modules/auth';
+import { APP_ROUTES } from '@shared/router/router';
 
 const USER = { id: 'u1', email: 'ana@example.com', name: 'Ana', createdAt: '2026-10-29T10:00:00.000Z' };
 

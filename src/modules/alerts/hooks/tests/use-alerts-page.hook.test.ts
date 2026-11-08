@@ -1,8 +1,8 @@
 import { jest } from '@jest/globals';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
-import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
-import { appWrapper, freshStore, useRouterProbe } from '../../../../../jest/render-app';
+import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
+import { appWrapper, freshStore, useRouterProbe } from '@test-utils/render-app';
 import { useAlertsPage } from '../use-alerts-page.hook';
 
 const ALERT = {

@@ -3,9 +3,9 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 
-import { mockApi } from '../../../../../jest/mock-api';
-import { freshStore } from '../../../../../jest/render-app';
-import { sessionStarted } from '../../../auth';
+import { mockApi } from '@test-utils/mock-api';
+import { freshStore } from '@test-utils/render-app';
+import { sessionStarted } from '@modules/auth';
 import { useProfileForm } from '../../hooks/use-profile-form.hook';
 import { ProfileForm } from '../profile-form.component';
 

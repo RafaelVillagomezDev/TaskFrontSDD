@@ -4,9 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { MemoryRouter } from 'react-router';
 
-import { apiFail, mockApi } from '../../../../../jest/mock-api';
-import { freshStore } from '../../../../../jest/render-app';
-import { sessionStarted } from '../../../auth';
+import { apiFail, mockApi } from '@test-utils/mock-api';
+import { freshStore } from '@test-utils/render-app';
+import { sessionStarted } from '@modules/auth';
 import { useDeleteAccount } from '../../hooks/use-delete-account.hook';
 import { DeleteAccountDialog } from '../delete-account-dialog.component';
 

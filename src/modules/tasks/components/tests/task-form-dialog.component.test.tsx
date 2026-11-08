@@ -3,9 +3,9 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 
-import { apiOk, mockApi } from '../../../../../jest/mock-api';
-import { freshStore } from '../../../../../jest/render-app';
-import { sessionStarted } from '../../../auth';
+import { apiOk, mockApi } from '@test-utils/mock-api';
+import { freshStore } from '@test-utils/render-app';
+import { sessionStarted } from '@modules/auth';
 import { useTaskForm } from '../../hooks/use-task-form.hook';
 import { TaskFormDialog } from '../task-form-dialog.component';
 

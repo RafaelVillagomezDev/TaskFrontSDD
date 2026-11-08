@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from 'react-router';
 
-import { NAVIGATION_TEXTS } from '../texts/navigation.texts';
-import { Spinner } from '../ui/spinner.component';
+import { NAVIGATION_TEXTS } from '@shared/texts/navigation.texts';
+import { Spinner } from '@shared/ui/spinner.component';
 import { useRouteAccess, type RouteAccess } from './use-route-access.hook';
 
 interface ProtectedRouteProps {

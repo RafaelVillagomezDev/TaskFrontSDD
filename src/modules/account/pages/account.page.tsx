@@ -1,5 +1,5 @@
-import { PageContainer } from '../../../shared/layout/page-container.layout';
-import { PageHeader } from '../../../shared/layout/page-header.component';
+import { PageContainer } from '@shared/layout/page-container.layout';
+import { PageHeader } from '@shared/layout/page-header.component';
 import { DeleteAccountDialog } from '../components/delete-account-dialog.component';
 import { PasswordForm } from '../components/password-form.component';
 import { ProfileForm } from '../components/profile-form.component';

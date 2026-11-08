@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react';
 
-import { formatDayLong, formatShortDate, formatWeekday } from '../../../shared/date/date-format.util';
-import { BoardColumn } from '../../../shared/layout/board-column.component';
-import { EmptyState } from '../../../shared/layout/empty-state.component';
-import { Badge } from '../../../shared/ui/badge.component';
-import { Text } from '../../../shared/ui/text.component';
+import { formatDayLong, formatShortDate, formatWeekday } from '@shared/date/date-format.util';
+import { BoardColumn } from '@shared/layout/board-column.component';
+import { EmptyState } from '@shared/layout/empty-state.component';
+import { Badge } from '@shared/ui/badge.component';
+import { Text } from '@shared/ui/text.component';
 import type { TaskCardActions } from '../hooks/use-task-actions.hook';
 import type { DayColumnModel, DayKind } from '../hooks/use-week-board.hook';
 import type { Task } from '../schemas/task.schema';

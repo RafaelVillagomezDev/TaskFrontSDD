@@ -3,11 +3,11 @@
  */
 import { jest } from '@jest/globals';
 
-import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
-import { toApiError } from '../../../../shared/api/api-error.util';
-import { baseApi } from '../../../../shared/api/base.api';
-import { createAppStore, type AppStore } from '../../../../shared/store/store';
-import { selectCurrentUser, sessionStarted } from '../../../auth';
+import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
+import { toApiError } from '@shared/api/api-error.util';
+import { baseApi } from '@shared/api/base.api';
+import { createAppStore, type AppStore } from '@shared/store/store';
+import { selectCurrentUser, sessionStarted } from '@modules/auth';
 import { accountApi } from '../account.api';
 
 const USER = { id: 'u1', email: 'ana@example.com', name: null, createdAt: '2026-10-29T10:00:00.000Z' };

@@ -2,9 +2,9 @@ import { jest } from '@jest/globals';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
-import { AppUnderTest, freshStore, routerAt } from '../../../../../jest/render-app';
-import { APP_ROUTES } from '../../../../shared/router/router';
+import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
+import { AppUnderTest, freshStore, routerAt } from '@test-utils/render-app';
+import { APP_ROUTES } from '@shared/router/router';
 import { sessionEnded } from '../../store/auth.slice';
 
 const USER = { id: 'u1', email: 'ana@example.com', name: null, createdAt: '2026-10-29T10:00:00.000Z' };

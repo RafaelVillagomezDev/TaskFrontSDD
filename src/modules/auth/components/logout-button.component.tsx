@@ -1,7 +1,7 @@
 import { LogOut } from 'lucide-react';
 
-import { Button } from '../../../shared/ui/button.component';
-import { Icon } from '../../../shared/ui/icon.component';
+import { Button } from '@shared/ui/button.component';
+import { Icon } from '@shared/ui/icon.component';
 import { useLogout } from '../hooks/use-logout.hook';
 import { AUTH_TEXTS } from '../texts/auth.texts';
 

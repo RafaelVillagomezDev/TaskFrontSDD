@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
-import { cn } from '../utils/class-names.util';
+import { cn } from '@shared/utils/class-names.util';
 import { Box } from './box.component';
 import { useDialogContent, type DialogState } from './use-dialog.hook';
 

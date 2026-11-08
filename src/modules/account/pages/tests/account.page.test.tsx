@@ -2,10 +2,10 @@ import { jest } from '@jest/globals';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import { apiOk, mockApi } from '../../../../../jest/mock-api';
-import { AppUnderTest, freshStore, routerAt } from '../../../../../jest/render-app';
-import { sessionStarted } from '../../../auth';
-import { APP_ROUTES } from '../../../../shared/router/router';
+import { apiOk, mockApi } from '@test-utils/mock-api';
+import { AppUnderTest, freshStore, routerAt } from '@test-utils/render-app';
+import { sessionStarted } from '@modules/auth';
+import { APP_ROUTES } from '@shared/router/router';
 
 const USER = { id: 'u1', email: 'ana@example.com', name: null, createdAt: '2026-10-29T10:00:00.000Z' };
 

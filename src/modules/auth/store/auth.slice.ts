@@ -1,6 +1,6 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 
-import { sessionExpired } from '../../../shared/api/session.actions';
+import { sessionExpired } from '@shared/api/session.actions';
 import type { User } from '../schemas/user.schema';
 
 export type AuthStatus = 'unknown' | 'authenticated' | 'anonymous';

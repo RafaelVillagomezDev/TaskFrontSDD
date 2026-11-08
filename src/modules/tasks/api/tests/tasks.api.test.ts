@@ -3,11 +3,11 @@
  */
 import { jest } from '@jest/globals';
 
-import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
-import { toApiError } from '../../../../shared/api/api-error.util';
-import { baseApi } from '../../../../shared/api/base.api';
-import { createAppStore, type AppStore } from '../../../../shared/store/store';
-import { sessionStarted } from '../../../auth';
+import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
+import { toApiError } from '@shared/api/api-error.util';
+import { baseApi } from '@shared/api/base.api';
+import { createAppStore, type AppStore } from '@shared/store/store';
+import { sessionStarted } from '@modules/auth';
 import { tasksApi } from '../tasks.api';
 
 function task(id: string, date: string, completed = false) {

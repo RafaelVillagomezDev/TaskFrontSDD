@@ -1,6 +1,6 @@
 import type { FieldValues, Path, UseFormReturn } from 'react-hook-form';
 
-import { INVALID_FIELD_MESSAGE } from '../texts/errors.texts';
+import { INVALID_FIELD_MESSAGE } from '@shared/texts/errors.texts';
 import { errorMessage, toApiError } from './api-error.util';
 
 // Muestra un error de la API en un formulario sin borrar lo escrito (RF-41): cada campo que rechazó la API

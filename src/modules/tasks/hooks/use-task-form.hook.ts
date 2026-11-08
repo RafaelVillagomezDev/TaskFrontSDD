@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm, useWatch } from 'react-hook-form';
 
-import { showApiError } from '../../../shared/api/api-form-error.util';
-import { formatDayLong } from '../../../shared/date/date-format.util';
-import { compareDays } from '../../../shared/date/day.util';
-import { useSingleSubmit } from '../../../shared/ui/use-single-submit.hook';
+import { showApiError } from '@shared/api/api-form-error.util';
+import { formatDayLong } from '@shared/date/date-format.util';
+import { compareDays } from '@shared/date/day.util';
+import { useSingleSubmit } from '@shared/ui/use-single-submit.hook';
 import { useCreateTaskMutation, useUpdateTaskMutation } from '../api/tasks.api';
 import { createTaskFormSchema, editTaskFormSchema, type TaskFormValues } from '../schemas/task-form.schema';
 import type { Task } from '../schemas/task.schema';

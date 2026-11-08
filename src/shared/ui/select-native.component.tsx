@@ -1,6 +1,6 @@
 import type { ComponentPropsWithRef } from 'react';
 
-import { cn } from '../utils/class-names.util';
+import { cn } from '@shared/utils/class-names.util';
 import { controlClassName, Field } from './field.component';
 import { useFieldIds } from './use-field-ids.hook';
 

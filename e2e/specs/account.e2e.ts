@@ -1,5 +1,5 @@
-import { formatDayLong } from '../../src/shared/date/date-format.util';
-import { todayKey } from '../../src/shared/date/day.util';
+import { formatDayLong } from '@shared/date/date-format.util';
+import { todayKey } from '@shared/date/day.util';
 import { expect, test } from '../fixtures/tasks.fixture';
 import { expectResponsive } from '../fixtures/responsive.fixture';
 import { AccountPage } from '../pages/account.po';

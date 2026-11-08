@@ -4,8 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { MemoryRouter, useLocation } from 'react-router';
 
-import { apiOk, mockApi } from '../../../../../jest/mock-api';
-import { freshStore } from '../../../../../jest/render-app';
+import { apiOk, mockApi } from '@test-utils/mock-api';
+import { freshStore } from '@test-utils/render-app';
 import { useHistory } from '../../hooks/use-history.hook';
 import { HistoryFilters } from '../history-filters.component';
 

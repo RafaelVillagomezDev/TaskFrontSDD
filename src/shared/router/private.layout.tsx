@@ -1,16 +1,16 @@
 import { Menu, X } from 'lucide-react';
 import { Outlet } from 'react-router';
 
-import { LogoutButton } from '../../modules/auth';
-import { AppShell } from '../layout/app-shell.layout';
-import { MainNavigation } from '../layout/main-navigation.component';
-import { Navbar } from '../layout/navbar.component';
-import { Sidebar } from '../layout/sidebar.component';
-import { useNavigationDrawer } from '../layout/use-navigation-drawer.hook';
-import { NAVIGATION_TEXTS } from '../texts/navigation.texts';
-import { Drawer } from '../ui/drawer.component';
-import { Icon } from '../ui/icon.component';
-import { Text } from '../ui/text.component';
+import { LogoutButton } from '@modules/auth';
+import { AppShell } from '@shared/layout/app-shell.layout';
+import { MainNavigation } from '@shared/layout/main-navigation.component';
+import { Navbar } from '@shared/layout/navbar.component';
+import { Sidebar } from '@shared/layout/sidebar.component';
+import { useNavigationDrawer } from '@shared/layout/use-navigation-drawer.hook';
+import { NAVIGATION_TEXTS } from '@shared/texts/navigation.texts';
+import { Drawer } from '@shared/ui/drawer.component';
+import { Icon } from '@shared/ui/icon.component';
+import { Text } from '@shared/ui/text.component';
 
 // Shell de las pantallas privadas (plan §6.2): Sidebar desde lg; por debajo, Navbar con el menú en un Drawer
 export function PrivateLayout() {

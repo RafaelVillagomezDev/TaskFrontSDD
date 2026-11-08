@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { REASON_EXPIRED } from '../../../shared/router/routes.constants';
+import { REASON_EXPIRED } from '@shared/router/routes.constants';
 
 // Estado de navegación que deja el registro al llevar al inicio de sesión (RF-01). Se valida: llega como unknown
 const registeredStateSchema = z.object({ registered: z.literal(true), email: z.string() });

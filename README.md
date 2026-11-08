@@ -169,6 +169,7 @@ graphify query "<pregunta>"     # Consultar el grafo
 - Pruebas E2E con Playwright en `e2e/` para el login, crear tarea, eliminar tarea y cada input escribible. Las de Chromium bloquean el push, salvo en los push que solo cambian ficheros `.md`; las de Firefox se ejecutan al terminar cada tarea.
 - Las dudas de una spec se marcan con `[NEEDS CLARIFICATION]` y se resuelven antes de escribir el plan. Si el código y la spec no coinciden, manda la spec.
 - Los módulos solo se importan entre sí a través de su `index.ts` público.
+- Alias de importación: `@shared/…` (`src/shared/`), `@modules/<módulo>` (solo el `index.ts` del módulo) y `@test-utils/…` (`jest/`). Las rutas relativas quedan para la propia carpeta (el mismo módulo o la misma carpeta de `src/shared/`). Se definen en `tsconfig.app.json`, `tsconfig.sonar.json`, `tsconfig.e2e.json`, `vite.config.ts` y `jest.config.ts`, y ESLint (`no-restricted-imports`) rechaza `../../shared/…` y `@modules/<módulo>/…`.
 - Toda funcionalidad nueva empieza con su spec, plan y tasks en `sdd/`. No necesitan spec las correcciones de errores, los typos, la configuración, las actualizaciones de dependencias ni los cambios de documentación.
 - **Spec-anchored:** las specs no se descartan tras implementarlas; siguen describiendo el comportamiento vigente. Todo cambio de comportamiento actualiza primero la spec y luego el código, y cada RF tiene un test que cita su ID.
 - Solo tokens del sistema de diseño: sin valores arbitrarios de Tailwind.

@@ -1,6 +1,6 @@
 import type { Page, Route } from '@playwright/test';
 
-import { todayKey } from '../../src/shared/date/day.util';
+import { todayKey } from '@shared/date/day.util';
 import { expect, test } from '../fixtures/tasks.fixture';
 import { BoardPage } from '../pages/board.po';
 import { LoginPage } from '../pages/login.po';

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { cn } from '../utils/class-names.util';
+import { cn } from '@shared/utils/class-names.util';
 import { Text } from './text.component';
 import type { FieldIds } from './use-field-ids.hook';
 

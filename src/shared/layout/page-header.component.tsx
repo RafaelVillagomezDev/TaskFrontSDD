@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import { Text } from '../ui/text.component';
+import { Text } from '@shared/ui/text.component';
 
 interface PageHeaderProps {
   children: ReactNode;

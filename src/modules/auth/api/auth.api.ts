@@ -1,8 +1,8 @@
 import type { FetchArgs } from '@reduxjs/toolkit/query';
 import { z } from 'zod';
 
-import { baseApi } from '../../../shared/api/base.api';
-import { validatedResult, type ApiResult, type BoundBaseQuery } from '../../../shared/api/validated-result.util';
+import { baseApi } from '@shared/api/base.api';
+import { validatedResult, type ApiResult, type BoundBaseQuery } from '@shared/api/validated-result.util';
 import type { LoginValues } from '../schemas/login.schema';
 import type { RegisterValues } from '../schemas/register.schema';
 import { sessionSchema, userSchema, type Session, type User } from '../schemas/user.schema';

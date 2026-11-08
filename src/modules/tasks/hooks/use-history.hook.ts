@@ -3,9 +3,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router';
 
-import { errorMessage, toApiError } from '../../../shared/api/api-error.util';
-import { useClampUrlPage, useUrlPage } from '../../../shared/router/use-url-page.hook';
-import { useSingleSubmit } from '../../../shared/ui/use-single-submit.hook';
+import { errorMessage, toApiError } from '@shared/api/api-error.util';
+import { useClampUrlPage, useUrlPage } from '@shared/router/use-url-page.hook';
+import { useSingleSubmit } from '@shared/ui/use-single-submit.hook';
 import { useGetTasksQuery } from '../api/tasks.api';
 import { historyFiltersSchema, NO_HISTORY_FILTERS, type HistoryFilters } from '../schemas/history-filters.schema';
 import type { Task } from '../schemas/task.schema';

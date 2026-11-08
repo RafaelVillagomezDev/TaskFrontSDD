@@ -12,7 +12,12 @@ const config: Config = {
     // Los estilos no se evalúan en los tests
     '\\.css$': 'identity-obj-proxy',
     // import.meta.env no existe en Jest: env.ts se sustituye por un stub (plan R-3)
-    '^(\\.{1,2}/)+((shared/)?config/)?env$': '<rootDir>/jest/env.stub.ts',
+    // Va antes que el alias @shared/*, que la resolvería al env.ts real
+    '^(@shared/config/|(\\.{1,2}/)+((shared/)?config/)?)env$': '<rootDir>/jest/env.stub.ts',
+    // Alias de importación: los mismos que "paths" en tsconfig.app.json
+    '^@shared/(.*)$': '<rootDir>/src/shared/$1',
+    '^@modules/([^/]+)$': '<rootDir>/src/modules/$1/index.ts',
+    '^@test-utils/(.*)$': '<rootDir>/jest/$1',
   },
   setupFilesAfterEnv: ['<rootDir>/jest/setup.ts'],
   // Tests unitarios en las subcarpetas tests/ (AGENTS.md §2); las E2E son de Playwright

@@ -3,8 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { Provider } from 'react-redux';
 import { MemoryRouter, useLocation, useRoutes } from 'react-router';
 
-import { sessionCheckFailed, sessionEnded, sessionExpired, sessionStarted } from '../../../modules/auth';
-import { createAppStore } from '../../store/store';
+import { sessionCheckFailed, sessionEnded, sessionExpired, sessionStarted } from '@modules/auth';
+import { createAppStore } from '@shared/store/store';
 import { APP_ROUTES } from '../router';
 
 const USER = { id: 'u1', email: 'ana@example.com', name: 'Ana', createdAt: '2026-10-29T10:00:00.000Z' };

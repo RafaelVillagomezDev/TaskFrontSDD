@@ -1,6 +1,6 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 
-import { env } from '../config/env';
+import { env } from '@shared/config/env';
 import { createSessionBaseQuery } from './session-base-query';
 
 // API base única (plan D-2): cada módulo añade sus endpoints con injectEndpoints sobre una sola caché

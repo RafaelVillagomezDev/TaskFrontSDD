@@ -1,4 +1,4 @@
-import { errorMessage, toApiError } from '../../../shared/api/api-error.util';
+import { errorMessage, toApiError } from '@shared/api/api-error.util';
 import { useGetStreakQuery } from '../api/streaks.api';
 import type { TodayProgress } from '../types/streak.types';
 

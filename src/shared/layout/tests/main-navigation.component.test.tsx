@@ -5,8 +5,8 @@ import { Bell } from 'lucide-react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, Route, Routes, useNavigate } from 'react-router';
 
-import { sessionStarted } from '../../../modules/auth';
-import { createAppStore } from '../../store/store';
+import { sessionStarted } from '@modules/auth';
+import { createAppStore } from '@shared/store/store';
 import { MainNavigation } from '../main-navigation.component';
 import { NavItem } from '../nav-item.component';
 import { useNavigationDrawer } from '../use-navigation-drawer.hook';

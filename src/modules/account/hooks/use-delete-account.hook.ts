@@ -3,11 +3,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
-import { baseApi } from '../../../shared/api/base.api';
-import { ROUTES } from '../../../shared/router/routes.constants';
-import { useAppDispatch } from '../../../shared/store/hooks';
-import { useSingleSubmit } from '../../../shared/ui/use-single-submit.hook';
-import { sessionEnded } from '../../auth';
+import { baseApi } from '@shared/api/base.api';
+import { ROUTES } from '@shared/router/routes.constants';
+import { useAppDispatch } from '@shared/store/hooks';
+import { useSingleSubmit } from '@shared/ui/use-single-submit.hook';
+import { sessionEnded } from '@modules/auth';
 import { useDeleteAccountMutation } from '../api/account.api';
 import { deleteAccountSchema, type DeleteAccountValues } from '../schemas/delete-account.schema';
 import { showPasswordFormError } from './account-form-error.util';

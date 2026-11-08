@@ -1,7 +1,7 @@
 import type { ComponentPropsWithRef } from 'react';
 import { Check } from 'lucide-react';
 
-import { cn } from '../utils/class-names.util';
+import { cn } from '@shared/utils/class-names.util';
 import { Icon } from './icon.component';
 
 type CheckboxProps = Omit<ComponentPropsWithRef<'input'>, 'type'>;

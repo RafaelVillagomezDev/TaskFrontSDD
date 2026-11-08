@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react';
 import { Pencil, Trash2 } from 'lucide-react';
 
-import { Badge } from '../../../shared/ui/badge.component';
-import { Box } from '../../../shared/ui/box.component';
-import { Button } from '../../../shared/ui/button.component';
-import { Checkbox } from '../../../shared/ui/checkbox.component';
-import { Icon } from '../../../shared/ui/icon.component';
-import { Text } from '../../../shared/ui/text.component';
-import { cn } from '../../../shared/utils/class-names.util';
+import { Badge } from '@shared/ui/badge.component';
+import { Box } from '@shared/ui/box.component';
+import { Button } from '@shared/ui/button.component';
+import { Checkbox } from '@shared/ui/checkbox.component';
+import { Icon } from '@shared/ui/icon.component';
+import { Text } from '@shared/ui/text.component';
+import { cn } from '@shared/utils/class-names.util';
 import type { Task } from '../schemas/task.schema';
 import { TASKS_TEXTS } from '../texts/tasks.texts';
 

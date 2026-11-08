@@ -1,9 +1,9 @@
 import { jest } from '@jest/globals';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
-import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
-import { appWrapper, freshStore } from '../../../../../jest/render-app';
-import { baseApi } from '../../../../shared/api/base.api';
+import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
+import { appWrapper, freshStore } from '@test-utils/render-app';
+import { baseApi } from '@shared/api/base.api';
 import type { TodayProgress } from '../../types/streak.types';
 import { useStreakPanel } from '../use-streak-panel.hook';
 

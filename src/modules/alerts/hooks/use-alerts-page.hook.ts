@@ -1,5 +1,5 @@
-import { errorMessage, toApiError } from '../../../shared/api/api-error.util';
-import { useClampUrlPage, useUrlPage } from '../../../shared/router/use-url-page.hook';
+import { errorMessage, toApiError } from '@shared/api/api-error.util';
+import { useClampUrlPage, useUrlPage } from '@shared/router/use-url-page.hook';
 import { useGetAlertsQuery } from '../api/alerts.api';
 import type { Alert } from '../schemas/alert.schema';
 

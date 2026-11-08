@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
 
-import { formatDayLong } from '../../src/shared/date/date-format.util';
+import { formatDayLong } from '@shared/date/date-format.util';
 
 // Page object del tablero semanal: solo localizadores accesibles (AGENTS.md §2)
 export class BoardPage {

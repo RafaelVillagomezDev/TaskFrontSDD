@@ -17,7 +17,13 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["vite/client", "jest", "@testing-library/jest-dom"]
+    "types": ["vite/client", "jest", "@testing-library/jest-dom"],
+    // Alias de importación (AGENTS.md §4): @modules/x solo resuelve al index.ts público del módulo
+    "paths": {
+      "@shared/*": ["./src/shared/*"],
+      "@modules/*": ["./src/modules/*/index.ts"],
+      "@test-utils/*": ["./jest/*"]
+    }
   },
   "include": ["src", "jest"]
 }

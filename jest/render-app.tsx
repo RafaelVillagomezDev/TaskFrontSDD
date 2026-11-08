@@ -9,7 +9,7 @@ import {
   type RouteObject,
 } from 'react-router';
 
-import { createAppStore, type AppStore } from '../src/shared/store/store';
+import { createAppStore, type AppStore } from '@shared/store/store';
 
 // Store real y router en memoria para los tests de hooks y páginas
 export function appWrapper(

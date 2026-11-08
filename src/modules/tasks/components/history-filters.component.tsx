@@ -1,6 +1,6 @@
-import { Button } from '../../../shared/ui/button.component';
-import { DateInput } from '../../../shared/ui/date-input.component';
-import { SelectNative } from '../../../shared/ui/select-native.component';
+import { Button } from '@shared/ui/button.component';
+import { DateInput } from '@shared/ui/date-input.component';
+import { SelectNative } from '@shared/ui/select-native.component';
 import type { History } from '../hooks/use-history.hook';
 import type { HistoryStatus } from '../schemas/history-filters.schema';
 import { TASKS_TEXTS } from '../texts/tasks.texts';

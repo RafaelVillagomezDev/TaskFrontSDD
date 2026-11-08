@@ -1,7 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
-import { authReducer } from '../../modules/auth';
-import { baseApi } from '../api/base.api';
+import { authReducer } from '@modules/auth';
+import { baseApi } from '@shared/api/base.api';
 
 // Store único (CONSTITUTION.md V.2): sesión en auth y estado de servidor solo en la caché de RTK Query
 export function createAppStore() {

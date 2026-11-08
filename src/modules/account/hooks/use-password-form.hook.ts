@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-import { useSingleSubmit } from '../../../shared/ui/use-single-submit.hook';
+import { useSingleSubmit } from '@shared/ui/use-single-submit.hook';
 import { useChangePasswordMutation } from '../api/account.api';
 import { passwordSchema, type PasswordValues } from '../schemas/password.schema';
 import { ACCOUNT_TEXTS } from '../texts/account.texts';

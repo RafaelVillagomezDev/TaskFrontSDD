@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { pageSchema } from '../../../shared/api/api-envelope.schema';
-import { isDayKey } from '../../../shared/date/day.util';
+import { pageSchema } from '@shared/api/api-envelope.schema';
+import { isDayKey } from '@shared/date/day.util';
 
 // Recurso Task de TaskApiSDD (API-001 «Recurso Task»)
 export const taskSchema = z.object({

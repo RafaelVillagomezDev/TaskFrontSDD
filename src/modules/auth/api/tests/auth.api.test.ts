@@ -3,9 +3,9 @@
  */
 import { jest } from '@jest/globals';
 
-import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
-import { toApiError } from '../../../../shared/api/api-error.util';
-import { createAppStore } from '../../../../shared/store/store';
+import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
+import { toApiError } from '@shared/api/api-error.util';
+import { createAppStore } from '@shared/store/store';
 import { sessionStarted } from '../../store/auth.slice';
 import { authApi } from '../auth.api';
 

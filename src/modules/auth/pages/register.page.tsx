@@ -1,10 +1,10 @@
-import { AuthLayout } from '../../../shared/layout/auth-layout.layout';
-import { ROUTES } from '../../../shared/router/routes.constants';
-import { Button } from '../../../shared/ui/button.component';
-import { ErrorMessage } from '../../../shared/ui/error-message.component';
-import { Input } from '../../../shared/ui/input.component';
-import { PasswordInput } from '../../../shared/ui/password-input.component';
-import { Text } from '../../../shared/ui/text.component';
+import { AuthLayout } from '@shared/layout/auth-layout.layout';
+import { ROUTES } from '@shared/router/routes.constants';
+import { Button } from '@shared/ui/button.component';
+import { ErrorMessage } from '@shared/ui/error-message.component';
+import { Input } from '@shared/ui/input.component';
+import { PasswordInput } from '@shared/ui/password-input.component';
+import { Text } from '@shared/ui/text.component';
 import { AuthSwitch } from '../components/auth-switch.component';
 import { useRegisterForm } from '../hooks/use-register-form.hook';
 import { AUTH_TEXTS } from '../texts/auth.texts';

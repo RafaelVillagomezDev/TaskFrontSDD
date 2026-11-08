@@ -1,8 +1,8 @@
 import { jest } from '@jest/globals';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
-import { apiFail, apiOk, mockApi } from '../../../../../jest/mock-api';
-import { appWrapper, freshStore } from '../../../../../jest/render-app';
+import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
+import { appWrapper, freshStore } from '@test-utils/render-app';
 import { useTodaysAlert } from '../use-todays-alert.hook';
 
 const NOON = new Date(2026, 9, 29, 12, 0, 0);

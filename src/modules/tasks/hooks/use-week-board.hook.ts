@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 
-import { errorMessage, toApiError } from '../../../shared/api/api-error.util';
-import { baseApi } from '../../../shared/api/base.api';
-import { addDays, compareDays, dayRange } from '../../../shared/date/day.util';
-import { useCurrentDay } from '../../../shared/date/use-current-day.hook';
-import { useAppDispatch } from '../../../shared/store/hooks';
-import type { TodayProgress } from '../../streaks';
+import { errorMessage, toApiError } from '@shared/api/api-error.util';
+import { baseApi } from '@shared/api/base.api';
+import { addDays, compareDays, dayRange } from '@shared/date/day.util';
+import { useCurrentDay } from '@shared/date/use-current-day.hook';
+import { useAppDispatch } from '@shared/store/hooks';
+import type { TodayProgress } from '@modules/streaks';
 import { useGetDayTasksQuery, useGetWeekTasksQuery } from '../api/tasks.api';
 import type { Task } from '../schemas/task.schema';
 import { WEEK_LENGTH } from '../schemas/tasks.constants';

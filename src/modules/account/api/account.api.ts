@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { baseApi } from '../../../shared/api/base.api';
-import { validatedResult } from '../../../shared/api/validated-result.util';
-import { userSchema, userUpdated, type User } from '../../auth';
+import { baseApi } from '@shared/api/base.api';
+import { validatedResult } from '@shared/api/validated-result.util';
+import { userSchema, userUpdated, type User } from '@modules/auth';
 import type { DeleteAccountValues } from '../schemas/delete-account.schema';
 import type { PasswordValues } from '../schemas/password.schema';
 import type { ProfileValues } from '../schemas/profile.schema';

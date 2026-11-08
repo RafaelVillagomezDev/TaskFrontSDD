@@ -1,5 +1,5 @@
-import { baseApi } from '../../../shared/api/base.api';
-import { validatedResult } from '../../../shared/api/validated-result.util';
+import { baseApi } from '@shared/api/base.api';
+import { validatedResult } from '@shared/api/validated-result.util';
 import { streakSchema, type Streak } from '../schemas/streak.schema';
 
 // Racha sobre la API base única (plan D-2), validada con Zod (D-5). Completar, desmarcar, crear o eliminar

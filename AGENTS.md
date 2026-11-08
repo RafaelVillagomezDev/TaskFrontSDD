@@ -53,6 +53,7 @@ $DC run --rm e2e pnpm test:e2e e2e/specs/login.e2e.ts --project=chromium-mobile 
 
 ## 4. Convenciones
 - **Ficheros y carpetas:** `kebab-case` + sufijo. **Componentes y tipos:** `PascalCase`. **Hooks:** `useXxx`. **Variables y funciones:** `camelCase`. **Constantes:** `UPPER_SNAKE_CASE`.
+- **Importaciones:** fuera de la propia carpeta (el mismo módulo o la misma carpeta de `src/shared/`), siempre con alias: `@shared/ui/button.component`, `@modules/auth` (solo el `index.ts`), `@test-utils/render-app`. Las E2E usan `@shared/…`. Un alias nuevo se añade a la vez en los `tsconfig` (`app`, `sonar`, `e2e` si aplica), `vite.config.ts` y `jest.config.ts`.
 - **Idioma:** código en inglés · comentarios en español · textos visibles en español dentro de `texts/[modulo].texts.ts`, nunca directamente en el JSX.
 
 | Rol | Fichero | Rol | Fichero |

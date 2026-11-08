@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 
-import { errorMessage, toApiError, type ApiErrorCode } from '../../../shared/api/api-error.util';
+import { errorMessage, toApiError, type ApiErrorCode } from '@shared/api/api-error.util';
 import { useDeleteTaskMutation, useUpdateTaskMutation } from '../api/tasks.api';
 import type { Task } from '../schemas/task.schema';
 

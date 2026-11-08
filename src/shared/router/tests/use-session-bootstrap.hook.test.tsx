@@ -4,9 +4,9 @@ import { render, renderHook, screen, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { createMemoryRouter } from 'react-router';
 
-import { apiFail, apiOk, mockApi } from '../../../../jest/mock-api';
-import { sessionEnded, sessionStarted } from '../../../modules/auth';
-import { createAppStore, type AppStore } from '../../store/store';
+import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
+import { sessionEnded, sessionStarted } from '@modules/auth';
+import { createAppStore, type AppStore } from '@shared/store/store';
 import { AppRoot } from '../app-root.component';
 import { useSessionBootstrap } from '../use-session-bootstrap.hook';
 

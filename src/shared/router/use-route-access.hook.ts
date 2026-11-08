@@ -1,7 +1,7 @@
 import { useLocation, useSearchParams } from 'react-router';
 
-import { selectAuthStatus, selectSessionExpired, selectSignedOut } from '../../modules/auth';
-import { useAppSelector } from '../store/hooks';
+import { selectAuthStatus, selectSessionExpired, selectSignedOut } from '@modules/auth';
+import { useAppSelector } from '@shared/store/hooks';
 import { REASON_EXPIRED, REASON_PARAM, RETURN_TO_PARAM, ROUTES } from './routes.constants';
 
 export type RouteAccess = 'private' | 'guest';

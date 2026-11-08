@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 
-import { NAVIGATION_TEXTS } from '../texts/navigation.texts';
-import { Box } from '../ui/box.component';
-import { Text } from '../ui/text.component';
+import { NAVIGATION_TEXTS } from '@shared/texts/navigation.texts';
+import { Box } from '@shared/ui/box.component';
+import { Text } from '@shared/ui/text.component';
 
 interface AuthLayoutProps {
   children: ReactNode;

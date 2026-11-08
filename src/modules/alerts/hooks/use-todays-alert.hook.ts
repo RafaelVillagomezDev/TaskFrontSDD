@@ -1,5 +1,5 @@
-import { toDayKey } from '../../../shared/date/day.util';
-import { useCurrentDay } from '../../../shared/date/use-current-day.hook';
+import { toDayKey } from '@shared/date/day.util';
+import { useCurrentDay } from '@shared/date/use-current-day.hook';
 import { useGetLatestAlertQuery } from '../api/alerts.api';
 import type { Alert } from '../schemas/alert.schema';
 

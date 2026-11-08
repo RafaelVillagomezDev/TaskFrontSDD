@@ -20,6 +20,19 @@ export default defineConfig({
     host: '0.0.0.0',
     port: 5173,
     strictPort: true,
+    // Carpetas generadas: cada HTML escrito en ellas (cobertura, informes de Playwright) recargaba todas las
+    // pestañas abiertas, también las de las E2E en curso
+    watch: {
+      ignored: [
+        '**/coverage/**',
+        '**/playwright-report/**',
+        '**/test-results/**',
+        '**/blob-report/**',
+        '**/dist/**',
+        '**/graphify-out/**',
+        '**/.playwright-mcp/**',
+      ],
+    },
   },
   preview: {
     host: '0.0.0.0',

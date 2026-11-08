@@ -76,7 +76,10 @@ test.describe('RNF-03: pantallas con sesión', () => {
   test('RNF-03: avisos', async ({ page }, testInfo) => {
     const alerts = new AlertsPage(page);
     await alerts.goto();
-    await expect(alerts.empty).toBeVisible();
+    await expect(alerts.heading).toBeVisible();
+    // La tarea pendiente de hoy del beforeEach puede generar un aviso real (API-001 RF-24 a RF-26 y RF-47: de 22:00
+    // a fin de día, de viernes 22:00 a fin del domingo y los 3 últimos días del mes): vale la lista o el estado vacío
+    await expect(alerts.empty.or(alerts.list)).toBeVisible();
     await expectResponsive(page, testInfo);
   });
 

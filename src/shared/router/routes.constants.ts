@@ -1,6 +1,7 @@
 // Rutas de la aplicación (plan §6.1): en inglés, como el resto del código
 export const ROUTES = {
   board: '/',
+  taskDay: '/taskday',
   history: '/history',
   alerts: '/alerts',
   account: '/account',

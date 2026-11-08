@@ -74,4 +74,13 @@ export const TASKS_TEXTS = {
     noTasks: 'Todavía no tienes tareas.',
     total: (total: number): string => (total === 1 ? '1 tarea' : `${String(total)} tareas`),
   },
+  // Hecho hoy (spec 002): tareas completadas hoy, en solo lectura
+  taskDay: {
+    title: 'Hecho hoy',
+    list: 'Tareas hechas hoy',
+    empty: 'Todavía no has completado ninguna tarea hoy.',
+    goToBoard: 'Ir al tablero',
+    total: (total: number): string =>
+      total === 1 ? '1 tarea completada hoy' : `${String(total)} tareas completadas hoy`,
+  },
 };

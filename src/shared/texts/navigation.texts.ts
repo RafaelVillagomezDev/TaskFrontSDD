@@ -6,6 +6,7 @@ export const NAVIGATION_TEXTS = {
   openMenu: 'Abrir menú',
   closeMenu: 'Cerrar menú',
   board: 'Tablero',
+  taskDay: 'Hecho hoy',
   history: 'Historial',
   alerts: 'Avisos',
   account: 'Cuenta',

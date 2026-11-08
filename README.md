@@ -14,12 +14,14 @@
 | Proyecto Vite + React, Docker, SonarQube, hooks de git | Listos |
 | Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | Spec *Implementada*: 116 de 116 tareas (fase B: aviso de racha en juego e historial actualizado al completar). Cobertura del 99,9 % de líneas, quality gate en verde y E2E en los 6 proyectos de Playwright |
 | Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Hecho (spec 003 de la API): la sesión sigue tras recargar |
+| Segunda funcionalidad (`sdd/002-taskDay/`): tareas completadas hoy en `/taskday` | Spec *Implementada*: 12 de 12 tareas, cada RF con su test y E2E en los 6 proyectos de Playwright |
 
 ## Funcionalidades
 
 - **Cuenta y sesión:** registro, inicio y cierre de sesión con cookies y token CSRF, renovación automática de la sesión y vuelta a la pantalla pedida.
 - **Tablero semanal** (`/`): 7 días desde hoy, navegación de semana en semana, crear, editar, completar y eliminar tareas, y días pasados de solo lectura.
 - **Racha y progreso de hoy:** racha actual y mejor racha de la API, «X de Y tareas completadas» y aviso cuando la racha está en juego.
+- **Hecho hoy** (`/taskday`): las tareas completadas hoy, en solo lectura, con su total; se actualiza sin recargar al completar o desmarcar en el tablero.
 - **Historial** (`/history`): todas las tareas con filtros de estado y de fechas en la URL, paginadas.
 - **Avisos** (`/alerts`): los avisos de las 22:00, paginados, y el de hoy destacado en el tablero.
 - **Cuenta** (`/account`): perfil con el nombre editable, cambio de contraseña y borrado de la cuenta.

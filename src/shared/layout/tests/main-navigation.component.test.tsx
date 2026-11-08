@@ -48,6 +48,21 @@ describe('RF-50: MainNavigation', () => {
   });
 });
 
+describe('002 RF-08: acceso a «Hecho hoy»', () => {
+  it('RF-08: va justo después de «Tablero» y lleva a /taskday', () => {
+    renderNavigation('/');
+    const links = screen.getAllByRole('link').map((link) => link.textContent);
+    expect(links.slice(0, 2)).toEqual(['Tablero', 'Hecho hoy']);
+    expect(screen.getByRole('link', { name: 'Hecho hoy' })).toHaveAttribute('href', '/taskday');
+  });
+
+  it('RF-08: se marca como activo en /taskday', () => {
+    renderNavigation('/taskday');
+    expect(screen.getByRole('link', { name: 'Hecho hoy' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Tablero' })).not.toHaveAttribute('aria-current');
+  });
+});
+
 describe('RF-54: NavItem', () => {
   it('marca la pantalla activa con aria-current y los estilos de DESIGN.md', () => {
     renderNavigation('/history');

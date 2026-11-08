@@ -6,10 +6,11 @@ import { AppShell } from '../pages/app-shell.po';
 import { LoginPage } from '../pages/login.po';
 
 const WEEK_LENGTH = 7;
-const PRIVATE_ROUTES = ['/', '/history', '/alerts', '/account'];
+const PRIVATE_ROUTES = ['/', '/taskday', '/history', '/alerts', '/account'];
 
-// Pantallas de la navegación, con su ruta y su título (RF-50)
+// Pantallas de la navegación, con su ruta y su título (RF-50 y 002 RF-08)
 const SCREENS = [
+  { link: 'Hecho hoy', path: '/taskday', heading: 'Hecho hoy' },
   { link: 'Historial', path: '/history', heading: 'Historial' },
   { link: 'Avisos', path: '/alerts', heading: 'Avisos' },
   { link: 'Cuenta', path: '/account', heading: 'Cuenta' },
@@ -32,7 +33,7 @@ authTest.describe('RF-08: sin sesión', () => {
 });
 
 test.describe('RF-50 y RF-54: navegación con sesión', () => {
-  test('RF-50: muestra el usuario, las cuatro pantallas y cerrar sesión; en móvil y tablet, dentro del menú', async ({
+  test('RF-50 y 002 RF-08: muestra el usuario, las cinco pantallas y cerrar sesión; en móvil y tablet, dentro del menú', async ({
     page,
     board,
     freshAccount,

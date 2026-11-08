@@ -8,6 +8,7 @@ import { AlertsPage } from '../pages/alerts.po';
 import { HistoryPage } from '../pages/history.po';
 import { LoginPage } from '../pages/login.po';
 import { RegisterPage } from '../pages/register.po';
+import { TaskDayPage } from '../pages/task-day.po';
 import { TaskFormDialog } from '../pages/task-form.po';
 
 // RNF-03, CE-07 y CONSTITUTION.md VII.5 en cada pantalla y cada diálogo, en los 3 tamaños de los 6 proyectos:
@@ -70,6 +71,20 @@ test.describe('RNF-03: pantallas con sesión', () => {
     const history = new HistoryPage(page);
     await history.goto();
     await expect(history.items).toHaveCount(2);
+    await expectResponsive(page, testInfo);
+  });
+
+  test('RNF-03 y 002 CE-03: hecho hoy', async ({ page, freshAccount }, testInfo) => {
+    await createTasks(freshAccount, [
+      {
+        title: 'Una tarea hecha con un título bastante largo para ver cómo se parte',
+        date: todayKey(),
+        completed: true,
+      },
+    ]);
+    const taskDay = new TaskDayPage(page);
+    await taskDay.goto();
+    await expect(taskDay.items).toHaveCount(1);
     await expectResponsive(page, testInfo);
   });
 

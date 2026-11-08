@@ -3,7 +3,7 @@ import { Navigate, type RouteObject } from 'react-router';
 import { AccountPage } from '@modules/account';
 import { AlertsPage } from '@modules/alerts';
 import { LoginPage, RegisterPage } from '@modules/auth';
-import { BoardPage, HistoryPage } from '@modules/tasks';
+import { BoardPage, HistoryPage, TaskDayPage } from '@modules/tasks';
 import { PrivateLayout } from './private.layout';
 import { ProtectedRoute } from './protected-route.component';
 import { ROUTES } from './routes.constants';
@@ -24,6 +24,7 @@ export const APP_ROUTES: RouteObject[] = [
         element: <PrivateLayout />,
         children: [
           { path: ROUTES.board, element: <BoardPage /> },
+          { path: ROUTES.taskDay, element: <TaskDayPage /> },
           { path: ROUTES.history, element: <HistoryPage /> },
           { path: ROUTES.alerts, element: <AlertsPage /> },
           { path: ROUTES.account, element: <AccountPage /> },

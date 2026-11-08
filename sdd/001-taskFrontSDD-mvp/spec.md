@@ -338,3 +338,4 @@ Como usuario, quiero cambiar mi contraseña y poder borrar mi cuenta, para contr
 - **2026-10-30** — Todas las tareas de `tasks.md` hechas (T001–T114) y cada RF con su test, en Chromium y Firefox, en móvil, tablet y escritorio. Estado → *Implementada*. Los requisitos no cambian.
 - **2026-10-30** — Clarificación de RF-27 por un bug (aviso de racha en juego que parpadea al quitar las tareas completadas de hoy): el aviso usa la racha recalculada tras el último cambio. El texto de RF-27 no cambia. Estado → *Aprobada* hasta terminar T115; después vuelve a *Implementada*.
 - **2026-10-30** — T115 corregida y con sus tests en verde. Estado → *Implementada*.
+- **2026-11-08** — Ampliación por `sdd/002-taskDay/` (RF-08 de esa spec, aprobada): la navegación de RF-50 incluye además el acceso «Hecho hoy» (`/taskday`), justo después del tablero, y RF-54 lo marca activo. El texto de RF-50 y RF-54 no cambia aquí; el requisito vive en la spec 002.

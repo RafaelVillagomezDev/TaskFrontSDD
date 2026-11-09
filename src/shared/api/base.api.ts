@@ -7,6 +7,6 @@ import { createSessionBaseQuery } from './session-base-query';
 export const baseApi = createApi({
   reducerPath: 'api',
   baseQuery: createSessionBaseQuery({ baseUrl: env.apiUrl }),
-  tagTypes: ['Task', 'Streak', 'Alert', 'Me'],
+  tagTypes: ['Task', 'Streak', 'Alert', 'Me', 'Pomodoro', 'PomodoroTask', 'PomodoroStreak', 'PomodoroAchievement'],
   endpoints: () => ({}),
 });

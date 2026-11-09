@@ -63,6 +63,21 @@ describe('002 RF-08: acceso a «Hecho hoy»', () => {
   });
 });
 
+describe('003 RF-02: acceso a «Pomodoro»', () => {
+  it('RF-02: va justo después de «Hecho hoy» y lleva a /pomodoro', () => {
+    renderNavigation('/');
+    const links = screen.getAllByRole('link').map((link) => link.textContent);
+    expect(links.slice(0, 3)).toEqual(['Tablero', 'Hecho hoy', 'Pomodoro']);
+    expect(screen.getByRole('link', { name: 'Pomodoro' })).toHaveAttribute('href', '/pomodoro');
+  });
+
+  it.each(['/pomodoro', '/pomodoro/history', '/pomodoro/achievements'])('RF-02: se marca como activo en %s', (path) => {
+    renderNavigation(path);
+    expect(screen.getByRole('link', { name: 'Pomodoro' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('link', { name: 'Tablero' })).not.toHaveAttribute('aria-current');
+  });
+});
+
 describe('RF-54: NavItem', () => {
   it('marca la pantalla activa con aria-current y los estilos de DESIGN.md', () => {
     renderNavigation('/history');

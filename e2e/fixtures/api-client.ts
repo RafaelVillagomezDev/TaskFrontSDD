@@ -1,4 +1,4 @@
-import { request, type APIRequestContext } from '@playwright/test';
+import { request, type APIRequestContext, type Page } from '@playwright/test';
 import { z } from 'zod';
 
 import { buildClientTimeHeaders } from '@shared/api/client-time.util';
@@ -86,6 +86,20 @@ export async function createTasks(account: Account, tasks: NewTask[]): Promise<v
       expectStatus(completed, HTTP_OK, `completar la tarea «${task.title}»`);
     }
   });
+}
+
+// Inicia sesión por API dentro del contexto del navegador (003 plan D-15): page.request comparte las cookies con
+// la página, así que al abrir la aplicación la sesión ya existe y GET /me recupera el usuario y el token CSRF.
+// Chromium y Firefox guardan la cookie Secure de la API en localhost (003 plan R-6, comprobado en smoke.e2e.ts)
+export async function loginInPage(page: Page, account: Account): Promise<void> {
+  const apiUrl = requireEnv('VITE_API_URL');
+  const csrf = csrfResponseSchema.parse(await (await page.request.get(`${apiUrl}/auth/csrf`)).json()).data.csrfToken;
+  const login = await page.request.post(`${apiUrl}/auth/login`, {
+    headers: { 'X-CSRF-Token': csrf },
+    data: account,
+  });
+  expectStatus(login, HTTP_OK, `iniciar sesión por API con ${account.email}`);
+  expectStatus(await page.request.get(`${apiUrl}/me`), HTTP_OK, 'leer la sesión iniciada por API desde el navegador');
 }
 
 export async function registerAccount(account: Account): Promise<void> {

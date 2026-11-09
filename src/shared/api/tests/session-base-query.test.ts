@@ -82,7 +82,24 @@ describe('cabeceras', () => {
     },
   );
 
-  it.each(['/me', '/auth/csrf', '/tasksx'])('no añade la hora en %s', async (url) => {
+  it.each([
+    '/pomodoros',
+    '/pomodoros?page=1',
+    '/pomodoros/p-1',
+    '/pomodoros/p-1/tasks',
+    '/pomodoros/p-1/tasks/t-1',
+    '/pomodoro-tasks',
+    '/pomodoro-tasks/t-1',
+    '/pomodoro-streak',
+    '/pomodoro-achievements',
+  ])('RF-01 (003): añade la hora y la zona del dispositivo en la ruta del pomodoro %s', async (url) => {
+    const { baseQuery, api, requests } = setup(authenticated, () => ok());
+    await baseQuery(url, api, {});
+    expect(requests[0]?.headers.get('X-Client-Time')).toBe('2026-10-29T20:00:00-07:00');
+    expect(requests[0]?.headers.get('X-Timezone')).toBe('America/Los_Angeles');
+  });
+
+  it.each(['/me', '/auth/csrf', '/tasksx', '/pomodoro', '/pomodoro-x'])('no añade la hora en %s', async (url) => {
     const { baseQuery, api, requests } = setup(authenticated, () => ok());
     await baseQuery(url, api, {});
     expect(requests[0]?.headers.has('X-Client-Time')).toBe(false);

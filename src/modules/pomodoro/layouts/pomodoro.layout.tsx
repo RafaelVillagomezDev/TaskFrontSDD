@@ -1,0 +1,27 @@
+import { Outlet } from 'react-router';
+
+import { PageContainer } from '@shared/layout/page-container.layout';
+import { PageHeader } from '@shared/layout/page-header.component';
+import { SubNavigation } from '@shared/layout/sub-navigation.component';
+import { ROUTES } from '@shared/router/routes.constants';
+import { POMODORO_TEXTS } from '../texts/pomodoro.texts';
+
+const { layout: texts } = POMODORO_TEXTS;
+
+// Estructura común de la sección del pomodoro (RF-51, plan §5.2): título, subnavegación y la vista de cada ruta.
+// En la Fase 1 solo existe «Sesión»; la Fase 2 añade «Historial» y «Logros» (plan D-7)
+export function PomodoroLayout() {
+  return (
+    <PageContainer>
+      <div className="flex flex-col gap-4">
+        <PageHeader>
+          <PageHeader.Title>{texts.title}</PageHeader.Title>
+        </PageHeader>
+        <SubNavigation aria-label={texts.sections}>
+          <SubNavigation.Link to={ROUTES.pomodoro}>{texts.session}</SubNavigation.Link>
+        </SubNavigation>
+      </div>
+      <Outlet />
+    </PageContainer>
+  );
+}

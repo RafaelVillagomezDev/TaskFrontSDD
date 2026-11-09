@@ -23,6 +23,9 @@ export default defineConfig({
   testDir: './e2e/specs',
   testMatch: '**/*.e2e.ts',
   globalSetup: './e2e/global-setup.ts',
+  // Cada test usa su propia cuenta (freshAccount), así que también los de un mismo fichero se reparten entre los
+  // workers (003 plan D-14). Si la API no aguanta la carga, se limita workers, no se vuelve al modo serie (R-7)
+  fullyParallel: true,
   // Resuelve el alias @shared/* de las E2E (tsconfig.json raíz solo tiene referencias)
   tsconfig: './tsconfig.e2e.json',
   reporter: [['list'], ['html', { open: 'never' }]],

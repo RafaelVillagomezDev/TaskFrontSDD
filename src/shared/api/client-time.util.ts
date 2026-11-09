@@ -1,6 +1,6 @@
 import { toDayKey } from '@shared/date/day.util';
 
-// Cabeceras de hora que exige TaskApiSDD en /tasks, /streak y /alerts (API-001 RF-31 a RF-33, plan D-3)
+// Cabeceras de hora que exige TaskApiSDD en /tasks, /streak, /alerts y las rutas del pomodoro (API-001 RF-31 a RF-33, API-004 RF-03)
 export interface ClientTimeHeaders {
   'X-Client-Time': string;
   'X-Timezone': string;

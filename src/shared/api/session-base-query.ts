@@ -11,8 +11,16 @@ import { toApiError, type ApiErrorCode } from './api-error.util';
 import { buildClientTimeHeaders } from './client-time.util';
 import { sessionExpired } from './session.actions';
 
-// Rutas que exigen la hora y la zona del dispositivo (API-002 RF-30)
-const CLIENT_TIME_PATHS = ['/tasks', '/streak', '/alerts'];
+// Rutas que exigen la hora y la zona del dispositivo (API-002 RF-30 y, en el pomodoro, API-004 RF-03)
+const CLIENT_TIME_PATHS = [
+  '/tasks',
+  '/streak',
+  '/alerts',
+  '/pomodoros',
+  '/pomodoro-tasks',
+  '/pomodoro-streak',
+  '/pomodoro-achievements',
+];
 // Métodos que exigen X-CSRF-Token (API-002 RF-23)
 const CSRF_METHODS = new Set(['POST', 'PATCH', 'DELETE']);
 // Errores que significan que la sesión ya no existe y no se puede renovar

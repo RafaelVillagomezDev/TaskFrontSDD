@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { ERROR_MESSAGES } from '@shared/texts/errors.texts';
 import { apiErrorEnvelopeSchema } from './api-envelope.schema';
 
-// Códigos de error de TaskApiSDD (API-001 y API-002) más los del propio cliente: sin red o respuesta inesperada
+// Códigos de error de TaskApiSDD (API-001, API-002 y API-004) más los del propio cliente: sin red o respuesta inesperada
 export type ApiErrorCode =
   | 'ROUTE_NOT_FOUND'
   | 'INVALID_CSRF_TOKEN'
@@ -22,6 +22,14 @@ export type ApiErrorCode =
   | 'TASK_NOT_FOUND'
   | 'DAY_CLOSED'
   | 'DAY_NOT_STARTED'
+  | 'POMODORO_NOT_FOUND'
+  | 'POMODORO_TASK_NOT_FOUND'
+  | 'POMODORO_ALREADY_ACTIVE'
+  | 'POMODORO_TASK_LIMIT'
+  | 'INVALID_POMODORO_STATE'
+  | 'POMODORO_TASK_IN_SESSION'
+  | 'POMODORO_TASK_NOT_IN_SESSION'
+  | 'POMODORO_TASK_COMPLETED'
   | 'INTERNAL_ERROR'
   | 'NETWORK_ERROR';
 
@@ -43,6 +51,14 @@ export const API_ERROR_CODES: readonly ApiErrorCode[] = [
   'TASK_NOT_FOUND',
   'DAY_CLOSED',
   'DAY_NOT_STARTED',
+  'POMODORO_NOT_FOUND',
+  'POMODORO_TASK_NOT_FOUND',
+  'POMODORO_ALREADY_ACTIVE',
+  'POMODORO_TASK_LIMIT',
+  'INVALID_POMODORO_STATE',
+  'POMODORO_TASK_IN_SESSION',
+  'POMODORO_TASK_NOT_IN_SESSION',
+  'POMODORO_TASK_COMPLETED',
   'INTERNAL_ERROR',
   'NETWORK_ERROR',
 ];

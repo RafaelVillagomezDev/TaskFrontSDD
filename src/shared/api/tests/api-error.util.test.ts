@@ -33,6 +33,20 @@ describe('toApiError', () => {
     ).toBe('INTERNAL_ERROR');
     expect(toApiError(undefined).code).toBe('INTERNAL_ERROR');
   });
+
+  it.each([
+    'POMODORO_NOT_FOUND',
+    'POMODORO_TASK_NOT_FOUND',
+    'POMODORO_ALREADY_ACTIVE',
+    'POMODORO_TASK_LIMIT',
+    'INVALID_POMODORO_STATE',
+    'POMODORO_TASK_IN_SESSION',
+    'POMODORO_TASK_NOT_IN_SESSION',
+    'POMODORO_TASK_COMPLETED',
+  ])('RF-50 (003): reconoce el código del pomodoro %s', (code) => {
+    const error = toApiError({ status: 409, data: { success: false, status: 409, error: { code, message: 'x' } } });
+    expect(error.code).toBe(code);
+  });
 });
 
 describe('errorMessage', () => {

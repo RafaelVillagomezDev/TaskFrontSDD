@@ -1,19 +1,16 @@
-import { test as authTest } from './auth.fixture';
+import { test as sessionTest } from './session.fixture';
 import { BoardPage } from '../pages/board.po';
-import { LoginPage } from '../pages/login.po';
 
 interface TasksFixtures {
-  // Tablero de una cuenta nueva con la sesión iniciada por la interfaz; las tareas que cree el test
-  // se borran con la cuenta al terminar (CONSTITUTION.md IV.5)
+  // Tablero de una cuenta nueva con la sesión iniciada por API (003 plan D-15); las tareas que cree el test
+  // se borran con la cuenta al terminar (CONSTITUTION.md IV.5). El login por la interfaz se prueba en login.e2e.ts
   board: BoardPage;
 }
 
-export const test = authTest.extend<TasksFixtures>({
-  board: async ({ page, freshAccount }, provide) => {
-    const login = new LoginPage(page);
-    await login.goto();
-    await login.login(freshAccount);
-    const board = new BoardPage(page);
+export const test = sessionTest.extend<TasksFixtures>({
+  board: async ({ signedInPage }, provide) => {
+    const board = new BoardPage(signedInPage);
+    await signedInPage.goto('/');
     await board.board.waitFor();
     await provide(board);
   },

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Bell, CircleCheckBig, LayoutDashboard, ListChecks, UserRound } from 'lucide-react';
+import { Bell, CircleCheckBig, LayoutDashboard, ListChecks, Timer, UserRound } from 'lucide-react';
 
 import { ROUTES } from '@shared/router/routes.constants';
 import { NAVIGATION_TEXTS } from '@shared/texts/navigation.texts';
@@ -12,7 +12,7 @@ interface MainNavigationProps {
   children?: ReactNode;
 }
 
-// Navegación de las pantallas privadas (RF-50 y 002 RF-08): usuario arriba, las cinco pantallas y las acciones de sesión.
+// Navegación de las pantallas privadas (RF-50, 002 RF-08 y 003 RF-02): usuario arriba, las seis secciones y las acciones de sesión.
 // La misma pieza va en el Sidebar (lg) y en el Drawer (móvil y tablet)
 export function MainNavigation({ children }: Readonly<MainNavigationProps>) {
   const { displayName } = useMainNavigation();
@@ -34,6 +34,11 @@ export function MainNavigation({ children }: Readonly<MainNavigationProps>) {
           <li>
             <NavItem to={ROUTES.taskDay} icon={CircleCheckBig}>
               {NAVIGATION_TEXTS.taskDay}
+            </NavItem>
+          </li>
+          <li>
+            <NavItem to={ROUTES.pomodoro} icon={Timer} matchSubroutes>
+              {NAVIGATION_TEXTS.pomodoro}
             </NavItem>
           </li>
           <li>

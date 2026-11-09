@@ -15,7 +15,7 @@
 | Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | Spec *Implementada*: 116 de 116 tareas (fase B: aviso de racha en juego e historial actualizado al completar). Cobertura del 99,9 % de líneas, quality gate en verde y E2E en los 6 proyectos de Playwright |
 | Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Hecho (spec 003 de la API): la sesión sigue tras recargar |
 | Segunda funcionalidad (`sdd/002-taskDay/`): tareas completadas hoy en `/taskday` | Spec *Implementada*: 12 de 12 tareas, cada RF con su test y E2E en los 6 proyectos de Playwright |
-| Tercera funcionalidad (`sdd/003-pomodoro-task-session/`): sesiones pomodoro con lista de tareas (API-004) | Spec *Aprobada* (RF-01 a RF-72), plan *Aprobado* y 61 de 62 tareas: Base, Fase 1 (sesión, lista y tareas en espera), Fase 2 (historial, racha y logros) y cierre hechos, con Jest (1033 tests, 99,5 % de líneas), E2E en los 6 proyectos y quality gate en verde. Pendiente T062: pasar la spec a *Implementada*. E2E en paralelo con una cuenta por test |
+| Tercera funcionalidad (`sdd/003-pomodoro-task-session/`): sesiones pomodoro con lista de tareas (API-004) | Spec *Implementada*: 62 de 62 tareas en dos fases, P1 (sesión, lista y tareas en espera) y P2 (historial, racha y logros), cada RF con su test. Jest (1033 tests, 99,5 % de líneas), E2E en los 6 proyectos en paralelo con una cuenta por test y quality gate en verde |
 
 ## Funcionalidades
 
@@ -59,7 +59,7 @@
 ├── src/
 │   ├── styles/                # Tokens de diseño de Tailwind
 │   ├── shared/                # UI base, layout reutilizable, store, API base, router y utilidades
-│   └── modules/               # auth, tasks, streaks, alerts, account (un módulo vertical por funcionalidad)
+│   └── modules/               # auth, tasks, streaks, alerts, account, pomodoro (un módulo vertical por funcionalidad)
 ├── Dockerfile.dev             # Vite dev server en :5173 con hot reload
 ├── Dockerfile.prod            # Multi-stage: build con Vite → Nginx sin root con fallback SPA
 ├── nginx/                     # Plantilla de Nginx (fallback SPA, caché) y cabeceras de seguridad (CSP)

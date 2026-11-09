@@ -1,5 +1,5 @@
 # Feature: Pomodoro task session — sesiones de concentración con una lista de tareas
-Rama: 003-pomodoro-task-session · Estado: Aprobada · Fecha: 2026-11-09
+Rama: 003-pomodoro-task-session · Estado: Implementada · Fecha: 2026-11-09
 
 Depende de TaskApiSDD: `../TaskApiSDD/sdd/004-pomodoro-sessions/spec.md` (sesiones, tareas, racha y logros del pomodoro) y su colección `pomodoro-sessions.postman-collection.json`. Las reglas de negocio de la API se citan como «API-004 RF-xx» y los requisitos del MVP de esta aplicación (`sdd/001-taskFrontSDD-mvp/spec.md`) como «001 RF-xx».
 
@@ -279,3 +279,4 @@ Ninguna. Todas están resueltas en *Clarificaciones*.
 - **2026-11-09** — Clarificación P-08: descansos fuera de alcance. Se añade RF-71 y se concreta *Fuera de alcance*. Sin preguntas abiertas ni marcas `[NEEDS CLARIFICATION]`; pendiente de la aprobación del usuario. Estado → *Borrador*.
 - **2026-11-09** — Spec aprobada por el usuario, con las decisiones tomadas al resolver las preguntas: detalle en `/pomodoro/history/{id}` (RF-54), duraciones 15, 25, 45 y 60 (RF-06), título en pausa (RF-58), silencio no recordado (RF-61), hitos de 5 y 1 minutos (RF-64) y CE-01 a CE-03. El plan separa la entrega en dos fases: P1 (HU-01 a HU-05) y P2 (HU-06 y HU-07). Estado → *Aprobada*.
 - **2026-11-09** — Cambio aprobado por el usuario, detectado al planificar (R-1 del plan): se añade RF-72 (resultado solo de la sesión que termina con la sección abierta, mantenido al recargar) y se corrigen los casos límite de recarga, que contradecían RF-03 y RF-04. Estado → *Aprobada*.
+- **2026-11-09** — Funcionalidad implementada con la aprobación del usuario: las 62 tareas de `tasks.md` hechas y cada RF-01 a RF-72 con al menos un test que lo cita en su nombre (Jest o Playwright). E2E en los 6 proyectos y quality gate de SonarQube en verde. Sin cambios en los requisitos. Estado → *Implementada*.

@@ -1,5 +1,5 @@
 # Plan: Pomodoro task session — sesiones de concentración con una lista de tareas
-Spec: `sdd/003-pomodoro-task-session/spec.md` (Aprobada) · Estado: Aprobado · Fecha: 2026-11-09
+Spec: `sdd/003-pomodoro-task-session/spec.md` (Implementada) · Estado: Aprobado · Fecha: 2026-11-09
 
 Los RF, RNF, CE y S de este plan son los de la spec 003. Los del MVP del frontend se citan como «001 RF-xx», los de la 002 como «002 RF-xx» y los de la API como «API-004 RF-xx». Las decisiones se numeran D-1, D-2… y los riesgos R-1, R-2…
 

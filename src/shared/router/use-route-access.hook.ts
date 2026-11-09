@@ -2,17 +2,12 @@ import { useLocation, useSearchParams } from 'react-router';
 
 import { selectAuthStatus, selectSessionExpired, selectSignedOut } from '@modules/auth';
 import { useAppSelector } from '@shared/store/hooks';
+import { safeReturnTo } from './return-to.util';
 import { REASON_EXPIRED, REASON_PARAM, RETURN_TO_PARAM, ROUTES } from './routes.constants';
 
 export type RouteAccess = 'private' | 'guest';
 
 export type RouteDecision = { kind: 'loading' } | { kind: 'allow' } | { kind: 'redirect'; to: string };
-
-// Solo rutas internas: evita redirigir a otro dominio con returnTo=//ejemplo.com (open redirect)
-function safeReturnTo(value: string | null): string {
-  if (value?.startsWith('/') !== true || value.startsWith('//')) return ROUTES.board;
-  return value;
-}
 
 // Decide qué hace una ruta según la sesión (RF-08):
 // - Privada sin sesión → /login con la pantalla a la que volver y, si caducó, el motivo (RF-07).

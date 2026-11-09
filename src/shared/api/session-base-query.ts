@@ -7,6 +7,7 @@ import {
 } from '@reduxjs/toolkit/query';
 import { z } from 'zod';
 
+import { announceSessionEnd } from '@shared/session/session-channel.util';
 import { toApiError, type ApiErrorCode } from './api-error.util';
 import { buildClientTimeHeaders } from './client-time.util';
 import { sessionExpired } from './session.actions';
@@ -98,9 +99,12 @@ export function createSessionBaseQuery({
     return pending;
   }
 
-  // Solo caduca una sesión que estaba abierta: al arrancar sin sesión, un 401 de /me no es una sesión caducada
+  // Solo caduca una sesión que estaba abierta: al arrancar sin sesión, un 401 de /me no es una sesión caducada. Las
+  // demás pestañas se enteran por el canal de sesión (spec 004 RF-05)
   function expireSession(api: BaseQueryApi): void {
-    if (readSession(api.getState).status === 'authenticated') api.dispatch(sessionExpired());
+    if (readSession(api.getState).status !== 'authenticated') return;
+    api.dispatch(sessionExpired());
+    announceSessionEnd('expired');
   }
 
   return async (args, api, extraOptions: object) => {

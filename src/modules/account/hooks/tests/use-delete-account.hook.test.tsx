@@ -3,6 +3,11 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
 import { appWrapper, freshStore, useRouterProbe } from '@test-utils/render-app';
+import {
+  FakeBroadcastChannel,
+  installFakeBroadcastChannel,
+  restoreBroadcastChannel,
+} from '@test-utils/fake-broadcast-channel';
 import { tasksApi } from '@modules/tasks';
 import { sessionStarted } from '@modules/auth';
 import { useDeleteAccount } from '../use-delete-account.hook';
@@ -107,5 +112,27 @@ describe('useDeleteAccount', () => {
       result.current.deletion.onOpenChange(true);
     });
     expect(result.current.deletion.form.getValues('password')).toBe('');
+  });
+});
+
+describe('useDeleteAccount en varias pestañas (spec 004)', () => {
+  beforeEach(() => {
+    installFakeBroadcastChannel();
+  });
+
+  afterEach(() => {
+    restoreBroadcastChannel();
+  });
+
+  it('RF-04: al borrar la cuenta avisa a las demás pestañas de que la sesión se cerró', async () => {
+    mockApi({ 'DELETE /me': () => apiOk(null) });
+    const { result } = setup();
+    await confirmWith(result, 'correct horse battery');
+    await waitFor(() => {
+      expect(result.current.router.location.pathname).toBe('/login');
+    });
+    expect(FakeBroadcastChannel.posted.map(({ message }) => message)).toEqual([
+      { type: 'session-ended', reason: 'signedOut' },
+    ]);
   });
 });

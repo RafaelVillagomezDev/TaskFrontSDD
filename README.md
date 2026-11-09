@@ -16,6 +16,7 @@
 | Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Hecho (spec 003 de la API): la sesión sigue tras recargar |
 | Segunda funcionalidad (`sdd/002-taskDay/`): tareas completadas hoy en `/taskday` | Spec *Implementada*: 12 de 12 tareas, cada RF con su test y E2E en los 6 proyectos de Playwright |
 | Tercera funcionalidad (`sdd/003-pomodoro-task-session/`): sesiones pomodoro con lista de tareas (API-004) | Spec *Implementada*: 62 de 62 tareas en dos fases, P1 (sesión, lista y tareas en espera) y P2 (historial, racha y logros), cada RF con su test. Jest (1033 tests, 99,5 % de líneas), E2E en los 6 proyectos en paralelo con una cuenta por test y quality gate en verde |
+| Cuarta funcionalidad (`sdd/004-front-security-hardening/`): seguridad del front (datos al caducar la sesión, cierre de sesión en todas las pestañas, vuelta tras el login solo a rutas propias y cabeceras de producción) | Spec *Implementada*: 18 de 18 tareas, cada RF con su test. Sesión y pestañas, `returnTo` y servidor web conectado a la imagen (`NGINX_ENV=pre|pro`), con Jest (1076 tests, 99,5 % de líneas), E2E en los 6 proyectos, `test:security` y quality gate en verde |
 
 ## Funcionalidades
 
@@ -129,14 +130,24 @@ En los tests unitarios ninguna petición llega a la red: `jest/setup.ts` hace fa
 docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:e2e         # Todas, en Chromium y Firefox
 docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:e2e:report  # Informe HTML del último run
 ```
+- **Seguridad del servidor web** (spec 004): las cabeceras, la redirección a HTTPS, los límites por IP y la consola sin infracciones de la política de contenido solo existen en la imagen de producción, no en Vite. Se prueban contra los servicios `pre` (puerto 8081) y `pro` (8082) del perfil `security`, construidos con `Dockerfile.prod`. Van en un proyecto propio de Playwright (`security`, ficheros `e2e/security/*.security.ts`) que no ejecutan `pnpm test:e2e` ni el pre-push. Solo en este entorno, `pre` escribe también el registro de accesos en `.nginx-logs/access.log` (ignorado por git), que la E2E lee para comprobar la IP real (`nginx/testing/`).
+```bash
+docker compose -f docker-compose.dev.yml --profile security up --build -d pre pro   # Imagen de producción en pre y pro
+docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:security            # Cabeceras, HTTPS, límites y consola
+```
 - Docker Desktop necesita al menos **12 GB de memoria** (Settings → Resources): con las dos instancias de SonarQube (la de este repositorio y la de TaskApiSDD) y 6 navegadores Firefox en paralelo, con 8 GB los tests agotan sus tiempos de espera. Si no se puede subir, `--workers=2` lo evita a cambio de tardar más.
 
 ### Producción
-Proyecto de Compose propio (`taskfrontsdd-prod`): compila con Vite y sirve `dist/` con Nginx sin root, con fallback a `index.html`.
+Proyecto de Compose propio (`taskfrontsdd-prod`): compila con Vite y sirve `dist/` con Nginx sin root, con fallback a `index.html`. Se despliega con **Dokploy**.
+- **Servidor web por entorno** (spec 004): el build arg `NGINX_ENV` es obligatorio y elige la plantilla de `nginx/`.
+  - `pro` (`pro.conf.template`): producción detrás del proxy de Dokploy (Traefik). Solo atiende `kompitu.yandrydev.cloud`, redirige a HTTPS lo que llegue por HTTP, envía HSTS y descarta otros dominios.
+  - `pre` (`pre.conf.template`): las mismas políticas por HTTP, sin HSTS, para probar la imagen.
+  - Comunes a los dos: `security-headers.conf` (política de contenido con la API y Google Fonts, sin iframes, Trusted Types, `Permissions-Policy`, COOP y CORP), `http-hardening.conf` y `server-hardening.conf` (IP real del cliente, 20 peticiones por segundo y 30 conexiones por IP, solo `GET` y `HEAD`, `404` en rutas de escáneres, tamaños, tiempos y registro con la IP real).
+- **Dokploy:** obtiene y renueva el certificado de Let's Encrypt y termina HTTPS. El servicio **no publica puertos** (`expose: 8080`): en Dokploy, el dominio `kompitu.yandrydev.cloud` apunta al servicio `web`, puerto `8080`, con HTTPS activado. Si se publicara un puerto, se podría llegar al contenedor sin pasar por el proxy y falsificar `X-Forwarded-Proto` y `X-Forwarded-For`.
 ```bash
-docker compose --env-file .env.prod -f docker-compose.prod.yml up --build -d    # Construir y levantar
+docker compose --env-file .env.prod -f docker-compose.prod.yml up --build -d    # Construir y levantar (NGINX_ENV=pro)
 docker compose -f docker-compose.prod.yml down             # Parar
-docker build -f Dockerfile.prod --build-arg VITE_API_URL=https://apikompitu.yandrydev.cloud -t taskfrontsdd:latest .   # Construir solo la imagen
+docker build -f Dockerfile.prod --build-arg VITE_API_URL=https://apikompitu.yandrydev.cloud --build-arg NGINX_ENV=pro -t taskfrontsdd:latest .   # Construir solo la imagen
 ```
 
 ### SonarQube

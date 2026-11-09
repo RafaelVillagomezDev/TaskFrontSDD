@@ -29,3 +29,36 @@ services:
       - /app/node_modules
     entrypoint: ['sh', '-c', 'corepack enable && pnpm install --frozen-lockfile && exec "$$@"', '--']
     profiles: ['e2e']
+
+  # Imagen de producción con su servidor web, para las E2E de seguridad (spec 004 CE-04, CE-05, plan D-7):
+  #   docker compose -f docker-compose.dev.yml --profile security up --build -d pre pro
+  # pre sirve por HTTP como preproducción; pro se prueba enviando Host y X-Forwarded-Proto como lo haría Dokploy
+  pre:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: http://localhost:3000
+        NGINX_ENV: pre
+    environment:
+      VITE_API_URL: http://localhost:3000
+    ports:
+      - '8081:8080'
+    # Registro de accesos también en .nginx-logs/access.log, que la E2E lee para comprobar la IP real (RF-25)
+    volumes:
+      - ./nginx/testing:/etc/nginx/snippets/testing:ro
+      - ./.nginx-logs:/var/log/nginx-test
+    profiles: ['security']
+
+  pro:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: https://apikompitu.yandrydev.cloud
+        NGINX_ENV: pro
+    environment:
+      VITE_API_URL: https://apikompitu.yandrydev.cloud
+    ports:
+      - '8082:8080'
+    profiles: ['security']

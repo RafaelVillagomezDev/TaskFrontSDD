@@ -4,6 +4,11 @@
 import { jest } from '@jest/globals';
 import type { BaseQueryApi } from '@reduxjs/toolkit/query';
 
+import {
+  FakeBroadcastChannel,
+  installFakeBroadcastChannel,
+  restoreBroadcastChannel,
+} from '@test-utils/fake-broadcast-channel';
 import { createSessionBaseQuery } from '../session-base-query';
 
 interface FakeState {
@@ -174,5 +179,31 @@ describe('RF-07: fin de la sesión', () => {
     await baseQuery({ url: '/auth/login', method: 'POST' }, api, {});
     expect(dispatch).not.toHaveBeenCalled();
     expect(requests).toHaveLength(1);
+  });
+});
+
+describe('spec 004 RF-05: aviso a las demás pestañas', () => {
+  beforeEach(() => {
+    installFakeBroadcastChannel();
+  });
+
+  afterEach(() => {
+    restoreBroadcastChannel();
+  });
+
+  it('RF-05: cuando la sesión abierta caduca, avisa a las demás pestañas con «expired»', async () => {
+    const { baseQuery, api } = setup(authenticated, () => apiError(401, 'MISSING_TOKEN'));
+    await baseQuery('/tasks', api, {});
+    expect(FakeBroadcastChannel.posted.map(({ message }) => message)).toEqual([
+      { type: 'session-ended', reason: 'expired' },
+    ]);
+  });
+
+  it('RF-05: al arrancar sin sesión (401 en /me) no avisa a nadie', async () => {
+    const { baseQuery, api } = setup({ auth: { status: 'unknown', csrfToken: null } }, () =>
+      apiError(401, 'MISSING_TOKEN'),
+    );
+    await baseQuery('/me', api, {});
+    expect(FakeBroadcastChannel.posted).toEqual([]);
   });
 });

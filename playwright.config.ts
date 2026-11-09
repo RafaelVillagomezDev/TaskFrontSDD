@@ -19,6 +19,21 @@ const projects: Project[] = browsers.flatMap((browserName) =>
   })),
 );
 
+// Servidor web de producción (spec 004 CE-04, CE-05, plan D-7): las cabeceras solo existen en la imagen de Nginx, no en
+// Vite. Se prueban contra los servicios pre (8081) y pro (8082) de docker-compose.dev.yml, en un único proyecto, y
+// solo con pnpm test:security (E2E_SECURITY=1): el resto de ejecuciones no los necesita levantados
+const securityProjects: Project[] =
+  process.env.E2E_SECURITY === '1'
+    ? [
+        {
+          name: 'security',
+          testDir: './e2e/security',
+          testMatch: '**/*.security.ts',
+          use: { browserName: 'chromium', viewport: viewports.desktop, baseURL: 'http://localhost:8081' },
+        },
+      ]
+    : [];
+
 export default defineConfig({
   testDir: './e2e/specs',
   testMatch: '**/*.e2e.ts',
@@ -35,5 +50,5 @@ export default defineConfig({
     locale: 'es-ES',
     trace: 'retain-on-failure',
   },
-  projects,
+  projects: [...projects, ...securityProjects],
 });

@@ -1,3 +1,5 @@
+// Configuración de Zod antes que cualquier esquema (spec 004 RNF-01)
+import '@shared/config/zod.config';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { setupListeners } from '@reduxjs/toolkit/query';

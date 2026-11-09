@@ -1,4 +1,4 @@
-# Producción: proyecto propio que convive con desarrollo. Se lanza con las variables de .env.prod:
+# Producción (Dokploy): proyecto propio que convive con desarrollo. Se lanza con las variables de .env.prod:
 #   docker compose --env-file .env.prod -f docker-compose.prod.yml up --build -d
 name: taskfrontsdd-prod
 
@@ -9,7 +9,12 @@ services:
       dockerfile: Dockerfile.prod
       args:
         VITE_API_URL: ${VITE_API_URL:?Falta VITE_API_URL en .env.prod}
+        # Servidor web de producción: detrás del proxy de Dokploy, siempre HTTPS (spec 004 RF-14 a RF-18)
+        NGINX_ENV: pro
     env_file: .env.prod
-    ports:
-      - '${WEB_HOST_PORT:?Falta WEB_HOST_PORT en .env.prod}:8080'
+    # Sin puertos publicados (spec 004 S-02, plan D-6): el proxy de Dokploy llega por la red interna de Docker, y así
+    # sus cabeceras X-Forwarded-Proto y X-Forwarded-For son fiables. En Dokploy, el dominio apunta a este servicio y
+    # a su puerto 8080
+    expose:
+      - '8080'
     restart: unless-stopped

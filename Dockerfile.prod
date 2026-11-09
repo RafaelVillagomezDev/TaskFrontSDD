@@ -22,9 +22,22 @@ RUN pnpm build
 # --- Etapa 2: runtime ---
 FROM nginxinc/nginx-unprivileged:1.30-alpine
 
-# La plantilla se resuelve al arrancar con VITE_API_URL del entorno (CSP: connect-src a la API)
-COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
-COPY nginx/security-headers.conf /etc/nginx/snippets/security-headers.conf
+# Entorno del servidor web (spec 004 RF-18, plan D-5): pre (HTTP, para probar la imagen) o pro (detrás del proxy de
+# Dokploy, siempre HTTPS). Un valor no válido falla al construir, no al arrancar
+ARG NGINX_ENV
+
+# La plantilla elegida se resuelve al arrancar con VITE_API_URL del entorno (CSP: connect-src a la API). Se copian
+# las dos y se elige en un RUN para que un NGINX_ENV que falta o no es válido dé un mensaje claro. La imagen corre
+# como el usuario 101: la copia necesita root y se vuelve a 101 después
+COPY nginx/pre.conf.template nginx/pro.conf.template /tmp/nginx-templates/
+USER root
+RUN case "$NGINX_ENV" in pre|pro) ;; *) echo "NGINX_ENV debe ser pre o pro (recibido: '$NGINX_ENV')" >&2 && exit 1 ;; esac \
+    && mkdir -p /etc/nginx/templates \
+    && cp "/tmp/nginx-templates/$NGINX_ENV.conf.template" /etc/nginx/templates/default.conf.template \
+    && rm -rf /tmp/nginx-templates
+USER 101
+# Cabeceras de seguridad y proxy inverso: IP real, límites por IP, métodos, rutas de escáneres, tiempos y registro
+COPY nginx/security-headers.conf nginx/http-hardening.conf nginx/server-hardening.conf /etc/nginx/snippets/
 COPY --from=build /app/dist /usr/share/nginx/html
 
 EXPOSE 8080

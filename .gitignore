@@ -158,3 +158,6 @@ blob-report/
 
 # macOS
 .DS_Store
+
+# Registro de accesos del servicio pre en las E2E de seguridad (spec 004 RF-25)
+.nginx-logs/

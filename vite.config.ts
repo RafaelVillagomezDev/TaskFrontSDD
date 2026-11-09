@@ -6,9 +6,18 @@ import { defineConfig } from 'vite';
 // Alias de importación: los mismos que "paths" en tsconfig.app.json y moduleNameMapper en jest.config.ts
 const fromRoot = (path: string): string => fileURLToPath(new URL(path, import.meta.url));
 
+// Fuentes: nunca se incrustan en el CSS como data:, porque la política de contenido solo las admite como ficheros
+// (font-src, spec 004 RNF-01, plan D-9). El resto de recursos sigue la regla de Vite (menos de 4 KB, incrustado)
+const FONT_FILE = /\.(woff2?|ttf|otf|eot)$/i;
+
+const inlineAsset = (filePath: string): boolean | undefined => (FONT_FILE.test(filePath) ? false : undefined);
+
 // Servidor accesible desde fuera del contenedor en el puerto que espera CORS_ORIGIN de TaskApiSDD
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    assetsInlineLimit: inlineAsset,
+  },
   resolve: {
     alias: [
       { find: /^@shared\//, replacement: `${fromRoot('./src/shared')}/` },
@@ -31,6 +40,7 @@ export default defineConfig({
         '**/dist/**',
         '**/graphify-out/**',
         '**/.playwright-mcp/**',
+        '**/.nginx-logs/**',
       ],
     },
   },

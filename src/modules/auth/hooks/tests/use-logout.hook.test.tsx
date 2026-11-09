@@ -3,6 +3,11 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 
 import { apiFail, apiOk, mockApi } from '@test-utils/mock-api';
 import { appWrapper, freshStore, useRouterProbe } from '@test-utils/render-app';
+import {
+  FakeBroadcastChannel,
+  installFakeBroadcastChannel,
+  restoreBroadcastChannel,
+} from '@test-utils/fake-broadcast-channel';
 import { sessionStarted } from '../../store/auth.slice';
 import { useLogout } from '../use-logout.hook';
 
@@ -53,5 +58,29 @@ describe('useLogout', () => {
       expect(store.getState().auth.status).toBe('anonymous');
     });
     expect(result.current.router.location.pathname).toBe('/login');
+  });
+});
+
+describe('useLogout en varias pestañas (spec 004)', () => {
+  beforeEach(() => {
+    installFakeBroadcastChannel();
+  });
+
+  afterEach(() => {
+    restoreBroadcastChannel();
+  });
+
+  it('RF-04: avisa a las demás pestañas de que la sesión se cerró', async () => {
+    mockApi({ 'POST /auth/logout': () => apiOk(null) });
+    const { result } = setup();
+    act(() => {
+      result.current.logout.logout();
+    });
+    await waitFor(() => {
+      expect(result.current.router.location.pathname).toBe('/login');
+    });
+    expect(FakeBroadcastChannel.posted.map(({ message }) => message)).toEqual([
+      { type: 'session-ended', reason: 'signedOut' },
+    ]);
   });
 });

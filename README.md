@@ -15,6 +15,7 @@
 | Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | Spec *Implementada*: 116 de 116 tareas (fase B: aviso de racha en juego e historial actualizado al completar). Cobertura del 99,9 % de líneas, quality gate en verde y E2E en los 6 proyectos de Playwright |
 | Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Hecho (spec 003 de la API): la sesión sigue tras recargar |
 | Segunda funcionalidad (`sdd/002-taskDay/`): tareas completadas hoy en `/taskday` | Spec *Implementada*: 12 de 12 tareas, cada RF con su test y E2E en los 6 proyectos de Playwright |
+| Tercera funcionalidad (`sdd/003-pomodoro-task-session/`): sesiones pomodoro con lista de tareas (API-004) | Spec *Aprobada* (RF-01 a RF-72), plan *Aprobado* y 0 de 62 tareas, en dos fases: P1 (sesión, lista y tareas en espera, T012–T047) y P2 (historial, racha y logros, T048–T058); E2E en paralelo con una cuenta por test |
 
 ## Funcionalidades
 
@@ -120,7 +121,7 @@ En los tests unitarios ninguna petición llega a la red: `jest/setup.ts` hace fa
 - El servicio `e2e` usa la imagen oficial `mcr.microsoft.com/playwright` con la **misma versión** que `@playwright/test`.
 - Usa `network_mode: host` para que el navegador vea la app en `localhost:5173` y la API en `localhost:3000`. Solo así coinciden el origen con `CORS_ORIGIN` y se aceptan las cookies `Secure`.
 - En Docker Desktop (macOS/Windows) requiere activar **Settings → Resources → Network → Enable host networking**.
-- Antes de ejecutarlas: `web` levantado, TaskApiSDD levantada y el usuario de prueba creado.
+- Antes de ejecutarlas: `web` levantado, TaskApiSDD levantada y el usuario de prueba creado. Las E2E del pomodoro (spec 003) necesitan además TaskApiSDD con su funcionalidad 004 (sesiones pomodoro): `GET /pomodoros` tiene que existir.
 - Los tests que necesitan una cuenta propia la registran por API con un email único (`e2e-…@kompitu.test`) y la borran al terminar (`e2e/fixtures/auth.fixture.ts`). Cada pantalla pasa por `expectResponsive` (`e2e/fixtures/responsive.fixture.ts`). Las tareas que necesita un test se crean por API en esa cuenta (`createTasks`, en `e2e/fixtures/api-client.ts`) y se borran con ella. El fixture `board` (`e2e/fixtures/tasks.fixture.ts`) entra en el tablero con una cuenta nueva.
 ```bash
 docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:e2e         # Todas, en Chromium y Firefox

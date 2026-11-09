@@ -15,7 +15,7 @@
 | Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | Spec *Implementada*: 116 de 116 tareas (fase B: aviso de racha en juego e historial actualizado al completar). Cobertura del 99,9 % de líneas, quality gate en verde y E2E en los 6 proyectos de Playwright |
 | Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Hecho (spec 003 de la API): la sesión sigue tras recargar |
 | Segunda funcionalidad (`sdd/002-taskDay/`): tareas completadas hoy en `/taskday` | Spec *Implementada*: 12 de 12 tareas, cada RF con su test y E2E en los 6 proyectos de Playwright |
-| Tercera funcionalidad (`sdd/003-pomodoro-task-session/`): sesiones pomodoro con lista de tareas (API-004) | Spec *Aprobada* (RF-01 a RF-72), plan *Aprobado* y 0 de 62 tareas, en dos fases: P1 (sesión, lista y tareas en espera, T012–T047) y P2 (historial, racha y logros, T048–T058); E2E en paralelo con una cuenta por test |
+| Tercera funcionalidad (`sdd/003-pomodoro-task-session/`): sesiones pomodoro con lista de tareas (API-004) | Spec *Aprobada* (RF-01 a RF-72), plan *Aprobado* y 47 de 62 tareas: Base (T001–T011) y Fase 1 (sesión, lista y tareas en espera, T012–T047) hechas, con lint, typecheck, Jest (977 tests, 99,5 % de líneas), E2E de Chromium en los 3 tamaños (495 tests) y quality gate en verde. Por hacer: Fase 2 (historial, racha y logros, T048–T058) y cierre (T059–T062). E2E en paralelo con una cuenta por test |
 
 ## Funcionalidades
 
@@ -23,6 +23,7 @@
 - **Tablero semanal** (`/`): 7 días desde hoy, navegación de semana en semana, crear, editar, completar y eliminar tareas, y días pasados de solo lectura.
 - **Racha y progreso de hoy:** racha actual y mejor racha de la API, «X de Y tareas completadas» y aviso cuando la racha está en juego.
 - **Hecho hoy** (`/taskday`): las tareas completadas hoy, en solo lectura, con su total; se actualiza sin recargar al completar o desmarcar en el tablero.
+- **Pomodoro** (`/pomodoro`): sesiones de concentración de 15, 25, 45 o 60 minutos, o de 1 a 120 con «Otra», con una lista de hasta 20 tareas. La cuenta atrás sigue igual tras recargar; se puede pausar, reanudar y terminar con confirmación, y completar, añadir o quitar tareas durante la sesión. Al terminar avisa con un sonido (que se puede silenciar), con el título de la pestaña y a los lectores de pantalla, y muestra el resultado. Las tareas pendientes pasan a espera, desde donde se editan, se borran o se incluyen en otra sesión. El historial de sesiones, la racha y los logros llegan en la Fase 2.
 - **Historial** (`/history`): todas las tareas con filtros de estado y de fechas en la URL, paginadas.
 - **Avisos** (`/alerts`): los avisos de las 22:00, paginados, y el de hoy destacado en el tablero.
 - **Cuenta** (`/account`): perfil con el nombre editable, cambio de contraseña y borrado de la cuenta.

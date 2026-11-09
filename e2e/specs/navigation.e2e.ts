@@ -6,11 +6,12 @@ import { AppShell } from '../pages/app-shell.po';
 import { LoginPage } from '../pages/login.po';
 
 const WEEK_LENGTH = 7;
-const PRIVATE_ROUTES = ['/', '/taskday', '/history', '/alerts', '/account'];
+const PRIVATE_ROUTES = ['/', '/taskday', '/pomodoro', '/history', '/alerts', '/account'];
 
 // Pantallas de la navegación, con su ruta y su título (RF-50 y 002 RF-08)
 const SCREENS = [
   { link: 'Hecho hoy', path: '/taskday', heading: 'Hecho hoy' },
+  { link: 'Pomodoro', path: '/pomodoro', heading: 'Pomodoro' },
   { link: 'Historial', path: '/history', heading: 'Historial' },
   { link: 'Avisos', path: '/alerts', heading: 'Avisos' },
   { link: 'Cuenta', path: '/account', heading: 'Cuenta' },

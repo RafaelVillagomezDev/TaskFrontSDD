@@ -165,10 +165,11 @@ Un módulo nuevo, `pomodoro`, con cuatro pantallas bajo `/pomodoro`, que consume
 - **Anuncios:** `useCountdownAnnouncer` compara el segundo anterior con el actual y anuncia un hito solo si la cuenta atrás lo cruza (de más de 300 a 300 o menos). Así se cumplen RF-64 y RF-65 sin casos especiales. Los cambios de estado y el fin vienen de las acciones y de `useSessionEnd`. Solo anuncia el fin que detecta la página (RF-66).
 
 ### 4.5 Formulario de empezar (RF-06 a RF-14, RF-55, RF-56)
-- `startSessionSchema(today)`:
-  - `duration` es una unión discriminada: `{ kind: 'preset', minutes: 15 | 25 | 45 | 60 }` o `{ kind: 'custom', minutes: string }`. Solo se valida el entero de 1 a 120 con `custom` (RF-07, RF-56).
+- `createStartSessionSchema(today)`, que amplía `createSessionTasksSchema(today)` (compartido con el formulario de añadir):
+  - `duration` es un `string` con uno de los presets (`'15'`, `'25'`, `'45'`, `'60'`) o `'custom'` (`CUSTOM_DURATION`), y `customMinutes` es un `string` aparte. Un `superRefine` valida `customMinutes` solo con `'custom'`: obligatorio, entero y de 1 a 120, con un único error por campo en ese orden (RF-07, RF-55, RF-56). `durationMinutesOf(values)` calcula los minutos que se envían.
+  - Se descarta la unión discriminada `{ kind, minutes }`: con React Hook Form, un grupo de radios y un campo de texto son dos campos planos, y la unión obligaba a transformar los valores en cada cambio.
   - `newTasks` reutiliza `createTaskFormSchema(today)` de `@modules/tasks` (D-9).
-  - `refine` sobre el total, como máximo 20 (RF-13).
+  - El mismo `superRefine` comprueba el total de `newTasks` y `waitingTaskIds`, como máximo 20 (RF-13).
 - `useFieldArray` gestiona las filas. «Añadir tarea» se deshabilita al llegar a 20.
 - Se envía `{ durationMinutes, newTasks, waitingTaskIds }`. Una descripción vacía va como `null`.
 - Errores: `showApiError` (RF-47) y, con `POMODORO_ALREADY_ACTIVE`, se invalida la lista y aparece la sesión activa (RF-46).
@@ -295,3 +296,4 @@ Un módulo nuevo, `pomodoro`, con cuatro pantallas bajo `/pomodoro`, que consume
 - **2026-11-09** — E2E más rápidas, a petición del usuario: una cuenta nueva por test del pomodoro (D-13, R-3 resuelto), `fullyParallel` (D-14), sesión iniciada por API en los tests que no prueban el login (D-15) y un único test con la sesión de 1 minuto (R-4). Nuevos R-6 (cookies `Secure` en Firefox) y R-7 (carga en la API). Afecta a `playwright.config.ts` y a las fixtures de toda la suite. La spec no cambia.
 - **2026-11-09** — Revisión de riesgos con el usuario: se añaden R-8 (API-004 desplegada), R-9 (borrado de la cuenta en cascada), R-10 (cambio de día en E2E), R-11 (regresión en el tablero), R-12 (acoplamiento con `tasks`) y R-13 (quality gate), con sus comprobaciones en T009, el checkpoint Base, T010, T047 y T052. La spec no cambia.
 - **2026-11-09** — Al implementar T009: R-6 resuelto (las cookies `Secure` funcionan en Chromium y Firefox, se quita el respaldo por la interfaz de D-15), R-8 comprobado con `smoke.e2e.ts` y R-9 comprobado en la migración de TaskApiSDD.
+- **2026-11-09** — Al implementar T017: §4.5 recoge el esquema real (`createStartSessionSchema`, con `duration` + `customMinutes` y `superRefine`) en lugar de la unión discriminada. Mismas reglas y mensajes; la spec no cambia.

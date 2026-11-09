@@ -1,5 +1,6 @@
 import { addDays, todayKey } from '@shared/date/day.util';
 import { createTasks } from '../fixtures/api-client';
+import { PomodoroPage } from '../pages/pomodoro.po';
 import { expect, test as authTest } from '../fixtures/auth.fixture';
 import { expectResponsive } from '../fixtures/responsive.fixture';
 import { test } from '../fixtures/tasks.fixture';
@@ -85,6 +86,20 @@ test.describe('RNF-03: pantallas con sesión', () => {
     const taskDay = new TaskDayPage(page);
     await taskDay.goto();
     await expect(taskDay.items).toHaveCount(1);
+    await expectResponsive(page, testInfo);
+  });
+
+  test('RNF-03 y 003 CE-03: pomodoro (formulario, sesión activa y resultado)', async ({ page }, testInfo) => {
+    const pomodoro = new PomodoroPage(page);
+    await pomodoro.goto();
+    await pomodoro.addNewTask({ title: 'Una tarea con un título bastante largo para ver cómo se parte en móvil' });
+    await expectResponsive(page, testInfo);
+    await pomodoro.submit.click();
+    await expect(pomodoro.session).toBeVisible();
+    await expectResponsive(page, testInfo);
+    await pomodoro.finish.click();
+    await pomodoro.confirmDialog.getByRole('button', { name: 'Terminar sesión' }).click();
+    await expect(pomodoro.result).toBeVisible();
     await expectResponsive(page, testInfo);
   });
 

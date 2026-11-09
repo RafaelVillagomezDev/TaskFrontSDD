@@ -10,6 +10,7 @@ export const MAX_SESSION_TASKS = 20;
 export const FIRST_PAGE = 1;
 
 export const SECONDS_PER_MINUTE = 60;
+export const MINUTES_PER_HOUR = 60;
 export const MS_PER_SECOND = 1000;
 // Cada cuánto se recalcula la cuenta atrás; el valor se calcula, no se acumula (plan D-4)
 export const COUNTDOWN_TICK_MS = 250;

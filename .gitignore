@@ -155,3 +155,6 @@ vite.config.ts.timestamp-*
 playwright-report/
 test-results/
 blob-report/
+
+# macOS
+.DS_Store

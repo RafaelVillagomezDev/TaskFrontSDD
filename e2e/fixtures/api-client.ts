@@ -132,3 +132,44 @@ export async function deleteAccount(account: Account): Promise<void> {
     }
   });
 }
+
+const meResponseSchema = z.object({ data: z.object({ csrfToken: z.string() }) });
+const pomodoroResponseSchema = z.object({ data: z.object({ id: z.string() }) });
+
+export interface NewPomodoroTaskData {
+  title: string;
+  date: string;
+  description?: string | null;
+}
+
+// Prepara datos del pomodoro por API con la sesión de la página (003 plan §7): más rápido que por la interfaz
+// en los tests que no prueban empezar una sesión. El token CSRF sale de GET /me, como en la aplicación
+export async function startPomodoroInPage(
+  page: Page,
+  body: { durationMinutes?: number; newTasks?: NewPomodoroTaskData[] },
+): Promise<string> {
+  const apiUrl = requireEnv('VITE_API_URL');
+  const me = meResponseSchema.parse(await (await page.request.get(`${apiUrl}/me`)).json());
+  const started = await page.request.post(`${apiUrl}/pomodoros`, {
+    headers: { 'X-CSRF-Token': me.data.csrfToken, ...buildClientTimeHeaders() },
+    data: { durationMinutes: body.durationMinutes ?? 25, newTasks: body.newTasks ?? [], waitingTaskIds: [] },
+  });
+  expectStatus(started, HTTP_CREATED, 'empezar una sesión pomodoro');
+  return pomodoroResponseSchema.parse(await started.json()).data.id;
+}
+
+// Termina a mano una sesión: sus tareas pendientes pasan a espera (API-004 RF-32)
+export async function finishPomodoroInPage(page: Page, id: string): Promise<void> {
+  const apiUrl = requireEnv('VITE_API_URL');
+  const me = meResponseSchema.parse(await (await page.request.get(`${apiUrl}/me`)).json());
+  const finished = await page.request.patch(`${apiUrl}/pomodoros/${id}`, {
+    headers: { 'X-CSRF-Token': me.data.csrfToken, ...buildClientTimeHeaders() },
+    data: { status: 'finished' },
+  });
+  expectStatus(finished, HTTP_OK, 'terminar la sesión pomodoro');
+}
+
+// Deja tareas en espera: empieza una sesión con ellas y la termina sin completarlas
+export async function createWaitingTasksInPage(page: Page, tasks: NewPomodoroTaskData[]): Promise<void> {
+  await finishPomodoroInPage(page, await startPomodoroInPage(page, { newTasks: tasks }));
+}

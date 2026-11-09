@@ -84,10 +84,15 @@ function sessionChangeTags(error: unknown): PomodoroTag[] {
   return error === undefined ? [LIST_TAG, 'PomodoroTask'] : staleTags(error);
 }
 
-// Terminar deja las pendientes en espera y puede cambiar la racha (API-004 RF-23, RF-38)
+// Al terminar una sesión, por tiempo o a mano: sus pendientes pasan a espera y puede cambiar la racha
+// (API-004 RF-23, RF-38)
+export function sessionEndedTags(): PomodoroTag[] {
+  return [LIST_TAG, 'PomodoroTask', 'PomodoroStreak'];
+}
+
 function statusChangeTags(error: unknown, status: PomodoroStatus): PomodoroTag[] {
   if (error !== undefined) return staleTags(error);
-  return status === 'finished' ? [LIST_TAG, 'PomodoroTask', 'PomodoroStreak'] : [LIST_TAG];
+  return status === 'finished' ? sessionEndedTags() : [LIST_TAG];
 }
 
 // La sesión que devuelve un cambio se guarda en su caché sin volver a pedirla; un rechazo no toca la caché

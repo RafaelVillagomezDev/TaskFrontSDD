@@ -5,6 +5,14 @@ const LOCALE = 'es-ES';
 
 const timeFormat = new Intl.DateTimeFormat(LOCALE, { hour: '2-digit', minute: '2-digit' });
 
+const dateTimeFormat = new Intl.DateTimeFormat(LOCALE, {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+  hour: '2-digit',
+  minute: '2-digit',
+});
+
 const weekdayFormat = new Intl.DateTimeFormat(LOCALE, { weekday: 'long' });
 const shortDateFormat = new Intl.DateTimeFormat(LOCALE, { day: '2-digit', month: '2-digit', year: 'numeric' });
 const longDateFormat = new Intl.DateTimeFormat(LOCALE, {
@@ -29,4 +37,9 @@ export function formatDayLong(day: string): string {
 // Hora local HH:mm de un instante (la de generación de un aviso)
 export function formatTime(instant: Date): string {
   return timeFormat.format(instant);
+}
+
+// Fecha y hora local de un instante ISO de la API (el inicio de una sesión pomodoro, 003 RF-39)
+export function formatDateTime(instant: string): string {
+  return dateTimeFormat.format(new Date(instant));
 }

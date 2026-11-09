@@ -1,4 +1,4 @@
-import { formatDayLong, formatShortDate, formatTime, formatWeekday } from '../date-format.util';
+import { formatDateTime, formatDayLong, formatShortDate, formatTime, formatWeekday } from '../date-format.util';
 
 // Formato español de fechas (spec S-03)
 describe('formato de fechas en español', () => {
@@ -18,5 +18,10 @@ describe('formato de fechas en español', () => {
   it('hora local con dos cifras', () => {
     expect(formatTime(new Date(2026, 9, 24, 22, 0))).toBe('22:00');
     expect(formatTime(new Date(2026, 9, 24, 7, 5))).toBe('07:05');
+  });
+
+  it('003 RF-39: fecha y hora local de un instante de la API', () => {
+    // Los tests corren en America/Los_Angeles (UTC-8 en noviembre)
+    expect(formatDateTime('2026-11-09T18:30:00Z')).toBe('9 nov 2026, 10:30');
   });
 });

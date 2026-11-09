@@ -16,10 +16,11 @@ export class AppShell {
     return this.page.getByRole('heading', { level: 1, name });
   }
 
-  // Abre el menú si la navegación está en el Drawer (móvil y tablet) y sigue el enlace
+  // Abre el menú si la navegación está en el Drawer (móvil y tablet) y sigue el enlace de la navegación principal
+  // (la subnavegación del pomodoro también tiene un «Historial», 003 RF-51)
   async navigateTo(screen: string): Promise<void> {
     if (await this.openMenu.isVisible()) await this.openMenu.click();
-    await this.page.getByRole('link', { name: screen }).click();
+    await this.page.getByRole('navigation', { name: 'Navegación principal' }).getByRole('link', { name: screen }).click();
   }
 
   // Nombre visible de la cuenta en la navegación (RF-50, RF-53): en el Sidebar (complementary) o, en móvil y

@@ -4,11 +4,14 @@ import { toApiError, type ApiErrorCode } from '@shared/api/api-error.util';
 import type { Page } from '@shared/api/api-envelope.schema';
 import { baseApi } from '@shared/api/base.api';
 import { validatedResult } from '@shared/api/validated-result.util';
+import { streakSchema, type Streak } from '@modules/streaks';
 import {
+  achievementListSchema,
   pomodoroPageSchema,
   pomodoroSchema,
   pomodoroTaskPageSchema,
   pomodoroTaskSchema,
+  type Achievement,
   type Pomodoro,
   type PomodoroStatus,
   type PomodoroTask,
@@ -174,6 +177,21 @@ export const pomodoroApi = baseApi.injectEndpoints({
         ),
       invalidatesTags: (_result, error) => (error === undefined ? ['Pomodoro', 'PomodoroTask'] : staleTags(error)),
     }),
+    // Racha del pomodoro (RF-41): misma forma que la racha del tablero, separada de ella (API-004 RF-41, RF-42).
+    // Terminar una sesión invalida PomodoroStreak (sessionEndedTags)
+    getPomodoroStreak: build.query<Streak, undefined>({
+      queryFn: async (_arg, _api, _extra, baseQuery) =>
+        validatedResult(await baseQuery('/pomodoro-streak'), streakSchema),
+      providesTags: ['PomodoroStreak'],
+    }),
+    // Los 11 logros en el orden del catálogo (RF-42, API-004 RF-19). La referencia solo separa entradas de caché de la
+    // misma petición (plan D-11): «baseline» al empezar, el id de la sesión al terminar y «current» en «Logros».
+    // Nada invalida PomodoroAchievement durante la sesión; se invalida al cerrar el resultado (RF-45, RF-68)
+    getPomodoroAchievements: build.query<Achievement[], string>({
+      queryFn: async (_ref, _api, _extra, baseQuery) =>
+        validatedResult(await baseQuery('/pomodoro-achievements'), achievementListSchema),
+      providesTags: ['PomodoroAchievement'],
+    }),
     // Borrar solo se permite en espera (API-004 RF-22)
     deleteWaitingTask: build.mutation<null, string>({
       queryFn: async (id, _api, _extra, baseQuery) =>
@@ -193,4 +211,6 @@ export const {
   useGetWaitingTasksQuery,
   useUpdatePomodoroTaskMutation,
   useDeleteWaitingTaskMutation,
+  useGetPomodoroStreakQuery,
+  useGetPomodoroAchievementsQuery,
 } = pomodoroApi;

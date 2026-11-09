@@ -1,5 +1,5 @@
 import { apiOk } from '@test-utils/mock-api';
-import type { Pomodoro, PomodoroTask } from '../schemas/pomodoro.schema';
+import type { Achievement, Pomodoro, PomodoroTask } from '../schemas/pomodoro.schema';
 
 // Datos de prueba del pomodoro con la forma de API-004, para los tests de hooks, componentes y páginas
 
@@ -39,4 +39,36 @@ export function pomodoroFixture(overrides: Partial<Pomodoro> = {}): Pomodoro {
 
 export function pomodoroPage(items: unknown[]) {
   return apiOk({ items, page: 1, pageSize: 20, totalItems: items.length, totalPages: items.length === 0 ? 0 : 1 });
+}
+
+export function achievementFixture(overrides: Partial<Achievement> = {}): Achievement {
+  return {
+    code: 'FIRST_POMODORO',
+    name: 'Primer pomodoro',
+    description: 'Termina tu primera sesión por tiempo.',
+    target: 1,
+    progress: 0,
+    unlocked: false,
+    unlockedAt: null,
+    ...overrides,
+  };
+}
+
+// Los 11 logros del catálogo de API-004 RF-43, sin conseguir, en su orden
+export const ACHIEVEMENT_CODES: readonly string[] = [
+  'FIRST_POMODORO',
+  'SESSIONS_10',
+  'SESSIONS_50',
+  'SESSIONS_100',
+  'STREAK_3',
+  'STREAK_7',
+  'STREAK_30',
+  'MARATHON',
+  'TASKS_10',
+  'TASKS_100',
+  'FOCUS_10H',
+];
+
+export function catalogFixture(): Achievement[] {
+  return ACHIEVEMENT_CODES.map((code) => achievementFixture({ code, name: `Logro ${code}` }));
 }

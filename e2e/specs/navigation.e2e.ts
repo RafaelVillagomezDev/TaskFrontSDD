@@ -6,7 +6,23 @@ import { AppShell } from '../pages/app-shell.po';
 import { LoginPage } from '../pages/login.po';
 
 const WEEK_LENGTH = 7;
-const PRIVATE_ROUTES = ['/', '/taskday', '/pomodoro', '/history', '/alerts', '/account'];
+const PRIVATE_ROUTES = [
+  '/',
+  '/taskday',
+  '/pomodoro',
+  '/pomodoro/history',
+  '/pomodoro/achievements',
+  '/history',
+  '/alerts',
+  '/account',
+];
+
+// Vistas de la sección del pomodoro en su subnavegación (003 RF-51 a RF-53)
+const POMODORO_VIEWS = [
+  { link: 'Historial', path: '/pomodoro/history' },
+  { link: 'Logros', path: '/pomodoro/achievements' },
+  { link: 'Sesión', path: '/pomodoro' },
+];
 
 // Pantallas de la navegación, con su ruta y su título (RF-50 y 002 RF-08)
 const SCREENS = [
@@ -65,6 +81,25 @@ test.describe('RF-50 y RF-54: navegación con sesión', () => {
         await shell.openMenu.click();
       }
       await expect(page.getByRole('link', { name: screen.link, exact: true })).toHaveAttribute('aria-current', 'page');
+      if (await page.getByRole('dialog').isVisible()) await page.keyboard.press('Escape');
+    }
+  });
+
+  test('003 RF-02 y RF-51: la subnavegación lleva a las tres vistas del pomodoro y «Pomodoro» sigue activo', async ({
+    page,
+    board,
+  }) => {
+    await board.board.waitFor();
+    const shell = new AppShell(page);
+    await shell.navigateTo('Pomodoro');
+    const subNavigation = page.getByRole('navigation', { name: 'Secciones del pomodoro' });
+    await expect(subNavigation.getByRole('link')).toHaveText(['Sesión', 'Historial', 'Logros']);
+    for (const view of POMODORO_VIEWS) {
+      await subNavigation.getByRole('link', { name: view.link }).click();
+      await expect(page).toHaveURL(new RegExp(`${view.path}$`));
+      await expect(subNavigation.getByRole('link', { name: view.link })).toHaveAttribute('aria-current', 'page');
+      if (await shell.openMenu.isVisible()) await shell.openMenu.click();
+      await expect(page.getByRole('link', { name: 'Pomodoro', exact: true })).toHaveAttribute('aria-current', 'page');
       if (await page.getByRole('dialog').isVisible()) await page.keyboard.press('Escape');
     }
   });

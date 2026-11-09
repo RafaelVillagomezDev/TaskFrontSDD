@@ -11,6 +11,7 @@ import { Countdown } from '../components/countdown.component';
 import { EditPomodoroTaskDialog } from '../components/edit-pomodoro-task-dialog.component';
 import { SessionAnnouncements } from '../components/session-announcements.component';
 import { SessionControls } from '../components/session-controls.component';
+import { NewAchievementsNotice } from '../components/new-achievements-notice.component';
 import { SessionResult } from '../components/session-result.component';
 import { SessionTaskActions } from '../components/session-task-actions.component';
 import { SessionTaskItem } from '../components/session-task-item.component';
@@ -35,7 +36,11 @@ export function PomodoroSessionPage() {
           <WaitingTaskPicker items={waiting.items} rows={startForm.rows} />
         </StartSessionForm>
       )}
-      {view.kind === 'result' && <SessionResult session={view.session} onStartAnother={page.startAnother} />}
+      {view.kind === 'result' && (
+        <SessionResult session={view.session} onStartAnother={page.startAnother}>
+          <NewAchievementsNotice achievements={page.newAchievements} />
+        </SessionResult>
+      )}
       {view.kind === 'session' && (
         <ActiveSession session={view.session}>
           <Countdown seconds={timer.seconds} paused={view.session.status === 'paused'} />

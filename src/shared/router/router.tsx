@@ -3,7 +3,13 @@ import { Navigate, type RouteObject } from 'react-router';
 import { AccountPage } from '@modules/account';
 import { AlertsPage } from '@modules/alerts';
 import { LoginPage, RegisterPage } from '@modules/auth';
-import { PomodoroLayout, PomodoroSessionPage } from '@modules/pomodoro';
+import {
+  PomodoroAchievementsPage,
+  PomodoroHistoryPage,
+  PomodoroLayout,
+  PomodoroSessionDetailPage,
+  PomodoroSessionPage,
+} from '@modules/pomodoro';
 import { BoardPage, HistoryPage, TaskDayPage } from '@modules/tasks';
 import { PrivateLayout } from './private.layout';
 import { ProtectedRoute } from './protected-route.component';
@@ -29,7 +35,12 @@ export const APP_ROUTES: RouteObject[] = [
           // Sección del pomodoro (003 RF-51): sus vistas cuelgan de este layout
           {
             element: <PomodoroLayout />,
-            children: [{ path: ROUTES.pomodoro, element: <PomodoroSessionPage /> }],
+            children: [
+              { path: ROUTES.pomodoro, element: <PomodoroSessionPage /> },
+              { path: ROUTES.pomodoroHistory, element: <PomodoroHistoryPage /> },
+              { path: `${ROUTES.pomodoroHistory}/:id`, element: <PomodoroSessionDetailPage /> },
+              { path: ROUTES.pomodoroAchievements, element: <PomodoroAchievementsPage /> },
+            ],
           },
           { path: ROUTES.history, element: <HistoryPage /> },
           { path: ROUTES.alerts, element: <AlertsPage /> },

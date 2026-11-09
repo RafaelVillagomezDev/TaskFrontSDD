@@ -173,3 +173,23 @@ export async function finishPomodoroInPage(page: Page, id: string): Promise<void
 export async function createWaitingTasksInPage(page: Page, tasks: NewPomodoroTaskData[]): Promise<void> {
   await finishPomodoroInPage(page, await startPomodoroInPage(page, { newTasks: tasks }));
 }
+
+const pomodoroTasksResponseSchema = z.object({
+  data: z.object({ tasks: z.array(z.object({ id: z.string(), title: z.string() })) }),
+});
+
+// Completa por API una tarea de una sesión activa, buscándola por su título (API-004 RF-13)
+export async function completePomodoroTaskInPage(page: Page, pomodoroId: string, title: string): Promise<void> {
+  const apiUrl = requireEnv('VITE_API_URL');
+  const me = meResponseSchema.parse(await (await page.request.get(`${apiUrl}/me`)).json());
+  const current = await page.request.get(`${apiUrl}/pomodoros/${pomodoroId}`, { headers: { ...buildClientTimeHeaders() } });
+  expectStatus(current, HTTP_OK, 'consultar la sesión pomodoro');
+  const session = pomodoroTasksResponseSchema.parse(await current.json());
+  const task = session.data.tasks.find((candidate) => candidate.title === title);
+  if (task === undefined) throw new Error(`La sesión ${pomodoroId} no tiene la tarea «${title}»`);
+  const completed = await page.request.patch(`${apiUrl}/pomodoro-tasks/${task.id}`, {
+    headers: { 'X-CSRF-Token': me.data.csrfToken, ...buildClientTimeHeaders() },
+    data: { completed: true },
+  });
+  expectStatus(completed, HTTP_OK, 'completar una tarea del pomodoro');
+}

@@ -1,6 +1,7 @@
 import { useActiveSession } from './use-active-session.hook';
 import { useAddTasksForm } from './use-add-tasks-form.hook';
 import { useEditPomodoroTask } from './use-edit-pomodoro-task.hook';
+import { useNewAchievements } from './use-new-achievements.hook';
 import { useSessionActions } from './use-session-actions.hook';
 import { useSessionTimer } from './use-session-timer.hook';
 import { useStartSessionForm } from './use-start-session-form.hook';
@@ -29,6 +30,7 @@ export function usePomodoroSessionPage() {
   const addForm = useAddTasksForm(session);
   const waiting = useWaitingTasks();
   const editTask = useEditPomodoroTask();
+  const newAchievements = useNewAchievements(active.view);
 
   return {
     view: active.view,
@@ -39,6 +41,12 @@ export function usePomodoroSessionPage() {
     waiting,
     editTask,
     retry: active.retry,
-    startAnother: active.clearResult,
+    // Logros conseguidos durante la sesión, para el aviso del resultado (RF-68)
+    newAchievements: newAchievements.unlocked,
+    // «Empezar otra sesión» (RF-71): quita el resultado y deja «Logros» al día (RF-68)
+    startAnother: () => {
+      active.clearResult();
+      newAchievements.close();
+    },
   };
 }

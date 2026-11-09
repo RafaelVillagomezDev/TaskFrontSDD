@@ -1,6 +1,9 @@
 import { addDays, todayKey } from '@shared/date/day.util';
-import { createTasks } from '../fixtures/api-client';
+import { createTasks, createWaitingTasksInPage, finishPomodoroInPage, startPomodoroInPage } from '../fixtures/api-client';
+import { worstCaseTasks } from '../fixtures/worst-case.fixture';
 import { PomodoroPage } from '../pages/pomodoro.po';
+import { PomodoroAchievementsPage } from '../pages/pomodoro-achievements.po';
+import { PomodoroHistoryPage } from '../pages/pomodoro-history.po';
 import { expect, test as authTest } from '../fixtures/auth.fixture';
 import { expectResponsive } from '../fixtures/responsive.fixture';
 import { test } from '../fixtures/tasks.fixture';
@@ -100,6 +103,44 @@ test.describe('RNF-03: pantallas con sesión', () => {
     await pomodoro.finish.click();
     await pomodoro.confirmDialog.getByRole('button', { name: 'Terminar sesión' }).click();
     await expect(pomodoro.result).toBeVisible();
+    await expectResponsive(page, testInfo);
+  });
+
+  test('RNF-03 y 003 CE-03: historial del pomodoro, detalle de una sesión y logros', async ({ page }, testInfo) => {
+    const id = await startPomodoroInPage(page, {
+      newTasks: [{ title: 'Una tarea con un título bastante largo para ver cómo se parte en móvil', date: todayKey() }],
+    });
+    await finishPomodoroInPage(page, id);
+    const history = new PomodoroHistoryPage(page);
+    await history.goto();
+    await expect(history.items).toHaveCount(1);
+    await expectResponsive(page, testInfo);
+    await history.openSession(0).click();
+    await expect(history.detailTasks).toBeVisible();
+    await expectResponsive(page, testInfo);
+    const achievements = new PomodoroAchievementsPage(page);
+    await achievements.goto();
+    await expect(achievements.cards).toHaveCount(11);
+    await expectResponsive(page, testInfo);
+  });
+
+  test('003 CE-03 y T060: el peor caso de contenido no rompe la sesión, las tareas en espera, el historial ni el detalle', async ({
+    page,
+  }, testInfo) => {
+    await createWaitingTasksInPage(page, worstCaseTasks());
+    const id = await startPomodoroInPage(page, { newTasks: worstCaseTasks() });
+    const pomodoro = new PomodoroPage(page);
+    await pomodoro.goto();
+    await expect(pomodoro.sessionTasks.getByRole('listitem')).toHaveCount(4);
+    await expect(pomodoro.waitingList.getByRole('listitem')).toHaveCount(4);
+    await expectResponsive(page, testInfo);
+
+    await finishPomodoroInPage(page, id);
+    const history = new PomodoroHistoryPage(page);
+    await history.goto();
+    await expectResponsive(page, testInfo);
+    await history.openSession(0).click();
+    await expect(history.detailTasks.getByRole('listitem')).toHaveCount(4);
     await expectResponsive(page, testInfo);
   });
 

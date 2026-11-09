@@ -31,6 +31,7 @@ export class PomodoroPage {
   readonly waitingPicker: Locator;
   readonly editDialog: Locator;
   readonly deleteDialog: Locator;
+  readonly newAchievements: Locator;
 
   constructor(page: Page) {
     this.page = page;
@@ -56,6 +57,7 @@ export class PomodoroPage {
     this.waitingPicker = page.getByRole('group', { name: 'Incluir tareas en espera' });
     this.editDialog = page.getByRole('dialog', { name: 'Editar tarea' });
     this.deleteDialog = page.getByRole('dialog', { name: '¿Borrar la tarea?' });
+    this.newAchievements = this.result.getByRole('status').filter({ hasText: /^¡Logros? conseguidos?!/ });
   }
 
   // Quitar de la sesión, editar y borrar, por el título de la tarea

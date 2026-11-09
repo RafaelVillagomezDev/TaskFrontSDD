@@ -9,7 +9,7 @@ import { POMODORO_TEXTS } from '../texts/pomodoro.texts';
 const { layout: texts } = POMODORO_TEXTS;
 
 // Estructura común de la sección del pomodoro (RF-51, plan §5.2): título, subnavegación y la vista de cada ruta.
-// En la Fase 1 solo existe «Sesión»; la Fase 2 añade «Historial» y «Logros» (plan D-7)
+// «Historial» sigue activo en el detalle de una sesión (RF-54)
 export function PomodoroLayout() {
   return (
     <PageContainer>
@@ -19,6 +19,10 @@ export function PomodoroLayout() {
         </PageHeader>
         <SubNavigation aria-label={texts.sections}>
           <SubNavigation.Link to={ROUTES.pomodoro}>{texts.session}</SubNavigation.Link>
+          <SubNavigation.Link to={ROUTES.pomodoroHistory} matchSubroutes>
+            {texts.history}
+          </SubNavigation.Link>
+          <SubNavigation.Link to={ROUTES.pomodoroAchievements}>{texts.achievements}</SubNavigation.Link>
         </SubNavigation>
       </div>
       <Outlet />

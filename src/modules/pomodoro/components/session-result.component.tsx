@@ -4,7 +4,7 @@ import { Button } from '@shared/ui/button.component';
 import { Spinner } from '@shared/ui/spinner.component';
 import { Text } from '@shared/ui/text.component';
 import type { Pomodoro, PomodoroTask } from '../schemas/pomodoro.schema';
-import { focusDuration, POMODORO_TEXTS } from '../texts/pomodoro.texts';
+import { POMODORO_TEXTS, sessionOutcome } from '../texts/pomodoro.texts';
 
 interface SessionResultProps {
   // Sesión terminada; undefined mientras se carga tras una recarga
@@ -58,9 +58,7 @@ export function SessionResult({ session, onStartAnother, children }: Readonly<Se
               {texts.title}
             </Text>
             <Text variant="body-sm" tone="muted">
-              {session.endReason === 'manual' ? texts.manual : texts.byTime}
-              {' · '}
-              {texts.focus(focusDuration(session.focusedSeconds ?? 0))}
+              {sessionOutcome(session.endReason, session.focusedSeconds)}
             </Text>
             <Text variant="body" className="font-semibold">
               {sessionTexts.summary(session.completedTasks, session.totalTasks)}

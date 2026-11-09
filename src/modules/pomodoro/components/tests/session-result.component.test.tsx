@@ -50,6 +50,7 @@ describe('focusDuration', () => {
     [0, '0 min'],
     [1499, '24 min'],
     [3900, '1 h 5 min'],
+    [36000, '10 h'],
   ])('%i s → %s', (seconds, text) => {
     expect(focusDuration(seconds)).toBe(text);
   });

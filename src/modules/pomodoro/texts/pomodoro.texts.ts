@@ -1,11 +1,22 @@
 import { MINUTES_PER_HOUR, SECONDS_PER_MINUTE } from '../schemas/pomodoro.constants';
 
-// Duración de concentración: «45 min» o «1 h 5 min» (minutos enteros hacia abajo, como API-004 RF-65)
-export function focusDuration(seconds: number): string {
-  const totalMinutes = Math.floor(seconds / SECONDS_PER_MINUTE);
+// Minutos en horas y minutos: «45 min», «1 h 5 min» o, con horas exactas, «10 h» (RF-44)
+export function minutesDuration(totalMinutes: number): string {
   const hours = Math.floor(totalMinutes / MINUTES_PER_HOUR);
   const minutes = totalMinutes % MINUTES_PER_HOUR;
-  return hours === 0 ? `${String(minutes)} min` : `${String(hours)} h ${String(minutes)} min`;
+  if (hours === 0) return `${String(minutes)} min`;
+  return minutes === 0 ? `${String(hours)} h` : `${String(hours)} h ${String(minutes)} min`;
+}
+
+// Duración de concentración (minutos enteros hacia abajo, como API-004 RF-65)
+export function focusDuration(seconds: number): string {
+  return minutesDuration(Math.floor(seconds / SECONDS_PER_MINUTE));
+}
+
+// Cómo terminó una sesión y cuánto tiempo de concentración tuvo (RF-27, RF-39)
+export function sessionOutcome(endReason: 'time' | 'manual' | null, focusedSeconds: number | null): string {
+  const reason = endReason === 'manual' ? 'Terminada a mano' : 'Terminada por tiempo';
+  return `${reason} · ${focusDuration(focusedSeconds ?? 0)} de concentración`;
 }
 
 // «Queda 1 minuto» o «Quedan N minutos», con el verbo concordando (redondeado hacia arriba: con 30 s, 1 minuto)
@@ -20,6 +31,52 @@ export const POMODORO_TEXTS = {
     // Subnavegación de la sección (RF-51)
     sections: 'Secciones del pomodoro',
     session: 'Sesión',
+    history: 'Historial',
+    achievements: 'Logros',
+  },
+  // Racha y logros del pomodoro (RF-41 a RF-44, RF-67)
+  achievements: {
+    streak: 'Racha del pomodoro',
+    streakHelp: 'Días seguidos con al menos una sesión terminada por tiempo.',
+    region: 'Logros del pomodoro',
+    title: 'Logros',
+    list: 'Logros',
+    unlocked: 'Conseguido',
+    unlockedOn: (date: string): string => `Conseguido el ${date}`,
+    progress: (name: string): string => `Progreso de «${name}»`,
+    count: (progress: string, target: string): string => `${progress} de ${target}`,
+  },
+  // Aviso de logros nuevos en el resultado (RF-68)
+  newAchievements: {
+    title: (count: number): string => (count === 1 ? '¡Logro conseguido!' : '¡Logros conseguidos!'),
+    list: 'Logros nuevos',
+    open: 'Ver mis logros',
+  },
+  // Historial de sesiones (RF-38, RF-39)
+  history: {
+    title: 'Historial de sesiones',
+    list: 'Sesiones',
+    duration: (minutes: number): string => `Sesión de ${String(minutes)} min`,
+    openPrefix: 'Ver la sesión del ',
+    running: 'En curso',
+    paused: 'En pausa',
+    total: (count: number): string => (count === 1 ? '1 sesión' : `${String(count)} sesiones`),
+    empty: 'Todavía no tienes sesiones.',
+    startFirst: 'Empezar una sesión',
+  },
+  // Detalle de una sesión del historial (RF-40, RF-49, RF-54)
+  detail: {
+    back: 'Volver al historial',
+    tasks: 'Tareas de la sesión',
+    noTasks: 'Esta sesión no tuvo tareas.',
+    completed: 'Completada: ',
+    pending: 'Pendiente: ',
+    stillActive: 'Esta sesión sigue en marcha.',
+    goToSession: 'Ir a la sesión',
+    notFound: 'No encontramos esta sesión.',
+    notFoundHelp: 'Puede que el enlace no sea correcto o que la sesión ya no exista.',
+    goToPomodoro: 'Ir al pomodoro',
+    loading: 'Cargando la sesión…',
   },
   // Formulario de empezar una sesión (RF-06 a RF-14)
   start: {
@@ -94,9 +151,6 @@ export const POMODORO_TEXTS = {
   result: {
     region: 'Resultado de la sesión',
     title: 'Sesión terminada',
-    byTime: 'Terminada por tiempo',
-    manual: 'Terminada a mano',
-    focus: (duration: string): string => `${duration} de concentración`,
     completed: 'Completadas',
     pending: 'Pendientes',
     pendingMoved: 'Han pasado a tus tareas en espera: puedes incluirlas en otra sesión.',

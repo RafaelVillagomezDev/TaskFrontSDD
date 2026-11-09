@@ -222,3 +222,88 @@ describe('pomodoroApi: rechazos de estado (RF-46, RF-48)', () => {
     list.unsubscribe();
   });
 });
+
+const ACHIEVEMENT = {
+  code: 'FIRST_POMODORO',
+  name: 'Primer pomodoro',
+  description: 'Termina tu primera sesión por tiempo',
+  target: 1,
+  progress: 0,
+  unlocked: false,
+  unlockedAt: null,
+};
+
+describe('pomodoroApi: racha y logros (Fase 2)', () => {
+  it('RF-41: pide la racha del pomodoro a GET /pomodoro-streak con la forma de la racha del tablero', async () => {
+    mockApi({ 'GET /pomodoro-streak': () => apiOk({ current: 2, best: 5 }) });
+    const result = await store.dispatch(pomodoroApi.endpoints.getPomodoroStreak.initiate(undefined, { subscribe: false }));
+    expect(result.data).toEqual({ current: 2, best: 5 });
+  });
+
+  it('RF-42: pide los logros a GET /pomodoro-achievements y valida cada uno', async () => {
+    mockApi({ 'GET /pomodoro-achievements': () => apiOk([ACHIEVEMENT]) });
+    const result = await store.dispatch(
+      pomodoroApi.endpoints.getPomodoroAchievements.initiate('current', { subscribe: false }),
+    );
+    expect(result.data).toEqual([ACHIEVEMENT]);
+  });
+
+  it('RF-44 (001): un logro fuera de contrato se trata como INTERNAL_ERROR', async () => {
+    mockApi({ 'GET /pomodoro-achievements': () => apiOk([{ ...ACHIEVEMENT, progress: -1 }]) });
+    const result = await store.dispatch(
+      pomodoroApi.endpoints.getPomodoroAchievements.initiate('current', { subscribe: false }),
+    );
+    expect(toApiError(result.error).code).toBe('INTERNAL_ERROR');
+  });
+
+  it('plan D-11: cada referencia es una entrada de caché distinta de la misma petición', async () => {
+    const api = mockApi({ 'GET /pomodoro-achievements': () => apiOk([ACHIEVEMENT]) });
+    const baseline = store.dispatch(pomodoroApi.endpoints.getPomodoroAchievements.initiate('baseline'));
+    const atEnd = store.dispatch(pomodoroApi.endpoints.getPomodoroAchievements.initiate('p-1'));
+    await baseline;
+    await atEnd;
+
+    expect(count(api.requests, 'GET', '/pomodoro-achievements')).toBe(2);
+    baseline.unsubscribe();
+    atEnd.unsubscribe();
+  });
+
+  it('RF-41: terminar una sesión vuelve a pedir la racha; pausarla no', async () => {
+    const api = mockApi({
+      'GET /pomodoro-streak': () => apiOk({ current: 0, best: 0 }),
+      'PATCH /pomodoros/p-1': async (request) => {
+        const body: unknown = await request.json();
+        const finished = body !== null && typeof body === 'object' && 'status' in body && body.status === 'finished';
+        return apiOk(session('p-1', finished ? 'finished' : 'paused'));
+      },
+    });
+    const streak = store.dispatch(pomodoroApi.endpoints.getPomodoroStreak.initiate(undefined));
+    await streak;
+
+    await store.dispatch(pomodoroApi.endpoints.changePomodoroStatus.initiate({ id: 'p-1', status: 'paused' }));
+    await settle();
+    expect(count(api.requests, 'GET', '/pomodoro-streak')).toBe(1);
+
+    await store.dispatch(pomodoroApi.endpoints.changePomodoroStatus.initiate({ id: 'p-1', status: 'finished' }));
+    await settle();
+    expect(count(api.requests, 'GET', '/pomodoro-streak')).toBe(2);
+    streak.unsubscribe();
+  });
+
+  it('RF-45 y plan D-11: ni terminar ni completar una tarea vuelven a pedir la referencia de logros', async () => {
+    const api = mockApi({
+      'GET /pomodoro-achievements': () => apiOk([ACHIEVEMENT]),
+      'PATCH /pomodoros/p-1': () => apiOk(session('p-1', 'finished')),
+      'PATCH /pomodoro-tasks/t-1': () => apiOk({ ...TASK, completed: true, completedAt: '2026-11-09T09:10:00Z' }),
+    });
+    const baseline = store.dispatch(pomodoroApi.endpoints.getPomodoroAchievements.initiate('baseline'));
+    await baseline;
+
+    await store.dispatch(pomodoroApi.endpoints.updatePomodoroTask.initiate({ id: 't-1', changes: { completed: true } }));
+    await store.dispatch(pomodoroApi.endpoints.changePomodoroStatus.initiate({ id: 'p-1', status: 'finished' }));
+    await settle();
+
+    expect(count(api.requests, 'GET', '/pomodoro-achievements')).toBe(1);
+    baseline.unsubscribe();
+  });
+});

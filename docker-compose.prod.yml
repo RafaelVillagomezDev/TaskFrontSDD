@@ -13,7 +13,11 @@ services:
         VITE_TURNSTILE_SITE_KEY: ${VITE_TURNSTILE_SITE_KEY:?Falta VITE_TURNSTILE_SITE_KEY en .env.prod}
         # Servidor web de producción: detrás del proxy de Dokploy, siempre HTTPS (spec 004 RF-14 a RF-18)
         NGINX_ENV: pro
-    env_file: .env.prod
+    # Solo VITE_API_URL hace falta al arrancar (Nginx la sustituye en la CSP). Se interpola en vez de usar
+    # env_file: .env.prod, porque ese fichero no se versiona y Dokploy (que clona el repo y escribe las variables de
+    # su pestaña Environment en .env) no lo tiene, así que el despliegue fallaba
+    environment:
+      VITE_API_URL: ${VITE_API_URL}
     # Sin puertos publicados (spec 004 S-02, plan D-6): el proxy de Dokploy llega por la red interna de Docker, y así
     # sus cabeceras X-Forwarded-Proto y X-Forwarded-For son fiables. En Dokploy, el dominio apunta a este servicio y
     # a su puerto 8080

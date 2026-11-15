@@ -1,0 +1,71 @@
+# Entorno de desarrollo: web (Vite, Dockerfile.dev) y e2e (Playwright), ambos con .env.dev
+# TaskApiSDD se levanta desde su propio repositorio y escucha en http://localhost:3000
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    env_file: .env.dev
+    environment:
+      # Site key de prueba de Cloudflare Turnstile que siempre pasa: pública y la misma para todos (spec 005 RF-12,
+      # plan D-7). La real solo se usa al construir la imagen de producción
+      VITE_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+    ports:
+      - '5173:5173'
+    volumes:
+      # Código montado para la recarga en caliente
+      - .:/app
+      # Evita que el volumen general pise las dependencias del contenedor
+      - /app/node_modules
+
+  e2e:
+    # Debe coincidir con la versión exacta de @playwright/test de package.json (plan §3)
+    image: mcr.microsoft.com/playwright:v1.64.1-noble
+    env_file: .env.dev
+    environment:
+      COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+      VITE_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+    # Red del host: el navegador ve la app en localhost:5173 y la API en localhost:3000,
+    # el origen coincide con CORS_ORIGIN y las cookies Secure se aceptan (plan R-2)
+    network_mode: host
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /app/node_modules
+    entrypoint: ['sh', '-c', 'corepack enable && pnpm install --frozen-lockfile && exec "$$@"', '--']
+    profiles: ['e2e']
+
+  # Imagen de producción con su servidor web, para las E2E de seguridad (spec 004 CE-04, CE-05, plan D-7):
+  #   docker compose -f docker-compose.dev.yml --profile security up --build -d pre pro
+  # pre sirve por HTTP como preproducción; pro se prueba enviando Host y X-Forwarded-Proto como lo haría Dokploy
+  pre:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: http://localhost:3000
+        VITE_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+        NGINX_ENV: pre
+    environment:
+      VITE_API_URL: http://localhost:3000
+    ports:
+      - '8081:8080'
+    # Registro de accesos también en .nginx-logs/access.log, que la E2E lee para comprobar la IP real (RF-25)
+    volumes:
+      - ./nginx/testing:/etc/nginx/snippets/testing:ro
+      - ./.nginx-logs:/var/log/nginx-test
+    profiles: ['security']
+
+  pro:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        VITE_API_URL: https://apikompitu.yandrydev.cloud
+        VITE_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
+        NGINX_ENV: pro
+    environment:
+      VITE_API_URL: https://apikompitu.yandrydev.cloud
+    ports:
+      - '8082:8080'
+    profiles: ['security']

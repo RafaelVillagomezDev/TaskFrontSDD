@@ -1,0 +1,36 @@
+import type { ReactNode } from 'react';
+import type { LucideIcon } from 'lucide-react';
+import { NavLink } from 'react-router';
+
+import { cn } from '@shared/utils/class-names.util';
+import { Icon } from '@shared/ui/icon.component';
+
+interface NavItemProps {
+  to: string;
+  icon: LucideIcon;
+  children: ReactNode;
+  // También activo en las subrutas (/pomodoro/history marca «Pomodoro»); por defecto, solo en la ruta exacta
+  matchSubroutes?: boolean;
+}
+
+// Ítem de navegación de DESIGN.md: icono de 20 px + etiqueta Body SM 500, padding 12 px 16 px. El activo lleva
+// borde izquierdo de 3 px en el acento y fondo tintado; NavLink le pone aria-current="page" (RF-54)
+export function NavItem({ to, icon, children, matchSubroutes = false }: Readonly<NavItemProps>) {
+  return (
+    <NavLink
+      to={to}
+      end={!matchSubroutes}
+      className={({ isActive }) =>
+        cn(
+          'focus-ring anim-fast flex min-h-touch items-center gap-3 rounded-md border-l-3 px-4 py-3 text-body-sm font-medium transition-colors',
+          isActive
+            ? 'border-primary bg-nav-active text-primary-text'
+            : 'border-transparent text-foreground-muted hover:bg-surface-subtle hover:text-foreground',
+        )
+      }
+    >
+      <Icon icon={icon} />
+      {children}
+    </NavLink>
+  );
+}

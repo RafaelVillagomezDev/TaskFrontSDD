@@ -1,0 +1,15 @@
+# Prettier solo formatea código y configuración; la documentación y los generados quedan fuera
+*.md
+*.MD
+pnpm-lock.yaml
+skills-lock.json
+docs/
+sdd/
+.claude/
+dist/
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.playwright-mcp/
+graphify-out/

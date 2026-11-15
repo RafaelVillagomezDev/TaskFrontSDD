@@ -1,0 +1,218 @@
+# TaskFrontSDD
+
+**Kompitu**: aplicación web (SPA) para gestionar tareas diarias y seguir rachas de productividad (días consecutivos). Consume la API REST **TaskApiSDD**.
+
+## Estado del proyecto
+
+**MVP implementado.** La primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) está terminada: sus 116 tareas hechas, incluidas las correcciones T115 y T116, y su spec en estado *Implementada*. Cada RF tiene al menos un test con su nombre, y la suite completa pasa en Chromium y Firefox, en móvil, tablet y escritorio.
+
+| Elemento | Estado |
+| :--- | :--- |
+| `CONSTITUTION.md`, `AGENTS.md`, `DESIGN.md` | Listos |
+| Tokens de diseño (`src/styles/design-tokens.css`) | Paleta cálida (papel, tinta y carbón con acento Tide) en claro y oscuro; el contraste de cada pareja se comprueba con un test |
+| Referencia de diseño del tablero (`docs/design/`) | Lista |
+| Proyecto Vite + React, Docker, SonarQube, hooks de git | Listos |
+| Primera funcionalidad (`sdd/001-taskFrontSDD-mvp/`) | Spec *Implementada*: 116 de 116 tareas (fase B: aviso de racha en juego e historial actualizado al completar). Cobertura del 99,9 % de líneas, quality gate en verde y E2E en los 6 proyectos de Playwright |
+| Cambio previo en TaskApiSDD: `GET /me` devuelve `csrfToken` | Hecho (spec 003 de la API): la sesión sigue tras recargar |
+| Segunda funcionalidad (`sdd/002-taskDay/`): tareas completadas hoy en `/taskday` | Spec *Implementada*: 12 de 12 tareas, cada RF con su test y E2E en los 6 proyectos de Playwright |
+| Tercera funcionalidad (`sdd/003-pomodoro-task-session/`): sesiones pomodoro con lista de tareas (API-004) | Spec *Implementada*: 62 de 62 tareas en dos fases, P1 (sesión, lista y tareas en espera) y P2 (historial, racha y logros), cada RF con su test. Jest (1033 tests, 99,5 % de líneas), E2E en los 6 proyectos en paralelo con una cuenta por test y quality gate en verde |
+| Cuarta funcionalidad (`sdd/004-front-security-hardening/`): seguridad del front (datos al caducar la sesión, cierre de sesión en todas las pestañas, vuelta tras el login solo a rutas propias y cabeceras de producción) | Spec *Implementada*: 18 de 18 tareas, cada RF con su test. Sesión y pestañas, `returnTo` y servidor web conectado a la imagen (`NGINX_ENV=pre|pro`), con Jest (1076 tests, 99,5 % de líneas), E2E en los 6 proyectos, `test:security` y quality gate en verde |
+| Quinta funcionalidad (`sdd/005-turnstile-bot-protection/`): protección frente a bots con Cloudflare Turnstile en el inicio de sesión y el registro | Spec *Implementada*: 15 de 15 tareas, cada RF con su test. Widget *managed* con render explícito y sin dependencias nuevas, `turnstileToken` en el cuerpo (API-005), CSP ampliada a `challenges.cloudflare.com` (004 RF-12). Jest (1134 tests, 99,4 % de líneas), E2E en los 6 proyectos, `test:security` y quality gate en verde |
+
+## Funcionalidades
+
+- **Cuenta y sesión:** registro, inicio y cierre de sesión con cookies y token CSRF, renovación automática de la sesión y vuelta a la pantalla pedida. El inicio de sesión y el registro piden la comprobación anti-bots de Cloudflare Turnstile (widget *managed*, spec 005).
+- **Tablero semanal** (`/`): 7 días desde hoy, navegación de semana en semana, crear, editar, completar y eliminar tareas, y días pasados de solo lectura.
+- **Racha y progreso de hoy:** racha actual y mejor racha de la API, «X de Y tareas completadas» y aviso cuando la racha está en juego.
+- **Hecho hoy** (`/taskday`): las tareas completadas hoy, en solo lectura, con su total; se actualiza sin recargar al completar o desmarcar en el tablero.
+- **Pomodoro** (`/pomodoro`): sesiones de concentración de 15, 25, 45 o 60 minutos, o de 1 a 120 con «Otra», con una lista de hasta 20 tareas. La cuenta atrás sigue igual tras recargar; se puede pausar, reanudar y terminar con confirmación, y completar, añadir o quitar tareas durante la sesión. Al terminar avisa con un sonido (que se puede silenciar), con el título de la pestaña y a los lectores de pantalla, y muestra el resultado. Las tareas pendientes pasan a espera, desde donde se editan, se borran o se incluyen en otra sesión. En «Historial» (`/pomodoro/history`) están las sesiones pasadas, con su detalle en solo lectura, y en «Logros» (`/pomodoro/achievements`), la racha del pomodoro y los 11 logros con su progreso. Al terminar una sesión, el resultado avisa de los logros conseguidos en ella.
+- **Historial** (`/history`): todas las tareas con filtros de estado y de fechas en la URL, paginadas.
+- **Avisos** (`/alerts`): los avisos de las 22:00, paginados, y el de hoy destacado en el tablero.
+- **Cuenta** (`/account`): perfil con el nombre editable, cambio de contraseña y borrado de la cuenta.
+
+## Stack
+
+| Área | Tecnología |
+| :--- | :--- |
+| Lenguaje | TypeScript (modo estricto) |
+| UI | React (componentes funcionales + hooks) |
+| Build | Vite |
+| Enrutado | React Router |
+| Estado y API | Redux Toolkit + RTK Query |
+| Formularios | React Hook Form + Zod |
+| Estilos | Tailwind CSS v4 con tokens propios |
+| Iconos | Lucide |
+| Pruebas | Jest + React Testing Library · Playwright (E2E en Chromium y Firefox contra TaskApiSDD real) |
+| Paquetes | pnpm |
+| Contenedores | Docker + Docker Compose (Nginx en producción) |
+| Calidad | SonarQube (quality gate en cada push) |
+
+## Estructura
+
+```text
+./
+├── CONSTITUTION.md            # Leyes del proyecto (prevalece sobre todo lo demás)
+├── AGENTS.md                  # Guía corta para agentes de IA
+├── DESIGN.md                  # Sistema de diseño de Kompitu
+├── README.md                  # Este fichero (guía operativa completa)
+├── sdd/                       # Spec, plan y tasks de cada funcionalidad
+├── docs/design/               # Referencias de diseño
+├── e2e/                       # Pruebas end-to-end con Playwright
+├── src/
+│   ├── styles/                # Tokens de diseño de Tailwind
+│   ├── shared/                # UI base, layout reutilizable, store, API base, router y utilidades
+│   └── modules/               # auth, tasks, streaks, alerts, account, pomodoro (un módulo vertical por funcionalidad)
+├── Dockerfile.dev             # Vite dev server en :5173 con hot reload
+├── Dockerfile.prod            # Multi-stage: build con Vite → Nginx sin root con fallback SPA
+├── nginx/                     # Plantilla de Nginx (fallback SPA, caché) y cabeceras de seguridad (CSP)
+├── docker-compose.dev.yml     # Servicios web y e2e con .env.dev
+├── docker-compose.prod.yml    # Proyecto taskfrontsdd-prod con .env.prod
+├── docker-compose.sonar.yml   # SonarQube en :9001 y el scanner
+├── sonar-project.properties   # Fuentes, tests, exclusiones y cobertura
+├── scripts/                   # sonar-setup.sh, sonar-scan.sh, sonar-issues.sh
+├── .githooks/                 # pre-commit (README vivo) y pre-push (E2E de Chromium + quality gate)
+├── jest/                      # Entorno jsdom con el fetch de Node, setup y utilidades de test (mockApi, render con store y router)
+├── vite.config.ts · jest.config.ts · playwright.config.ts
+├── tsconfig.json              # Índice para el editor: referencia tsconfig.app.json (app y Jest), tsconfig.node.json (*.config.ts) y tsconfig.e2e.json
+├── .env.example               # Variables sin valor (versionado)
+├── .claude/ · .claudeignore   # Configuración de Claude Code (permisos, hooks, skills)
+└── CLAUDE.MD                  # Reglas para Claude Code (importa AGENTS.md)
+```
+
+## Guía operativa
+
+El proyecto **siempre** se ejecuta dentro de Docker: nada se instala ni se lanza en la máquina host (graphify es la única excepción).
+
+| Entorno | Servicio | URL |
+| :--- | :--- | :--- |
+| Desarrollo | `web` (Vite) | http://localhost:5173 |
+| Producción | `web` (Nginx) | https://kompitu.yandrydev.cloud |
+| SonarQube | `sonarqube` | http://localhost:9001 |
+| API en desarrollo (TaskApiSDD, otro repositorio) | `api` | http://localhost:3000 |
+
+### Variables de entorno
+`.env.dev` y `.env.prod` están ignorados por git; `.env.example` las lista sin valor.
+
+| Variable | `.env.dev` | `.env.prod` |
+| :--- | :--- | :--- |
+| `VITE_API_URL` | `http://localhost:3000` | `https://apikompitu.yandrydev.cloud` |
+| `VITE_TURNSTILE_SITE_KEY` | No va en `.env.dev`: `docker-compose.dev.yml` fija la site key de prueba `1x00000000000000000000AA`, que siempre pasa | `0x4AAAAAAGCKQh7WSaKl9bC0` (site key pública del widget) |
+| `WEB_HOST_PORT` | — | Puerto del host donde se publica Nginx |
+| `E2E_USER_EMAIL` / `E2E_USER_PASSWORD` | Usuario de prueba dedicado en TaskApiSDD | — |
+| `SONAR_ADMIN_PASSWORD` | Mínimo 12 caracteres con mayúscula, minúscula, dígito y símbolo | — |
+| `SONAR_TOKEN` | Lo rellena `scripts/sonar-setup.sh` | — |
+
+Las variables `VITE_*` se incrustan en el bundle **en tiempo de build**: son públicas (nunca secretos) y cambiarlas en producción exige reconstruir la imagen.
+
+### Desarrollo
+```bash
+docker compose -f docker-compose.dev.yml up --build                  # Construir y levantar web con hot reload
+docker compose -f docker-compose.dev.yml down                        # Parar los contenedores
+docker compose -f docker-compose.dev.yml exec web pnpm add <pkg>     # Añadir una dependencia dentro del contenedor
+docker compose -f docker-compose.dev.yml cp web:/app/node_modules ./ # Copiar node_modules al host para que el editor vea los tipos
+git config core.hooksPath .githooks                                  # Activar los hooks de git (una vez por clon)
+```
+`node_modules` vive en un volumen anónimo del contenedor (`/app/node_modules`):
+- `run --rm web pnpm install` **no** sirve: instala en un volumen temporal que se borra al terminar.
+- Tras cambiar `package.json` hay que usar `up --build -V` (`--renew-anon-volumes`).
+- El `./node_modules` del host es solo una copia para el editor.
+
+Safari no acepta cookies `Secure` en `http://localhost`: para desarrollar usa Chrome o Firefox.
+
+En los tests unitarios ninguna petición llega a la red: `jest/setup.ts` hace fallar todo `fetch` sin simular, y cada test simula la API con `mockApi` (`jest/mock-api.ts`).
+
+### Pruebas end-to-end
+- El servicio `e2e` usa la imagen oficial `mcr.microsoft.com/playwright` con la **misma versión** que `@playwright/test`.
+- Usa `network_mode: host` para que el navegador vea la app en `localhost:5173` y la API en `localhost:3000`. Solo así coinciden el origen con `CORS_ORIGIN` y se aceptan las cookies `Secure`.
+- En Docker Desktop (macOS/Windows) requiere activar **Settings → Resources → Network → Enable host networking**.
+- Antes de ejecutarlas: `web` levantado, TaskApiSDD levantada y el usuario de prueba creado. TaskApiSDD tiene que tener su funcionalidad 005 (Turnstile) con la clave secreta de prueba `1x0000000000000000000000000000000AA` y `example.com` en `TURNSTILE_ALLOWED_HOSTNAMES`. Las fixtures envían el token ficticio `XXXX.DUMMY.TOKEN.XXXX` en cada login y registro por API, así que funcionan con `TURNSTILE_ENFORCE` a `true` o a `false`. Las E2E de acceso cargan el widget real de Cloudflare: necesitan salida a Internet. Las E2E del pomodoro (spec 003) necesitan además TaskApiSDD con su funcionalidad 004 (sesiones pomodoro): `GET /pomodoros` tiene que existir.
+- Los tests que necesitan una cuenta propia la registran por API con un email único (`e2e-…@kompitu.test`) y la borran al terminar (`e2e/fixtures/auth.fixture.ts`). Cada pantalla pasa por `expectResponsive` (`e2e/fixtures/responsive.fixture.ts`). Las tareas que necesita un test se crean por API en esa cuenta (`createTasks`, en `e2e/fixtures/api-client.ts`) y se borran con ella. El fixture `signedInPage` (`e2e/fixtures/session.fixture.ts`) da la página con la sesión de una cuenta nueva ya iniciada por API (`loginInPage`), sin pasar por el formulario; el fixture `board` (`e2e/fixtures/tasks.fixture.ts`) lo usa para entrar en el tablero. El login por la interfaz se prueba en `login.e2e.ts` y `fields-auth.e2e.ts`.
+- Los tests se reparten entre los workers también dentro de un mismo fichero (`fullyParallel: true` en `playwright.config.ts`): ninguno depende de otro porque cada uno usa su propia cuenta. La suite completa (1152 tests en los 6 proyectos) tarda unos 10 minutos.
+```bash
+docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:e2e         # Todas, en Chromium y Firefox
+docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:e2e:report  # Informe HTML del último run
+```
+- **Seguridad del servidor web** (spec 004): las cabeceras, la redirección a HTTPS, los límites por IP y la consola sin infracciones de la política de contenido solo existen en la imagen de producción, no en Vite. Se prueban contra los servicios `pre` (puerto 8081) y `pro` (8082) del perfil `security`, construidos con `Dockerfile.prod`. Van en un proyecto propio de Playwright (`security`, ficheros `e2e/security/*.security.ts`) que no ejecutan `pnpm test:e2e` ni el pre-push. Solo en este entorno, `pre` escribe también el registro de accesos en `.nginx-logs/access.log` (ignorado por git), que la E2E lee para comprobar la IP real (`nginx/testing/`).
+```bash
+docker compose -f docker-compose.dev.yml --profile security up --build -d pre pro   # Imagen de producción en pre y pro
+docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:security            # Cabeceras, HTTPS, límites y consola
+```
+- Docker Desktop necesita al menos **12 GB de memoria** (Settings → Resources): con las dos instancias de SonarQube (la de este repositorio y la de TaskApiSDD) y 6 navegadores Firefox en paralelo, con 8 GB los tests agotan sus tiempos de espera. Si no se puede subir, `--workers=2` lo evita a cambio de tardar más.
+
+### Producción
+Proyecto de Compose propio (`taskfrontsdd-prod`): compila con Vite y sirve `dist/` con Nginx sin root, con fallback a `index.html`. Se despliega con **Dokploy**.
+- **Servidor web por entorno** (spec 004): el build arg `NGINX_ENV` es obligatorio y elige la plantilla de `nginx/`.
+  - `pro` (`pro.conf.template`): producción detrás del proxy de Dokploy (Traefik). Solo atiende `kompitu.yandrydev.cloud`, redirige a HTTPS lo que llegue por HTTP, envía HSTS y descarta otros dominios.
+  - `pre` (`pre.conf.template`): las mismas políticas por HTTP, sin HSTS, para probar la imagen.
+  - Comunes a los dos: `security-headers.conf` (política de contenido con la API y Google Fonts, sin más script ni iframe de fuera que los de Cloudflare Turnstile, Trusted Types, `Permissions-Policy`, COOP y CORP), `http-hardening.conf` y `server-hardening.conf` (IP real del cliente, 20 peticiones por segundo y 30 conexiones por IP, solo `GET` y `HEAD`, `404` en rutas de escáneres, tamaños, tiempos y registro con la IP real).
+- **Dokploy:** obtiene y renueva el certificado de Let's Encrypt y termina HTTPS. El servicio **no publica puertos** (`expose: 8080`): en Dokploy, el dominio `kompitu.yandrydev.cloud` apunta al servicio `web`, puerto `8080`, con HTTPS activado. Si se publicara un puerto, se podría llegar al contenedor sin pasar por el proxy y falsificar `X-Forwarded-Proto` y `X-Forwarded-For`.
+```bash
+docker compose --env-file .env.prod -f docker-compose.prod.yml up --build -d    # Construir y levantar (NGINX_ENV=pro)
+docker compose -f docker-compose.prod.yml down             # Parar
+docker build -f Dockerfile.prod --build-arg VITE_API_URL=https://apikompitu.yandrydev.cloud --build-arg VITE_TURNSTILE_SITE_KEY=0x4AAAAAAGCKQh7WSaKl9bC0 --build-arg NGINX_ENV=pro -t taskfrontsdd:latest .   # Construir solo la imagen
+```
+- **Turnstile (spec 005):** la imagen no se construye sin `VITE_TURNSTILE_SITE_KEY`. Orden de despliegue para no cortar el acceso:
+  1. TaskApiSDD con `TURNSTILE_ENFORCE=false`: acepta el login y el registro con y sin token.
+  2. Este frontend, que siempre envía el token.
+  3. TaskApiSDD con `TURNSTILE_ENFORCE=true` y `TURNSTILE_ALLOWED_HOSTNAMES=kompitu.yandrydev.cloud`. Hasta este paso no hay protección: basta con no enviar el token.
+
+  En local, mientras el front no envíe el token, la API tiene que estar en `TURNSTILE_ENFORCE=false`.
+
+### SonarQube
+- Corre en su propio compose en **:9001**, para convivir con el de TaskApiSDD (:9000). El scanner es una imagen de Docker, así que nada se añade a `package.json`.
+- SonarQube Community no distingue ramas, así que cada rama tiene su propio proyecto `taskfrontsdd-<rama>`, con el quality gate predeterminado «TaskFrontSDD».
+- `sonar-setup.sh` crea también el perfil de calidad CSS «TaskFrontSDD», en el que la regla `css:S4662` reconoce las directivas de Tailwind v4 (`@theme`, `@utility`, `@custom-variant`…).
+- El análisis usa `tsconfig.sonar.json`, una copia de `tsconfig.app.json` sin `erasableSyntaxOnly`, que el TypeScript integrado de SonarQube 10.7 no reconoce.
+```bash
+docker compose -f docker-compose.sonar.yml up -d sonarqube   # Levantar SonarQube
+./scripts/sonar-setup.sh                                     # Primera vez: admin, quality gate y token
+./scripts/sonar-scan.sh                                      # Analizar la rama actual y esperar el quality gate
+./scripts/sonar-issues.sh                                    # Condiciones, incidencias y hotspots con fichero y línea
+docker compose -f docker-compose.sonar.yml down              # Parar (conserva configuración y análisis)
+```
+El hook `pre-push` ejecuta los tests con cobertura, las E2E de **Chromium** en móvil, tablet y escritorio y el análisis. Por el momento, Firefox no entra en el pre-push: se ejecuta al terminar cada tarea que toca los flujos E2E y antes de dar una spec por implementada. Rechaza el push en cualquiera de estos casos:
+- Algo falla.
+- SonarQube, `web` o TaskApiSDD no responden.
+- Hay cambios sin commitear.
+- Lo que se sube no es la rama actual.
+
+### Grafo de conocimiento (graphify)
+Herramienta de apoyo que se instala en el host (`uv tool install graphifyy`) y no es dependencia del proyecto.
+```bash
+/graphify .                     # (en Claude Code) Construir el grafo en graphify-out/
+graphify update .               # Actualizar tras cambiar código (sin coste de LLM)
+graphify query "<pregunta>"     # Consultar el grafo
+```
+
+## Convenciones
+
+- Ficheros y carpetas en `kebab-case` con sufijo de responsabilidad (`task-card.component.tsx`, `login.schema.ts`).
+- Código en inglés, comentarios en español y textos de la UI en español dentro de `texts/`.
+- Tests en una subcarpeta `tests/` junto a la carpeta del fichero probado.
+- Responsive obligatorio: toda pantalla y todo componente funcionan desde 360px, mobile-first, comprobado con Playwright en móvil (360×800), tablet (768×1024) y escritorio (1280×800).
+- Pruebas E2E con Playwright en `e2e/` para el login, crear tarea, eliminar tarea y cada input escribible. Las de Chromium bloquean el push, salvo en los push que solo cambian ficheros `.md`; las de Firefox se ejecutan al terminar cada tarea.
+- Las dudas de una spec se marcan con `[NEEDS CLARIFICATION]` y se resuelven antes de escribir el plan. Si el código y la spec no coinciden, manda la spec.
+- Los módulos solo se importan entre sí a través de su `index.ts` público.
+- Alias de importación: `@shared/…` (`src/shared/`), `@modules/<módulo>` (solo el `index.ts` del módulo) y `@test-utils/…` (`jest/`). Las rutas relativas quedan para la propia carpeta (el mismo módulo o la misma carpeta de `src/shared/`). Se definen en `tsconfig.app.json`, `tsconfig.sonar.json`, `tsconfig.e2e.json`, `vite.config.ts` y `jest.config.ts`, y ESLint (`no-restricted-imports`) rechaza `../../shared/…` y `@modules/<módulo>/…`.
+- Toda funcionalidad nueva empieza con su spec, plan y tasks en `sdd/`. No necesitan spec las correcciones de errores, los typos, la configuración, las actualizaciones de dependencias ni los cambios de documentación.
+- **Spec-anchored:** las specs no se descartan tras implementarlas; siguen describiendo el comportamiento vigente. Todo cambio de comportamiento actualiza primero la spec y luego el código, y cada RF tiene un test que cita su ID.
+- Solo tokens del sistema de diseño: sin valores arbitrarios de Tailwind.
+- Props de los componentes de solo lectura (`Readonly<Props>`) y `<output>` para los estados de carga, como exige SonarQube (S6759, S6819).
+- TypeScript sin `any` ni aserciones de tipo (`as`, incluido `as const`): tipos con `interface`/`type`, genéricos, type guards o Zod. Las aserciones solo se permiten en los tests.
+- Sin `enum`: uniones de literales (`'todo' | 'in-progress' | 'done'`).
+- Estructura de pantallas según la plantilla de `docs/design/`. El tema (colores, tipografía, márgenes…) sale solo de `DESIGN.md`: cambiarlo solo toca `DESIGN.md` y `design-tokens.css`, nunca los componentes.
+- Sin componentes duplicados: las piezas de layout se definen una vez en `src/shared/layout/` y todo componente existente se reutiliza o se amplía antes de crear uno nuevo.
+- Todo `useEffect` limpia lo que registra, es cancelable para evitar condiciones de carrera y tiene tests de limpieza y de carreras.
+- Componentes headless (lógica y efectos solo en custom hooks), compound components, composición con `children` y componentes base polimórficos (`as`).
+- Estado compartido centralizado en los stores de Redux. El estado de UI de los compound components (desplegable, acordeón, stepper, modal) va en su contexto interno. Cualquier otro React Context requiere aprobación.
+
+Detalle completo en `AGENTS.md` §4.
+
+## Documentos
+
+- **`CONSTITUTION.md`**: ley suprema del proyecto.
+- **`AGENTS.md`**: guía corta para agentes de IA (estructura, comandos del día a día, prohibiciones y lecciones aprendidas).
+- **`DESIGN.md`**: sistema de diseño (colores, tipografía, componentes y patrones de layout).
+- **`docs/design/`**: análisis del tablero de tareas de referencia y su imagen.
+
+> Este README se mantiene al día con cada cambio en `CONSTITUTION.md`, `AGENTS.md` o `sdd/` (CONSTITUTION.md, Gobierno 3).

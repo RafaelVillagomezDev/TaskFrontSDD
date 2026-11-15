@@ -1,0 +1,370 @@
+/*
+ * Kompitu Design System — tokens globales para Tailwind CSS v4.
+ * Fuente de verdad: DESIGN.md. Cualquier cambio aquí debe reflejarse allí (y viceversa).
+ *
+ * Las escalas por defecto de Tailwind se resetean (`--*: initial`) para que
+ * SOLO existan utilidades basadas en los tokens del sistema de diseño.
+ */
+
+/* Modo oscuro (plan D-11, RNF-05): sigue la preferencia del sistema; la clase `.dark` en <html> lo fuerza */
+@custom-variant dark {
+  @media (prefers-color-scheme: dark) {
+    @slot;
+  }
+  &:where(.dark, .dark *) {
+    @slot;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 1. Primitivos (valores literales de DESIGN.md)                      */
+/* ------------------------------------------------------------------ */
+@theme {
+  /* --- Color --- */
+  --color-*: initial;
+
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-white: #ffffff;
+
+  /* Neutros cálidos: papel y tinta en claro, carbón en oscuro (nunca grises puros ni negro absoluto) */
+  --color-paper-0: #fffdfa; /* Superficie en claro: tarjetas, campos y modales */
+  --color-paper-50: #f7f5f2; /* Fondo de página en claro */
+  --color-paper-100: #efebe6; /* Fondo sutil y badge default en claro */
+  --color-paper-200: #e7e2db; /* Bordes y divisores en claro */
+  --color-paper-500: #948c82; /* Borde de campos en claro (3:1 sobre paper-0) */
+  --color-ink-500: #6b645c; /* Texto secundario y placeholder en claro (4.91:1 sobre paper-100) */
+  --color-ink-700: #4a443d; /* Texto del badge default en claro */
+  --color-ink-900: #2a2622; /* Texto principal en claro */
+  --color-coal-100: #eeeae4; /* Texto principal en oscuro: blanco roto, no blanco puro */
+  --color-coal-200: #d6d1ca; /* Texto del badge default en oscuro */
+  --color-coal-400: #a8a29a; /* Texto secundario y placeholder en oscuro */
+  --color-coal-500: #7a746c; /* Borde de campos en oscuro (3:1 sobre coal-900) */
+  --color-coal-750: #34312d; /* Bordes y divisores en oscuro */
+  --color-coal-800: #2c2a27; /* Fondo sutil, badge default e ítem activo en oscuro */
+  --color-coal-900: #22201e; /* Superficie en oscuro */
+  --color-coal-950: #191816; /* Fondo de página en oscuro */
+
+  /* Acento Tide: verde azulado profundo en claro, aguamarina suave en oscuro */
+  --color-tide-700: #0f6e66; /* Acento en claro (6.01:1 con texto paper-0) */
+  --color-tide-50: #e0f0ec; /* Badge primary e ítem activo en claro */
+  --color-tide-300: #5cc8b8; /* Botón principal en oscuro */
+  --color-tide-200: #6fd3c4; /* Enlaces y texto de acento en oscuro */
+  --color-tide-950: #173a35; /* Badge primary en oscuro */
+
+  /* Estados en tonos de tierra: arcilla (error), hoja (éxito) y miel (aviso) */
+  --color-clay-700: #b03a24; /* Error y botón destructivo en claro */
+  --color-clay-800: #a3361f; /* Texto del badge danger en claro */
+  --color-clay-50: #fbe6e0;
+  --color-clay-300: #f07a63; /* Error y botón destructivo en oscuro */
+  --color-clay-950: #3d211b;
+  --color-leaf-700: #2f7046; /* Éxito en claro */
+  --color-leaf-50: #e3f1e7;
+  --color-leaf-300: #6cc489; /* Éxito en oscuro */
+  --color-leaf-950: #1c3524;
+  --color-honey-700: #8a5a0c; /* Aviso en claro */
+  --color-honey-50: #fbefd9;
+  --color-honey-300: #e8b25a; /* Aviso en oscuro */
+  --color-honey-950: #3b2c14;
+
+  /* --- Tipografía --- */
+  --font-*: initial;
+  --font-sans: 'Inter Variable', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --text-*: initial;
+  --text-display: 3rem; /* 48px */
+  --text-display--line-height: 1.1;
+  --text-display--font-weight: 700;
+  --text-h1: 2.25rem; /* 36px */
+  --text-h1--line-height: 1.2;
+  --text-h1--font-weight: 700;
+  --text-h2: 1.75rem; /* 28px */
+  --text-h2--line-height: 1.3;
+  --text-h2--font-weight: 600;
+  --text-h3: 1.375rem; /* 22px */
+  --text-h3--line-height: 1.4;
+  --text-h3--font-weight: 600;
+  --text-h4: 1.125rem; /* 18px */
+  --text-h4--line-height: 1.4;
+  --text-h4--font-weight: 600;
+  --text-body-lg: 1.125rem; /* 18px */
+  --text-body-lg--line-height: 1.6;
+  --text-body-lg--font-weight: 400;
+  --text-body: 1rem; /* 16px */
+  --text-body--line-height: 1.6;
+  --text-body--font-weight: 400;
+  --text-body-sm: 0.875rem; /* 14px */
+  --text-body-sm--line-height: 1.5;
+  --text-body-sm--font-weight: 400;
+  --text-caption: 0.75rem; /* 12px */
+  --text-caption--line-height: 1.4;
+  --text-caption--font-weight: 500;
+  --text-button-md: 0.9375rem; /* 15px — botón MD */
+
+  /* --- Espaciado (base 4px) --- */
+  --spacing-*: initial;
+  --spacing-0: 0px;
+  --spacing-1: 0.25rem; /* 4px  */
+  --spacing-2: 0.5rem; /* 8px  */
+  --spacing-3: 0.75rem; /* 12px */
+  --spacing-4: 1rem; /* 16px */
+  --spacing-6: 1.5rem; /* 24px */
+  --spacing-8: 2rem; /* 32px */
+  --spacing-12: 3rem; /* 48px */
+  --spacing-16: 4rem; /* 64px */
+  --spacing-24: 6rem; /* 96px */
+
+  /* Tokens de componente/layout derivados de DESIGN.md */
+  --spacing-control-sm: 2rem; /* 32px — botón SM */
+  --spacing-control-md: 2.5rem; /* 40px — botón/input MD */
+  --spacing-control-lg: 3rem; /* 48px — botón/input LG */
+  --spacing-btn-md-y: 0.625rem; /* 10px — padding vertical botón MD */
+  --spacing-icon: 1.25rem; /* 20px — icono inline / nav */
+  --spacing-icon-lg: 1.5rem; /* 24px — icono standalone */
+  --spacing-touch: 2.75rem; /* 44px — target táctil mínimo */
+  --spacing-gutter: 1.5rem; /* 24px */
+  --spacing-sidebar: 15rem; /* 240px */
+  --spacing-sidebar-collapsed: 4rem; /* 64px */
+  --spacing-navbar: 4rem; /* 64px */
+  --spacing-lift: 2px; /* hover de Card: translateY(-2px) */
+  --spacing-column: 16.5rem; /* 264px — columna del tablero */
+  --spacing-pill: 1.25rem; /* 20px — alto de contador/badge */
+
+  --container-content: 80rem; /* 1280px — ancho máximo de contenido */
+  --container-dialog: 32rem; /* 512px — ancho máximo de un modal */
+
+  /* --- Border radius --- */
+  --radius-*: initial;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* --- Sombras --- */
+  --shadow-*: initial;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+
+  /* --- Motion --- */
+  --ease-*: initial;
+  /* ease-out fuerte: responde en cuanto empieza (DESIGN.md Motion) */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: ease-in-out;
+  /* Curva de cajón tipo iOS: sale rápido del borde y se asienta sin rebote */
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  --animate-*: initial;
+  --animate-scale-in: scale-in 200ms var(--ease-out); /* DESIGN.md anim-modal */
+  --animate-fade-in: fade-in 150ms var(--ease-out); /* DESIGN.md anim-overlay */
+  --animate-slide-in-left: slide-in-left 250ms var(--ease-drawer); /* DESIGN.md anim-drawer */
+  --animate-spin: spin 800ms linear infinite; /* DESIGN.md anim-spin: indicador de carga */
+
+  /* --- Breakpoints --- */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slide-in-left {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 2. Tokens semánticos (cambian con dark mode)                        */
+/*    Los componentes deben usar ESTOS, no los primitivos.             */
+/* ------------------------------------------------------------------ */
+@layer base {
+  /* Cada token semántico tiene su valor claro y oscuro (CONSTITUTION.md VII.3); light-dark() elige según color-scheme */
+  :root {
+    color-scheme: light dark;
+
+    --background: light-dark(var(--color-paper-0), var(--color-coal-950));
+    --page: light-dark(var(--color-paper-50), var(--color-coal-950));
+    --surface: light-dark(var(--color-paper-0), var(--color-coal-900));
+    --surface-subtle: light-dark(var(--color-paper-100), var(--color-coal-800));
+    --foreground: light-dark(var(--color-ink-900), var(--color-coal-100));
+    --foreground-muted: light-dark(var(--color-ink-500), var(--color-coal-400));
+    --border: light-dark(var(--color-paper-200), var(--color-coal-750));
+    --border-input: light-dark(var(--color-paper-500), var(--color-coal-500));
+    --placeholder: light-dark(var(--color-ink-500), var(--color-coal-400));
+    --primary-text: light-dark(var(--color-tide-700), var(--color-tide-200));
+    --danger-text: light-dark(var(--color-clay-700), var(--color-clay-300));
+    --nav-active: light-dark(var(--color-tide-50), var(--color-coal-800));
+
+    /* Acciones: en oscuro el acento y la arcilla son claros, así que su texto es oscuro */
+    --primary: light-dark(var(--color-tide-700), var(--color-tide-300));
+    --on-primary: light-dark(var(--color-paper-0), var(--color-coal-950));
+    --destructive: light-dark(var(--color-clay-700), var(--color-clay-300));
+    --on-destructive: light-dark(var(--color-paper-0), var(--color-coal-950));
+    --success: light-dark(var(--color-leaf-700), var(--color-leaf-300));
+    --highlight: light-dark(var(--color-honey-700), var(--color-honey-300));
+    --danger: light-dark(var(--color-clay-700), var(--color-clay-300));
+
+    /* Badges: fondo tintado y texto del mismo tono en cada modo */
+    --badge-default-bg: light-dark(var(--color-paper-100), var(--color-coal-800));
+    --badge-default-fg: light-dark(var(--color-ink-700), var(--color-coal-200));
+    --badge-primary-bg: light-dark(var(--color-tide-50), var(--color-tide-950));
+    --badge-primary-fg: light-dark(var(--color-tide-700), var(--color-tide-200));
+    --badge-success-bg: light-dark(var(--color-leaf-50), var(--color-leaf-950));
+    --badge-success-fg: light-dark(var(--color-leaf-700), var(--color-leaf-300));
+    --badge-warning-bg: light-dark(var(--color-honey-50), var(--color-honey-950));
+    --badge-warning-fg: light-dark(var(--color-honey-700), var(--color-honey-300));
+    --badge-danger-bg: light-dark(var(--color-clay-50), var(--color-clay-950));
+    --badge-danger-fg: light-dark(var(--color-clay-800), var(--color-clay-300));
+
+    /* Fondo detrás de modales y drawers (DESIGN.md Overlay) */
+    --overlay: light-dark(rgba(42, 38, 34, 0.4), rgba(0, 0, 0, 0.6)); /* Tinta al 40 % en claro */
+
+    --duration-fast: 100ms;
+    --duration-base: 200ms;
+  }
+
+  .dark {
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-page: var(--page);
+  --color-surface: var(--surface);
+  --color-surface-subtle: var(--surface-subtle);
+  --color-foreground: var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-border: var(--border);
+  --color-border-input: var(--border-input);
+  --color-placeholder: var(--placeholder);
+  --color-nav-active: var(--nav-active);
+  --color-overlay: var(--overlay);
+
+  /* Acciones y estados */
+  --color-primary: var(--primary);
+  --color-primary-hover: color-mix(in oklab, var(--primary) 90%, black); /* 10% más oscuro */
+  --color-primary-active: color-mix(in oklab, var(--primary) 80%, black); /* 20% más oscuro */
+  --color-on-primary: var(--on-primary);
+  --color-destructive: var(--destructive);
+  --color-destructive-hover: color-mix(in oklab, var(--destructive) 90%, black);
+  --color-destructive-active: color-mix(in oklab, var(--destructive) 80%, black);
+  --color-on-destructive: var(--on-destructive);
+  --color-success: var(--success);
+  --color-highlight: var(--highlight);
+  --color-danger: var(--danger); /* Bordes e iconos de error */
+  --color-danger-text: var(--danger-text);
+  --color-primary-text: var(--primary-text); /* Enlaces, pestaña e ítem de navegación activos */
+
+  /* Badges */
+  --color-badge-default-bg: var(--badge-default-bg);
+  --color-badge-default-fg: var(--badge-default-fg);
+  --color-badge-primary-bg: var(--badge-primary-bg);
+  --color-badge-primary-fg: var(--badge-primary-fg);
+  --color-badge-success-bg: var(--badge-success-bg);
+  --color-badge-success-fg: var(--badge-success-fg);
+  --color-badge-warning-bg: var(--badge-warning-bg);
+  --color-badge-warning-fg: var(--badge-warning-fg);
+  --color-badge-danger-bg: var(--badge-danger-bg);
+  --color-badge-danger-fg: var(--badge-danger-fg);
+}
+
+/* ------------------------------------------------------------------ */
+/* 3. Utilidades del sistema                                           */
+/* ------------------------------------------------------------------ */
+
+/* Transiciones de DESIGN.md: anim-fast | anim-base. Las entradas de modales, fondo y cajón son animaciones
+   (animate-scale-in, animate-fade-in, animate-slide-in-left) */
+@utility anim-fast {
+  transition-duration: var(--duration-fast);
+  transition-timing-function: var(--ease-out);
+}
+@utility anim-base {
+  transition-duration: var(--duration-base);
+  transition-timing-function: var(--ease-in-out);
+}
+
+/* Focus: anillo de 2px con offset en el acento (DESIGN.md Accessibility) */
+@utility focus-ring {
+  &:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* 4. Estilos base                                                     */
+/* ------------------------------------------------------------------ */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+  }
+
+  body {
+    background-color: var(--color-page);
+    color: var(--color-foreground);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+  }
+
+  code,
+  kbd,
+  pre,
+  samp {
+    font-family: var(--font-mono);
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--color-placeholder);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}

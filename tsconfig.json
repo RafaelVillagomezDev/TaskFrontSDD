@@ -1,0 +1,11 @@
+{
+  // Índice para el editor: TypeScript busca el tsconfig.json más cercano y, por estas referencias, encuentra la
+  // configuración de cada fichero. Sin él, e2e/ y los *.config.ts se comprobaban sin los tipos de Node.
+  // `pnpm typecheck` comprueba cada configuración por separado
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" },
+    { "path": "./tsconfig.e2e.json" }
+  ]
+}

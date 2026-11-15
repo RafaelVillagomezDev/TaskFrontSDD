@@ -147,3 +147,17 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
+# Playwright MCP (capturas y logs)
+.playwright-mcp/
+
+# Playwright (informes y resultados de E2E)
+playwright-report/
+test-results/
+blob-report/
+
+# macOS
+.DS_Store
+
+# Registro de accesos del servicio pre en las E2E de seguridad (spec 004 RF-25)
+.nginx-logs/

@@ -1,0 +1,32 @@
+// Configuración de Zod antes que cualquier esquema (spec 004 RNF-01)
+import '@shared/config/zod.config';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import { setupListeners } from '@reduxjs/toolkit/query';
+import { Provider } from 'react-redux';
+import { createBrowserRouter } from 'react-router';
+
+import './index.css';
+import { AppRoot } from '@shared/router/app-root.component';
+import { APP_ROUTES } from '@shared/router/router';
+import { store } from '@shared/store/store';
+
+// Punto de entrada (plan §6.1): el Provider de Redux y el router con las rutas de la aplicación
+const rootElement = document.getElementById('root');
+
+if (rootElement === null) {
+  throw new Error('index.html no contiene el elemento #root');
+}
+
+const router = createBrowserRouter(APP_ROUTES);
+
+// Activa refetchOnFocus en las consultas que lo piden (avisos, plan §4): la app vive lo que vive la pestaña
+setupListeners(store.dispatch);
+
+createRoot(rootElement).render(
+  <StrictMode>
+    <Provider store={store}>
+      <AppRoot router={router} />
+    </Provider>
+  </StrictMode>,
+);

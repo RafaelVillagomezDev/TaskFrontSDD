@@ -1,0 +1,86 @@
+// Textos visibles del módulo de tareas (AGENTS.md §4: nunca escritos directamente en el JSX)
+export const TASKS_TEXTS = {
+  board: {
+    title: 'Tablero',
+    region: 'Tareas de la semana',
+    newTask: 'Nueva tarea',
+  },
+  week: {
+    previous: 'Semana anterior',
+    next: 'Semana siguiente',
+    today: 'Hoy',
+    range: (from: string, to: string): string => `${from} – ${to}`,
+  },
+  column: {
+    today: 'Hoy',
+    closed: 'Día cerrado',
+    empty: 'Sin tareas',
+    pending: 'Pendientes',
+    completed: 'Completadas',
+    count: (total: number): string => (total === 1 ? '1 tarea' : `${String(total)} tareas`),
+    addTask: 'Añadir tarea',
+    // Nombre accesible que distingue el botón de cada columna; empieza por el texto visible
+    addTaskFor: (dayLong: string): string => `Añadir tarea el ${dayLong}`,
+  },
+  form: {
+    createTitle: 'Nueva tarea',
+    title: 'Título',
+    description: 'Descripción (opcional)',
+    date: 'Fecha',
+    counter: (length: number, max: number): string => `${String(length)}/${String(max)} caracteres`,
+    create: 'Crear tarea',
+    creating: 'Creando…',
+    editTitle: 'Editar tarea',
+    save: 'Guardar cambios',
+    saving: 'Guardando…',
+    createdOutsideWeek: (dayLong: string): string => `Tarea creada para el ${dayLong}.`,
+  },
+  edit: {
+    // Nombre accesible del botón de cada tarjeta: distingue las tareas entre sí
+    action: (title: string): string => `Editar «${title}»`,
+  },
+  delete: {
+    // Nombre accesible del botón de cada tarjeta: distingue las tareas entre sí
+    action: (title: string): string => `Eliminar «${title}»`,
+    title: '¿Eliminar la tarea?',
+    body: (title: string): string => `«${title}» desaparecerá del tablero y del historial. No se puede deshacer.`,
+    confirm: 'Eliminar',
+    deleting: 'Eliminando…',
+  },
+  validation: {
+    titleRequired: 'Escribe un título.',
+    titleTooLong: 'El título no puede tener más de 200 caracteres.',
+    descriptionTooLong: 'La descripción no puede tener más de 1000 caracteres.',
+    dateRequired: 'Elige una fecha.',
+    dateInvalid: 'Elige una fecha válida.',
+    datePast: 'Elige hoy o un día posterior.',
+    rangeInvalid: '«Desde» no puede ser posterior a «Hasta».',
+  },
+  status: {
+    pending: 'Pendiente',
+    completed: 'Completada',
+  },
+  history: {
+    title: 'Historial',
+    filters: 'Filtros del historial',
+    status: 'Estado',
+    statusOptions: { all: 'Todas', completed: 'Completadas', pending: 'Pendientes' },
+    from: 'Desde',
+    to: 'Hasta',
+    apply: 'Filtrar',
+    clear: 'Quitar filtros',
+    list: 'Tareas del historial',
+    empty: 'No hay tareas con estos filtros.',
+    noTasks: 'Todavía no tienes tareas.',
+    total: (total: number): string => (total === 1 ? '1 tarea' : `${String(total)} tareas`),
+  },
+  // Hecho hoy (spec 002): tareas completadas hoy, en solo lectura
+  taskDay: {
+    title: 'Hecho hoy',
+    list: 'Tareas hechas hoy',
+    empty: 'Todavía no has completado ninguna tarea hoy.',
+    goToBoard: 'Ir al tablero',
+    total: (total: number): string =>
+      total === 1 ? '1 tarea completada hoy' : `${String(total)} tareas completadas hoy`,
+  },
+};

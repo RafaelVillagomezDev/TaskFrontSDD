@@ -1,0 +1,37 @@
+# Preproducción (spec 004): la misma imagen y las mismas políticas de seguridad que producción, servida por HTTP para
+# probarla en local o detrás de un entorno sin certificado. Sin HSTS: solo tiene sentido sobre HTTPS (RF-14).
+# ${VITE_API_URL} se sustituye al arrancar el contenedor
+
+# Proxy inverso: versión oculta, IP real, límites por IP, tiempos y registro (RF-13, RF-19 a RF-21, RF-24, RF-25)
+include /etc/nginx/snippets/http-hardening.conf;
+
+server {
+    listen 8080;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Métodos, límites por IP y rutas de escáneres (RF-20 a RF-23)
+    include /etc/nginx/snippets/server-hardening.conf;
+
+    # Fragmentos opcionales: solo existen cuando las E2E de seguridad los montan (registro en fichero, RF-25). Sin
+    # ninguno, el include no hace nada
+    include /etc/nginx/snippets/testing/*.conf;
+
+    # CSP: connect-src a la API
+    set $api_origin "${VITE_API_URL}";
+
+    # Ficheros con hash en el nombre: caché larga
+    location /assets/ {
+        include /etc/nginx/snippets/security-headers.conf;
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+        try_files $uri =404;
+    }
+
+    # Rutas de la SPA: siempre index.html, sin caché para que un despliegue se vea al recargar
+    location / {
+        include /etc/nginx/snippets/security-headers.conf;
+        add_header Cache-Control "no-cache" always;
+        try_files $uri $uri/ /index.html;
+    }
+}

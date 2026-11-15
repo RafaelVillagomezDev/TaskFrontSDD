@@ -1,0 +1,79 @@
+{
+  "source": "https://www.figma.com/design/byvhly6M4JLRN3mb4HkoLX/Free-Task-Board-Dashboard-Sample--Community-?node-id=2911-62",
+  "notes": "Figma canvas (WebGL): values measured from a 103% zoom screenshot, divided by 1.03. Inspect panel unavailable without login, so sizes are ~approx (±1px); colors sampled from pixels.",
+  "tokens": {
+    "spacing": {
+      "scale": [4, 8, 12, 16, 20, 24, 36],
+      "base_unit": 4
+    },
+    "typography": {
+      "families": ["Inter (~approx, sans-serif)"],
+      "scale": [
+        { "role": "page-title", "size": "~32px", "weight": "600", "family": "Inter" },
+        { "role": "column-title", "size": "~16px", "weight": "500", "family": "Inter" },
+        { "role": "card-title / nav-item", "size": "~14px", "weight": "500", "family": "Inter" },
+        { "role": "tabs / toolbar", "size": "~13px", "weight": "500", "family": "Inter" },
+        { "role": "section-label (uppercase)", "size": "~12px", "weight": "500", "family": "Inter" },
+        { "role": "badge / tag / counter", "size": "~10px", "weight": "600", "family": "Inter" }
+      ]
+    },
+    "colors": [
+      { "role": "app background (sidebar, header, board, rail)", "value": "#F7F8FA" },
+      { "role": "card / input surface", "value": "#FFFFFF" },
+      { "role": "hairline divider", "value": "#E9EBF0" },
+      { "role": "text primary", "value": "#1F2633" },
+      { "role": "text muted", "value": "#606C80" },
+      { "role": "accent (active tab, nav icons)", "value": "~#3B82F6" },
+      { "role": "nav counter bg", "value": "#E4ECFA" },
+      { "role": "status To Do (pink) bg/text", "value": "#FDEDF5 / #DB2777" },
+      { "role": "status In Process / To Verify (purple) bg/text", "value": "#F6EEFE / #9333EA" },
+      { "role": "status Done (green) text", "value": "#16A34A" },
+      { "role": "status Backlog (amber) bg/text", "value": "#FDF7E6 / ~#CA8A04" },
+      { "role": "tag Design (blue) bg/text", "value": "#EBF2FE / #326CEC" },
+      { "role": "notification dot", "value": "#EF4444" }
+    ],
+    "radius": ["8px (cards, inputs, toolbar buttons)", "9999px (badges, counters, avatars)"],
+    "shadows": ["none on cards", "~imperceptible on search input / toolbar buttons"],
+    "image_ratios": [
+      { "usage": "avatar", "ratio": "1:1 (~24px in cards, ~40px profile)" }
+    ],
+    "grid": {
+      "max_width": "1600px frame",
+      "columns": "4 board columns, fixed ~264px each",
+      "gutter": "24px",
+      "sidebar": "~300px",
+      "header": "~86px",
+      "right_rail": "~88px"
+    }
+  },
+  "taste": [
+    {
+      "name": "Tone instead of elevation",
+      "trigger": "When separating 17 task cards from the board background",
+      "decision": "Chose flat #FFFFFF cards on a #F7F8FA board with no border and no shadow over shadowed/bordered cards",
+      "reason": "Because with a dozen-plus cards on screen, a shadow on each produces a dozen competing edges; a tonal step keeps the board readable as a grid of text",
+      "evidence": ["card edge goes directly #F7F8FA → #FFFFFF, no shadow pixels", "radius 8px", "16px vertical gap between cards"]
+    },
+    {
+      "name": "Color only where status lives",
+      "trigger": "When encoding task state (Backlog, To Do, In Process, To Verify, Done)",
+      "decision": "Chose ~10px tinted pills and matching column counters as the only saturated color over colored column headers or card backgrounds",
+      "reason": "Because scanning for state works when hue appears only where state is encoded; everything else stays in two grays",
+      "evidence": ["shell text #1F2633 / #606C80", "status pills: pink #DB2777, purple #9333EA, green #16A34A, amber", "column counters reuse the same tint per status"]
+    },
+    {
+      "name": "Fixed columns, variable cards",
+      "trigger": "When laying out workflow columns on a 1600px frame",
+      "decision": "Chose 4 columns of fixed ~264px with 24px gaps over fluid columns that stretch to fill width",
+      "reason": "Because a fixed column keeps card titles at a constant line length (2 lines max) and the eye scans the same horizontal positions in every column",
+      "evidence": ["column x-pitch ~288px = 264px card + 24px gap", "titles wrap at ~32 characters", "card height varies 96–152px with content"]
+    },
+    {
+      "name": "One shell surface, hairline seams",
+      "trigger": "When splitting sidebar, header, board and member rail",
+      "decision": "Chose a single #F7F8FA background for all four regions divided by 1px #E9EBF0 lines over a dark or contrasting sidebar",
+      "reason": "Because the chrome recedes and white cards become the only foreground layer, so attention lands on tasks, not navigation",
+      "evidence": ["sidebar, header, main and rail all sample #F7F8FA", "dividers 1px #E9EBF0 / #EDEEF3"]
+    }
+  ]
+}

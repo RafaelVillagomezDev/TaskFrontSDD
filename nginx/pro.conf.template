@@ -1,0 +1,58 @@
+# Producción (spec 004) en Dokploy: su proxy (Traefik) ocupa los puertos 80 y 443, obtiene y renueva el certificado de
+# Let's Encrypt y termina HTTPS. Este contenedor recibe HTTP de Traefik por la red interna de Docker (puerto 8080) y
+# solo atiende a kompitu.yandrydev.cloud. No debe publicarse ningún puerto: solo se llega a él a través de Traefik.
+# ${VITE_API_URL} se sustituye al arrancar el contenedor
+
+# Proxy inverso: versión oculta, IP real, límites por IP, tiempos y registro (RF-13, RF-19 a RF-21, RF-24, RF-25)
+include /etc/nginx/snippets/http-hardening.conf;
+
+# Protocolo con el que llegó la petición a Traefik. Traefik sustituye el X-Forwarded-Proto que mande el cliente por el
+# suyo, así que es fiable mientras el contenedor no sea accesible directamente. Sin cabecera se trata como HTTP
+map $http_x_forwarded_proto $is_https {
+    default 0;
+    https 1;
+}
+
+# Cualquier otro dominio que llegue hasta aquí se descarta sin responder (RF-17)
+server {
+    listen 8080 default_server;
+    server_name _;
+    return 444;
+}
+
+server {
+    listen 8080;
+    server_name kompitu.yandrydev.cloud;
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Métodos, límites por IP y rutas de escáneres (RF-20 a RF-23), antes de redirigir
+    include /etc/nginx/snippets/server-hardening.conf;
+
+    # Siempre HTTPS (RF-16): si la petición llegó a Traefik por HTTP, se redirige a la misma ruta por HTTPS. Protege
+    # aunque en Dokploy no esté activada la redirección del dominio
+    if ($is_https = 0) {
+        return 301 https://kompitu.yandrydev.cloud$request_uri;
+    }
+
+    # CSP: connect-src a la API
+    set $api_origin "${VITE_API_URL}";
+
+    # Ficheros con hash en el nombre: caché larga
+    location /assets/ {
+        include /etc/nginx/snippets/security-headers.conf;
+        # HSTS (RF-14): dos años, también para los subdominios de kompitu.yandrydev.cloud; sin preload, que es difícil
+        # de deshacer. Llega al navegador por HTTPS a través de Traefik
+        add_header Strict-Transport-Security "max-age=63072000; includeSubDomains" always;
+        add_header Cache-Control "public, max-age=31536000, immutable" always;
+        try_files $uri =404;
+    }
+
+    # Rutas de la SPA: siempre index.html, sin caché para que un despliegue se vea al recargar
+    location / {
+        include /etc/nginx/snippets/security-headers.conf;
+        add_header Strict-Transport-Security "max-age=63072000; includeSubDomains" always;
+        add_header Cache-Control "no-cache" always;
+        try_files $uri $uri/ /index.html;
+    }
+}

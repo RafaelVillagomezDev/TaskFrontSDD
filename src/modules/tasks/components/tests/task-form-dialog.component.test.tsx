@@ -1,0 +1,198 @@
+import { jest } from '@jest/globals';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { Provider } from 'react-redux';
+
+import { apiOk, mockApi } from '@test-utils/mock-api';
+import { freshStore } from '@test-utils/render-app';
+import { sessionStarted } from '@modules/auth';
+import { useTaskForm } from '../../hooks/use-task-form.hook';
+import { TaskFormDialog } from '../task-form-dialog.component';
+
+const USER = { id: 'u1', email: 'ana@example.com', name: 'Ana', createdAt: '2026-10-29T10:00:00.000Z' };
+
+const TASK = {
+  id: 't1',
+  title: 'Comprar pan',
+  description: 'Integral',
+  date: '2026-10-30',
+  completed: false,
+  createdAt: '2026-10-29T09:15:00Z',
+  updatedAt: '2026-10-29T09:15:00Z',
+};
+
+function Harness() {
+  const taskForm = useTaskForm({ today: '2026-10-29', weekStart: '2026-10-29', weekEnd: '2026-11-04' });
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => {
+          taskForm.openFor('2026-10-30');
+        }}
+      >
+        Abrir
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          taskForm.openEdit(TASK);
+        }}
+      >
+        Editar
+      </button>
+      <TaskFormDialog taskForm={taskForm} />
+    </>
+  );
+}
+
+async function openDialog(trigger = 'Abrir', name = 'Nueva tarea') {
+  const user = userEvent.setup();
+  const store = freshStore();
+  store.dispatch(sessionStarted({ user: USER, csrfToken: 'sesion-1' }));
+  render(
+    <Provider store={store}>
+      <Harness />
+    </Provider>,
+  );
+  await user.click(screen.getByRole('button', { name: trigger }));
+  return { user, dialog: screen.getByRole('dialog', { name }) };
+}
+
+afterEach(() => {
+  document.body.style.overflow = '';
+  jest.restoreAllMocks();
+});
+
+describe('TaskFormDialog (crear)', () => {
+  it('cerrado no pinta nada', () => {
+    const store = freshStore();
+    render(
+      <Provider store={store}>
+        <Harness />
+      </Provider>,
+    );
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  it('RF-15 y RF-16: es un diálogo con título, descripción y fecha propuesta, sin días pasados', async () => {
+    const { dialog } = await openDialog();
+    expect(within(dialog).getByLabelText('Título')).toHaveFocus();
+    expect(within(dialog).getByLabelText('Descripción (opcional)').tagName).toBe('TEXTAREA');
+    const date = within(dialog).getByLabelText('Fecha');
+    expect(date).toHaveAttribute('type', 'date');
+    expect(date).toHaveValue('2026-10-30');
+    expect(date).toHaveAttribute('min', '2026-10-29');
+  });
+
+  it('RF-17: muestra los contadores con su máximo mientras se escribe', async () => {
+    const { user, dialog } = await openDialog();
+    const title = within(dialog).getByLabelText('Título');
+    const description = within(dialog).getByLabelText('Descripción (opcional)');
+    expect(title).toHaveAccessibleDescription('0/200 caracteres');
+    expect(description).toHaveAccessibleDescription('0/1000 caracteres');
+    await user.type(title, 'Pan');
+    await user.type(description, 'Integral');
+    expect(title).toHaveAccessibleDescription('3/200 caracteres');
+    expect(description).toHaveAccessibleDescription('8/1000 caracteres');
+  });
+
+  it('RF-17: el contador pasa a rojo al superar el máximo y vuelve a gris al bajar de él', async () => {
+    const { user, dialog } = await openDialog();
+    const title = within(dialog).getByLabelText('Título');
+    await user.click(title);
+    await user.paste('a'.repeat(200));
+    expect(within(dialog).getByText('200/200 caracteres').className).toContain('text-foreground-muted');
+    await user.type(title, 'a');
+    expect(within(dialog).getByText('201/200 caracteres').className).toContain('text-danger-text');
+    await user.type(title, '{Backspace}');
+    expect(within(dialog).getByText('200/200 caracteres').className).toContain('text-foreground-muted');
+  });
+
+  it('RF-02: muestra cada error bajo su campo sin enviar nada', async () => {
+    const api = mockApi({});
+    const { user, dialog } = await openDialog();
+    await user.clear(within(dialog).getByLabelText('Fecha'));
+    await user.click(within(dialog).getByRole('button', { name: 'Crear tarea' }));
+    expect(await within(dialog).findByText('Escribe un título.')).toBeInTheDocument();
+    expect(within(dialog).getByLabelText('Título')).toHaveAccessibleDescription('0/200 caracteres Escribe un título.');
+    expect(within(dialog).getByLabelText('Fecha')).toHaveAccessibleDescription('Elige una fecha.');
+    expect(api.requests).toHaveLength(0);
+  });
+
+  it('RF-19: el botón se deshabilita mientras se envía y el diálogo se cierra al crear', async () => {
+    let release: (response: Response) => void = () => undefined;
+    mockApi({
+      'POST /tasks': () =>
+        new Promise<Response>((resolve) => {
+          release = resolve;
+        }),
+    });
+    const { user, dialog } = await openDialog();
+    await user.type(within(dialog).getByLabelText('Título'), 'Comprar pan');
+    await user.click(within(dialog).getByRole('button', { name: 'Crear tarea' }));
+    expect(await within(dialog).findByRole('button', { name: 'Creando…' })).toBeDisabled();
+    release(
+      apiOk(
+        {
+          id: 'n',
+          title: 'Comprar pan',
+          description: null,
+          date: '2026-10-30',
+          completed: false,
+          createdAt: '2026-10-29T09:15:00Z',
+          updatedAt: '2026-10-29T09:15:00Z',
+        },
+        201,
+      ),
+    );
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+  });
+
+  it('«Cancelar» cierra el diálogo y devuelve el foco', async () => {
+    const { user, dialog } = await openDialog();
+    await user.click(within(dialog).getByRole('button', { name: 'Cancelar' }));
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Abrir' })).toHaveFocus();
+  });
+});
+
+describe('TaskFormDialog (editar)', () => {
+  it('RF-29: «Editar tarea» con título y descripción de la tarea, sin campo fecha', async () => {
+    const { dialog } = await openDialog('Editar', 'Editar tarea');
+    expect(within(dialog).getByLabelText('Título')).toHaveValue('Comprar pan');
+    expect(within(dialog).getByLabelText('Descripción (opcional)')).toHaveValue('Integral');
+    expect(within(dialog).queryByLabelText('Fecha')).not.toBeInTheDocument();
+    expect(within(dialog).getByText('11/200 caracteres')).toBeInTheDocument();
+    expect(within(dialog).getByRole('button', { name: 'Guardar cambios' })).toBeInTheDocument();
+  });
+
+  it('RF-19 y RF-30: «Guardando…» deshabilitado mientras guarda y se cierra al terminar', async () => {
+    let release: (response: Response) => void = () => undefined;
+    mockApi({
+      'PATCH /tasks/t1': () =>
+        new Promise<Response>((resolve) => {
+          release = resolve;
+        }),
+    });
+    const { user, dialog } = await openDialog('Editar', 'Editar tarea');
+    await user.type(within(dialog).getByLabelText('Título'), ' integral');
+    await user.click(within(dialog).getByRole('button', { name: 'Guardar cambios' }));
+    expect(await within(dialog).findByRole('button', { name: 'Guardando…' })).toBeDisabled();
+    release(apiOk({ ...TASK, title: 'Comprar pan integral' }));
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    });
+  });
+
+  it('al pasar de editar a crear vuelve el título «Nueva tarea» y el campo fecha', async () => {
+    const { user } = await openDialog('Editar', 'Editar tarea');
+    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('button', { name: 'Abrir' }));
+    const dialog = screen.getByRole('dialog', { name: 'Nueva tarea' });
+    expect(within(dialog).getByLabelText('Título')).toHaveValue('');
+    expect(within(dialog).getByLabelText('Fecha')).toHaveValue('2026-10-30');
+  });
+});

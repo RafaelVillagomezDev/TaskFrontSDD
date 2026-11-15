@@ -1,0 +1,5 @@
+# Scripts de instalación (pnpm los bloquea por defecto). Ambos traen binarios precompilados como
+# dependencias opcionales; su script solo compila desde fuente, así que no se autorizan (como en TaskApiSDD)
+allowBuilds:
+  '@parcel/watcher': false
+  unrs-resolver: false

@@ -17,10 +17,11 @@
 | Segunda funcionalidad (`sdd/002-taskDay/`): tareas completadas hoy en `/taskday` | Spec *Implementada*: 12 de 12 tareas, cada RF con su test y E2E en los 6 proyectos de Playwright |
 | Tercera funcionalidad (`sdd/003-pomodoro-task-session/`): sesiones pomodoro con lista de tareas (API-004) | Spec *Implementada*: 62 de 62 tareas en dos fases, P1 (sesión, lista y tareas en espera) y P2 (historial, racha y logros), cada RF con su test. Jest (1033 tests, 99,5 % de líneas), E2E en los 6 proyectos en paralelo con una cuenta por test y quality gate en verde |
 | Cuarta funcionalidad (`sdd/004-front-security-hardening/`): seguridad del front (datos al caducar la sesión, cierre de sesión en todas las pestañas, vuelta tras el login solo a rutas propias y cabeceras de producción) | Spec *Implementada*: 18 de 18 tareas, cada RF con su test. Sesión y pestañas, `returnTo` y servidor web conectado a la imagen (`NGINX_ENV=pre|pro`), con Jest (1076 tests, 99,5 % de líneas), E2E en los 6 proyectos, `test:security` y quality gate en verde |
+| Quinta funcionalidad (`sdd/005-turnstile-bot-protection/`): protección frente a bots con Cloudflare Turnstile en el inicio de sesión y el registro | Spec *Implementada*: 15 de 15 tareas, cada RF con su test. Widget *managed* con render explícito y sin dependencias nuevas, `turnstileToken` en el cuerpo (API-005), CSP ampliada a `challenges.cloudflare.com` (004 RF-12). Jest (1134 tests, 99,4 % de líneas), E2E en los 6 proyectos, `test:security` y quality gate en verde |
 
 ## Funcionalidades
 
-- **Cuenta y sesión:** registro, inicio y cierre de sesión con cookies y token CSRF, renovación automática de la sesión y vuelta a la pantalla pedida.
+- **Cuenta y sesión:** registro, inicio y cierre de sesión con cookies y token CSRF, renovación automática de la sesión y vuelta a la pantalla pedida. El inicio de sesión y el registro piden la comprobación anti-bots de Cloudflare Turnstile (widget *managed*, spec 005).
 - **Tablero semanal** (`/`): 7 días desde hoy, navegación de semana en semana, crear, editar, completar y eliminar tareas, y días pasados de solo lectura.
 - **Racha y progreso de hoy:** racha actual y mejor racha de la API, «X de Y tareas completadas» y aviso cuando la racha está en juego.
 - **Hecho hoy** (`/taskday`): las tareas completadas hoy, en solo lectura, con su total; se actualiza sin recargar al completar o desmarcar en el tablero.
@@ -95,6 +96,7 @@ El proyecto **siempre** se ejecuta dentro de Docker: nada se instala ni se lanza
 | Variable | `.env.dev` | `.env.prod` |
 | :--- | :--- | :--- |
 | `VITE_API_URL` | `http://localhost:3000` | `https://apikompitu.yandrydev.cloud` |
+| `VITE_TURNSTILE_SITE_KEY` | No va en `.env.dev`: `docker-compose.dev.yml` fija la site key de prueba `1x00000000000000000000AA`, que siempre pasa | `0x4AAAAAAGCKQh7WSaKl9bC0` (site key pública del widget) |
 | `WEB_HOST_PORT` | — | Puerto del host donde se publica Nginx |
 | `E2E_USER_EMAIL` / `E2E_USER_PASSWORD` | Usuario de prueba dedicado en TaskApiSDD | — |
 | `SONAR_ADMIN_PASSWORD` | Mínimo 12 caracteres con mayúscula, minúscula, dígito y símbolo | — |
@@ -123,9 +125,9 @@ En los tests unitarios ninguna petición llega a la red: `jest/setup.ts` hace fa
 - El servicio `e2e` usa la imagen oficial `mcr.microsoft.com/playwright` con la **misma versión** que `@playwright/test`.
 - Usa `network_mode: host` para que el navegador vea la app en `localhost:5173` y la API en `localhost:3000`. Solo así coinciden el origen con `CORS_ORIGIN` y se aceptan las cookies `Secure`.
 - En Docker Desktop (macOS/Windows) requiere activar **Settings → Resources → Network → Enable host networking**.
-- Antes de ejecutarlas: `web` levantado, TaskApiSDD levantada y el usuario de prueba creado. Las E2E del pomodoro (spec 003) necesitan además TaskApiSDD con su funcionalidad 004 (sesiones pomodoro): `GET /pomodoros` tiene que existir.
+- Antes de ejecutarlas: `web` levantado, TaskApiSDD levantada y el usuario de prueba creado. TaskApiSDD tiene que tener su funcionalidad 005 (Turnstile) con la clave secreta de prueba `1x0000000000000000000000000000000AA` y `example.com` en `TURNSTILE_ALLOWED_HOSTNAMES`. Las fixtures envían el token ficticio `XXXX.DUMMY.TOKEN.XXXX` en cada login y registro por API, así que funcionan con `TURNSTILE_ENFORCE` a `true` o a `false`. Las E2E de acceso cargan el widget real de Cloudflare: necesitan salida a Internet. Las E2E del pomodoro (spec 003) necesitan además TaskApiSDD con su funcionalidad 004 (sesiones pomodoro): `GET /pomodoros` tiene que existir.
 - Los tests que necesitan una cuenta propia la registran por API con un email único (`e2e-…@kompitu.test`) y la borran al terminar (`e2e/fixtures/auth.fixture.ts`). Cada pantalla pasa por `expectResponsive` (`e2e/fixtures/responsive.fixture.ts`). Las tareas que necesita un test se crean por API en esa cuenta (`createTasks`, en `e2e/fixtures/api-client.ts`) y se borran con ella. El fixture `signedInPage` (`e2e/fixtures/session.fixture.ts`) da la página con la sesión de una cuenta nueva ya iniciada por API (`loginInPage`), sin pasar por el formulario; el fixture `board` (`e2e/fixtures/tasks.fixture.ts`) lo usa para entrar en el tablero. El login por la interfaz se prueba en `login.e2e.ts` y `fields-auth.e2e.ts`.
-- Los tests se reparten entre los workers también dentro de un mismo fichero (`fullyParallel: true` en `playwright.config.ts`): ninguno depende de otro porque cada uno usa su propia cuenta. La suite completa (738 tests en los 6 proyectos) tarda unos 4 minutos.
+- Los tests se reparten entre los workers también dentro de un mismo fichero (`fullyParallel: true` en `playwright.config.ts`): ninguno depende de otro porque cada uno usa su propia cuenta. La suite completa (1152 tests en los 6 proyectos) tarda unos 10 minutos.
 ```bash
 docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:e2e         # Todas, en Chromium y Firefox
 docker compose -f docker-compose.dev.yml run --rm e2e pnpm test:e2e:report  # Informe HTML del último run
@@ -142,13 +144,19 @@ Proyecto de Compose propio (`taskfrontsdd-prod`): compila con Vite y sirve `dist
 - **Servidor web por entorno** (spec 004): el build arg `NGINX_ENV` es obligatorio y elige la plantilla de `nginx/`.
   - `pro` (`pro.conf.template`): producción detrás del proxy de Dokploy (Traefik). Solo atiende `kompitu.yandrydev.cloud`, redirige a HTTPS lo que llegue por HTTP, envía HSTS y descarta otros dominios.
   - `pre` (`pre.conf.template`): las mismas políticas por HTTP, sin HSTS, para probar la imagen.
-  - Comunes a los dos: `security-headers.conf` (política de contenido con la API y Google Fonts, sin iframes, Trusted Types, `Permissions-Policy`, COOP y CORP), `http-hardening.conf` y `server-hardening.conf` (IP real del cliente, 20 peticiones por segundo y 30 conexiones por IP, solo `GET` y `HEAD`, `404` en rutas de escáneres, tamaños, tiempos y registro con la IP real).
+  - Comunes a los dos: `security-headers.conf` (política de contenido con la API y Google Fonts, sin más script ni iframe de fuera que los de Cloudflare Turnstile, Trusted Types, `Permissions-Policy`, COOP y CORP), `http-hardening.conf` y `server-hardening.conf` (IP real del cliente, 20 peticiones por segundo y 30 conexiones por IP, solo `GET` y `HEAD`, `404` en rutas de escáneres, tamaños, tiempos y registro con la IP real).
 - **Dokploy:** obtiene y renueva el certificado de Let's Encrypt y termina HTTPS. El servicio **no publica puertos** (`expose: 8080`): en Dokploy, el dominio `kompitu.yandrydev.cloud` apunta al servicio `web`, puerto `8080`, con HTTPS activado. Si se publicara un puerto, se podría llegar al contenedor sin pasar por el proxy y falsificar `X-Forwarded-Proto` y `X-Forwarded-For`.
 ```bash
 docker compose --env-file .env.prod -f docker-compose.prod.yml up --build -d    # Construir y levantar (NGINX_ENV=pro)
 docker compose -f docker-compose.prod.yml down             # Parar
-docker build -f Dockerfile.prod --build-arg VITE_API_URL=https://apikompitu.yandrydev.cloud --build-arg NGINX_ENV=pro -t taskfrontsdd:latest .   # Construir solo la imagen
+docker build -f Dockerfile.prod --build-arg VITE_API_URL=https://apikompitu.yandrydev.cloud --build-arg VITE_TURNSTILE_SITE_KEY=0x4AAAAAAGCKQh7WSaKl9bC0 --build-arg NGINX_ENV=pro -t taskfrontsdd:latest .   # Construir solo la imagen
 ```
+- **Turnstile (spec 005):** la imagen no se construye sin `VITE_TURNSTILE_SITE_KEY`. Orden de despliegue para no cortar el acceso:
+  1. TaskApiSDD con `TURNSTILE_ENFORCE=false`: acepta el login y el registro con y sin token.
+  2. Este frontend, que siempre envía el token.
+  3. TaskApiSDD con `TURNSTILE_ENFORCE=true` y `TURNSTILE_ALLOWED_HOSTNAMES=kompitu.yandrydev.cloud`. Hasta este paso no hay protección: basta con no enviar el token.
+
+  En local, mientras el front no envíe el token, la API tiene que estar en `TURNSTILE_ENFORCE=false`.
 
 ### SonarQube
 - Corre en su propio compose en **:9001**, para convivir con el de TaskApiSDD (:9000). El scanner es una imagen de Docker, así que nada se añade a `package.json`.

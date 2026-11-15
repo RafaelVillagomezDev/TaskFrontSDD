@@ -17,6 +17,10 @@ COPY . .
 ARG VITE_API_URL
 RUN test -n "$VITE_API_URL" || (echo "Falta el build arg VITE_API_URL" >&2 && exit 1)
 ENV VITE_API_URL=$VITE_API_URL
+# Site key pública de Cloudflare Turnstile (spec 005 RF-11): también se incrusta al compilar
+ARG VITE_TURNSTILE_SITE_KEY
+RUN test -n "$VITE_TURNSTILE_SITE_KEY" || (echo "Falta el build arg VITE_TURNSTILE_SITE_KEY" >&2 && exit 1)
+ENV VITE_TURNSTILE_SITE_KEY=$VITE_TURNSTILE_SITE_KEY
 RUN pnpm build
 
 # --- Etapa 2: runtime ---

@@ -1,6 +1,8 @@
 import { request } from '@playwright/test';
 import { z } from 'zod';
 
+import { E2E_TURNSTILE_TOKEN } from './fixtures/api-client';
+
 const csrfResponseSchema = z.object({ data: z.object({ csrfToken: z.string() }) });
 
 const HTTP_CREATED = 201;
@@ -25,7 +27,7 @@ export default async function globalSetup(): Promise<void> {
     const { data } = csrfResponseSchema.parse(await csrfResponse.json());
     const registerResponse = await api.post('/auth/register', {
       headers: { 'X-CSRF-Token': data.csrfToken },
-      data: { email, password },
+      data: { email, password, turnstileToken: E2E_TURNSTILE_TOKEN },
     });
     if (registerResponse.status() !== HTTP_CREATED && registerResponse.status() !== HTTP_CONFLICT) {
       throw new Error(`No se pudo registrar el usuario de prueba: HTTP ${String(registerResponse.status())}`);

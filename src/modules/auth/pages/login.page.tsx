@@ -7,12 +7,13 @@ import { Notice } from '@shared/ui/notice.component';
 import { PasswordInput } from '@shared/ui/password-input.component';
 import { Text } from '@shared/ui/text.component';
 import { AuthSwitch } from '../components/auth-switch.component';
+import { TurnstileField } from '../components/turnstile-field.component';
 import { useLoginForm } from '../hooks/use-login-form.hook';
 import { AUTH_TEXTS } from '../texts/auth.texts';
 
 // Inicio de sesión (RF-04, RF-05, RF-07): avisos de cuenta creada o sesión caducada y errores en español
 export function LoginPage() {
-  const { form, onSubmit, isSubmitting, notice, formError } = useLoginForm();
+  const { form, onSubmit, isSubmitting, notice, formError, turnstile, turnstileError } = useLoginForm();
   const { errors } = form.formState;
   return (
     <AuthLayout>
@@ -35,6 +36,9 @@ export function LoginPage() {
           autoComplete="current-password"
           errorText={errors.password?.message}
         />
+        <TurnstileField containerRef={turnstile.containerRef} errorText={turnstileError}>
+          {turnstile.statusText}
+        </TurnstileField>
         {formError !== undefined && <ErrorMessage message={formError} />}
         <Button type="submit" size="lg" disabled={isSubmitting} className="w-full">
           {isSubmitting ? AUTH_TEXTS.login.submitting : AUTH_TEXTS.login.submit}

@@ -28,6 +28,7 @@ test.describe('HU-01: registro', () => {
 
     // La cuenta existe: se puede entrar con ella y se llega al tablero
     await login.password.fill(account.password);
+    await login.waitForVerification();
     await login.submit.click();
     await expect(page.getByRole('heading', { level: 1, name: 'Tablero' })).toBeVisible();
   });

@@ -43,14 +43,15 @@ async function firstAsset(request: APIRequestContext, base: string, headers = {}
 function expectSecurityHeaders(response: APIResponse, apiOrigin: string): void {
   const headers = response.headers();
   const csp = cspDirectives(response);
-  // RF-12: API, Google Fonts, sin iframes en ningún sentido, sin plugins y con Trusted Types
+  // RF-12: API, Google Fonts, solo el marco de Turnstile (spec 005 RF-09), sin plugins y con Trusted Types
   expect(csp.get('default-src')).toEqual(["'self'"]);
-  expect(csp.get('script-src')).toEqual(["'self'"]);
+  // Spec 005 RF-09: el script y el marco de Cloudflare Turnstile, y nada más de fuera
+  expect(csp.get('script-src')).toEqual(["'self'", 'https://challenges.cloudflare.com']);
   expect(csp.get('connect-src')).toEqual(["'self'", apiOrigin]);
   expect(csp.get('style-src')).toEqual(["'self'", 'https://fonts.googleapis.com']);
   expect(csp.get('font-src')).toEqual(["'self'", 'https://fonts.gstatic.com']);
-  expect(csp.get('frame-src')).toEqual(["'none'"]);
-  expect(csp.get('child-src')).toEqual(["'none'"]);
+  expect(csp.get('frame-src')).toEqual(['https://challenges.cloudflare.com']);
+  expect(csp.get('child-src')).toEqual(['https://challenges.cloudflare.com']);
   expect(csp.get('frame-ancestors')).toEqual(["'none'"]);
   expect(csp.get('object-src')).toEqual(["'none'"]);
   expect(csp.get('require-trusted-types-for')).toEqual(["'script'"]);

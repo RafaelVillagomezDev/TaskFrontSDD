@@ -72,3 +72,15 @@ describe('LoginPage', () => {
     expect(screen.getByRole('status')).toHaveTextContent('Cuenta creada. Ya puedes iniciar sesión.');
   });
 });
+
+describe('LoginPage con Turnstile (spec 005)', () => {
+  it('RF-01: muestra el widget entre los campos y el botón, y anuncia la comprobación completada', async () => {
+    renderLogin();
+    const status = await screen.findByText('Comprobación completada.');
+    const field = screen.getByLabelText('Contraseña', { exact: true });
+    const submit = screen.getByRole('button', { name: 'Entrar' });
+    // El widget va después del último campo y antes del botón de enviar
+    expect(field.compareDocumentPosition(status) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(status.compareDocumentPosition(submit) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});

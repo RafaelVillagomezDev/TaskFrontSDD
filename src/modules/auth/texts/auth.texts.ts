@@ -36,5 +36,18 @@ export const AUTH_TEXTS = {
     },
     nameTooLong: 'El nombre no puede tener más de 100 caracteres.',
   },
+  // Comprobación de Cloudflare Turnstile (spec 005 RF-03, RF-06, RNF-01). Los rechazos de la API usan los
+  // mensajes de TURNSTILE_FAILED y TURNSTILE_UNAVAILABLE de errors.texts.ts (RF-08, RF-13)
+  turnstile: {
+    required: 'Completa la comprobación de seguridad.',
+    loadFailed: 'No se ha podido cargar la comprobación de seguridad. Recarga la página para intentarlo de nuevo.',
+    // Estado anunciado a los lectores de pantalla
+    status: {
+      loading: 'Cargando la comprobación de seguridad…',
+      ready: 'Comprobación de seguridad pendiente.',
+      solved: 'Comprobación completada.',
+      error: 'La comprobación de seguridad no está disponible.',
+    },
+  },
   logout: 'Cerrar sesión',
 };

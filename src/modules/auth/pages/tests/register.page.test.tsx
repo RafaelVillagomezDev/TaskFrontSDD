@@ -73,3 +73,15 @@ describe('RegisterPage', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Algo ha fallado.');
   });
 });
+
+describe('RegisterPage con Turnstile (spec 005)', () => {
+  it('RF-01: muestra el widget entre los campos y el botón, y anuncia la comprobación completada', async () => {
+    renderRegister();
+    const status = await screen.findByText('Comprobación completada.');
+    const field = screen.getByLabelText('Nombre (opcional)', { exact: true });
+    const submit = screen.getByRole('button', { name: 'Crear cuenta' });
+    // El widget va después del último campo y antes del botón de enviar
+    expect(field.compareDocumentPosition(status) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(status.compareDocumentPosition(submit) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+});

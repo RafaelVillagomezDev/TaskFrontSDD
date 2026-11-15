@@ -6,12 +6,13 @@ import { Input } from '@shared/ui/input.component';
 import { PasswordInput } from '@shared/ui/password-input.component';
 import { Text } from '@shared/ui/text.component';
 import { AuthSwitch } from '../components/auth-switch.component';
+import { TurnstileField } from '../components/turnstile-field.component';
 import { useRegisterForm } from '../hooks/use-register-form.hook';
 import { AUTH_TEXTS } from '../texts/auth.texts';
 
 // Registro (RF-01 a RF-03, S-11): un único campo de contraseña con la opción de mostrarla
 export function RegisterPage() {
-  const { form, onSubmit, isSubmitting, formError } = useRegisterForm();
+  const { form, onSubmit, isSubmitting, formError, turnstile, turnstileError } = useRegisterForm();
   const { errors } = form.formState;
   return (
     <AuthLayout>
@@ -39,6 +40,9 @@ export function RegisterPage() {
           autoComplete="name"
           errorText={errors.name?.message}
         />
+        <TurnstileField containerRef={turnstile.containerRef} errorText={turnstileError}>
+          {turnstile.statusText}
+        </TurnstileField>
         {formError !== undefined && <ErrorMessage message={formError} />}
         <Button type="submit" size="lg" disabled={isSubmitting} className="w-full">
           {isSubmitting ? AUTH_TEXTS.register.submitting : AUTH_TEXTS.register.submit}

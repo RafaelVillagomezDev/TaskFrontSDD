@@ -10,7 +10,8 @@ import { sessionStarted } from '../../store/auth.slice';
 import { authApi } from '../auth.api';
 
 const USER = { id: 'u1', email: 'ana@example.com', name: 'Ana', createdAt: '2026-10-29T10:00:00.000Z' };
-const CREDENTIALS = { email: 'ana@example.com', password: 'correct horse battery' };
+// Con el token de Turnstile que login y registro llevan en el cuerpo (spec 005 RF-07)
+const CREDENTIALS = { email: 'ana@example.com', password: 'correct horse battery', turnstileToken: 'token-1' };
 const csrf = () => apiOk({ csrfToken: 'previo-1' });
 
 afterEach(() => {
@@ -18,7 +19,7 @@ afterEach(() => {
 });
 
 describe('D-5: authApi.login', () => {
-  it('RF-04: pide antes GET /auth/csrf y envía su token con las credenciales', async () => {
+  it('RF-04, 005 RF-07: pide antes GET /auth/csrf y envía su token con las credenciales y el de Turnstile', async () => {
     const api = mockApi({
       'GET /auth/csrf': csrf,
       'POST /auth/login': () => apiOk({ user: USER, csrfToken: 'sesion-1' }),

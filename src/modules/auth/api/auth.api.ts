@@ -3,10 +3,9 @@ import { z } from 'zod';
 
 import { baseApi } from '@shared/api/base.api';
 import { validatedResult, type ApiResult, type BoundBaseQuery } from '@shared/api/validated-result.util';
-import type { LoginValues } from '../schemas/login.schema';
-import type { RegisterValues } from '../schemas/register.schema';
 import { sessionSchema, userSchema, type Session, type User } from '../schemas/user.schema';
 import { sessionCheckFailed, sessionStarted } from '../store/auth.slice';
+import type { LoginRequest, RegisterRequest } from '../types/auth-request.types';
 
 const csrfSchema = z.object({ csrfToken: z.string() });
 
@@ -22,14 +21,15 @@ async function withPreSessionCsrf<T>(
   return validatedResult(await baseQuery({ ...request, method: 'POST', headers }), dataSchema);
 }
 
-// Endpoints de auth sobre la API base única (plan D-2); cada respuesta se valida con Zod (D-5)
+// Endpoints de auth sobre la API base única (plan D-2); cada respuesta se valida con Zod (D-5). Registro e inicio
+// de sesión llevan el token de Turnstile en el cuerpo (spec 005 RF-07)
 export const authApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    register: build.mutation<User, RegisterValues>({
+    register: build.mutation<User, RegisterRequest>({
       queryFn: (body, _api, _extra, baseQuery) =>
         withPreSessionCsrf(baseQuery, { url: '/auth/register', body }, userSchema),
     }),
-    login: build.mutation<Session, LoginValues>({
+    login: build.mutation<Session, LoginRequest>({
       queryFn: async (body, { dispatch }, _extra, baseQuery) => {
         const result = await withPreSessionCsrf(baseQuery, { url: '/auth/login', body }, sessionSchema);
         // El token CSRF de la sesión queda solo en memoria (RNF-06)

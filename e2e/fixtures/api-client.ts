@@ -5,6 +5,11 @@ import { buildClientTimeHeaders } from '@shared/api/client-time.util';
 
 const csrfResponseSchema = z.object({ data: z.object({ csrfToken: z.string() }) });
 
+// Token ficticio de las site keys de prueba de Cloudflare: la API local, con su clave secreta de prueba, lo
+// acepta siempre (spec 005 S-03, API-005 RF-33). Va en cada login y registro por API, que en modo obligatorio
+// exige el token
+export const E2E_TURNSTILE_TOKEN = 'XXXX.DUMMY.TOKEN.XXXX';
+
 const HTTP_OK = 200;
 const HTTP_CREATED = 201;
 const HTTP_UNAUTHORIZED = 401;
@@ -55,7 +60,7 @@ async function csrfToken(api: APIRequestContext): Promise<string> {
 async function loginByApi(api: APIRequestContext, account: Account): Promise<string> {
   const login = await api.post('/auth/login', {
     headers: { 'X-CSRF-Token': await csrfToken(api) },
-    data: account,
+    data: { ...account, turnstileToken: E2E_TURNSTILE_TOKEN },
   });
   if (login.status() !== HTTP_OK) {
     throw new Error(`No se pudo iniciar sesión con ${account.email}: HTTP ${String(login.status())}`);
@@ -96,7 +101,7 @@ export async function loginInPage(page: Page, account: Account): Promise<void> {
   const csrf = csrfResponseSchema.parse(await (await page.request.get(`${apiUrl}/auth/csrf`)).json()).data.csrfToken;
   const login = await page.request.post(`${apiUrl}/auth/login`, {
     headers: { 'X-CSRF-Token': csrf },
-    data: account,
+    data: { ...account, turnstileToken: E2E_TURNSTILE_TOKEN },
   });
   expectStatus(login, HTTP_OK, `iniciar sesión por API con ${account.email}`);
   expectStatus(await page.request.get(`${apiUrl}/me`), HTTP_OK, 'leer la sesión iniciada por API desde el navegador');
@@ -106,7 +111,7 @@ export async function registerAccount(account: Account): Promise<void> {
   await withApi(async (api) => {
     const response = await api.post('/auth/register', {
       headers: { 'X-CSRF-Token': await csrfToken(api) },
-      data: account,
+      data: { ...account, turnstileToken: E2E_TURNSTILE_TOKEN },
     });
     if (response.status() !== HTTP_CREATED) {
       throw new Error(`No se pudo registrar la cuenta de prueba: HTTP ${String(response.status())}`);
@@ -119,7 +124,7 @@ export async function deleteAccount(account: Account): Promise<void> {
   await withApi(async (api) => {
     const login = await api.post('/auth/login', {
       headers: { 'X-CSRF-Token': await csrfToken(api) },
-      data: account,
+      data: { ...account, turnstileToken: E2E_TURNSTILE_TOKEN },
     });
     if (login.status() === HTTP_UNAUTHORIZED) return;
     const session = csrfResponseSchema.parse(await login.json()).data.csrfToken;

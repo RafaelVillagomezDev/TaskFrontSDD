@@ -9,6 +9,8 @@ services:
       dockerfile: Dockerfile.prod
       args:
         VITE_API_URL: ${VITE_API_URL:?Falta VITE_API_URL en .env.prod}
+        # Site key pública de Cloudflare Turnstile, la real (spec 005 RF-11, RF-12)
+        VITE_TURNSTILE_SITE_KEY: ${VITE_TURNSTILE_SITE_KEY:?Falta VITE_TURNSTILE_SITE_KEY en .env.prod}
         # Servidor web de producción: detrás del proxy de Dokploy, siempre HTTPS (spec 004 RF-14 a RF-18)
         NGINX_ENV: pro
     env_file: .env.prod

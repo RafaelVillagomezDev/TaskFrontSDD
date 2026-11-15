@@ -27,6 +27,9 @@ export const ERROR_MESSAGES: Record<ApiErrorCode, string> = {
   POMODORO_TASK_IN_SESSION: 'Esta tarea está en la sesión en marcha: quítala de la sesión antes de borrarla.',
   POMODORO_TASK_NOT_IN_SESSION: 'Solo puedes completar las tareas de la sesión en marcha.',
   POMODORO_TASK_COMPLETED: 'No puedes quitar una tarea completada: desmárcala antes.',
+  // Comprobación de Cloudflare Turnstile en el acceso (spec 005 RF-08, RF-13)
+  TURNSTILE_FAILED: 'No hemos podido comprobar que eres una persona. Inténtalo de nuevo.',
+  TURNSTILE_UNAVAILABLE: 'El servicio de verificación no responde. Inténtalo de nuevo en unos minutos.',
   INTERNAL_ERROR: 'Algo ha fallado. Inténtalo de nuevo en unos segundos.',
   NETWORK_ERROR: 'No hay conexión con el servidor. Comprueba tu conexión e inténtalo de nuevo.',
 };

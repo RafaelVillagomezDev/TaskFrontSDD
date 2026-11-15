@@ -24,3 +24,5 @@ export { authApi, useMeQuery } from './api/auth.api';
 export { LoginPage } from './pages/login.page';
 export { RegisterPage } from './pages/register.page';
 export { LogoutButton } from './components/logout-button.component';
+// Tipos de Turnstile para el doble de los tests (jest/fake-turnstile.ts, spec 005)
+export type { TurnstileApi, TurnstileRenderOptions } from './types/turnstile.types';

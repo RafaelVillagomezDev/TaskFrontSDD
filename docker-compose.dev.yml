@@ -6,6 +6,10 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     env_file: .env.dev
+    environment:
+      # Site key de prueba de Cloudflare Turnstile que siempre pasa: pública y la misma para todos (spec 005 RF-12,
+      # plan D-7). La real solo se usa al construir la imagen de producción
+      VITE_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
     ports:
       - '5173:5173'
     volumes:
@@ -20,6 +24,7 @@ services:
     env_file: .env.dev
     environment:
       COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+      VITE_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
     # Red del host: el navegador ve la app en localhost:5173 y la API en localhost:3000,
     # el origen coincide con CORS_ORIGIN y las cookies Secure se aceptan (plan R-2)
     network_mode: host
@@ -39,6 +44,7 @@ services:
       dockerfile: Dockerfile.prod
       args:
         VITE_API_URL: http://localhost:3000
+        VITE_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
         NGINX_ENV: pre
     environment:
       VITE_API_URL: http://localhost:3000
@@ -56,6 +62,7 @@ services:
       dockerfile: Dockerfile.prod
       args:
         VITE_API_URL: https://apikompitu.yandrydev.cloud
+        VITE_TURNSTILE_SITE_KEY: 1x00000000000000000000AA
         NGINX_ENV: pro
     environment:
       VITE_API_URL: https://apikompitu.yandrydev.cloud
